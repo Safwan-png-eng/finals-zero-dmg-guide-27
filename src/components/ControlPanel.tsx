@@ -4,7 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
-import { Upload, X, Scissors, Sparkles } from 'lucide-react';
+import { Upload, X, Scissors, Sparkles, User } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { removeBackground, loadImage } from '../utils/backgroundRemoval';
 import { useToast } from '@/hooks/use-toast';
@@ -31,6 +31,14 @@ const ControlPanel = ({ config, onConfigChange }: ControlPanelProps) => {
     { name: 'Ice Blue', value: '#00ffff' }
   ];
 
+  const characterPresets = [
+    {
+      name: 'Shield Specialist',
+      image: '/lovable-uploads/6aaa02a3-b77f-45ec-9397-781371f3e09b.png',
+      description: 'THE FINALS Heavy class'
+    }
+  ];
+
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -53,6 +61,14 @@ const ControlPanel = ({ config, onConfigChange }: ControlPanelProps) => {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleCharacterPreset = (imageUrl: string) => {
+    onConfigChange('overlayImage', imageUrl);
+    toast({
+      title: "Character Added!",
+      description: "Character preset has been applied to your thumbnail",
+    });
   };
 
   const handleRemoveBackground = async () => {
@@ -152,7 +168,7 @@ const ControlPanel = ({ config, onConfigChange }: ControlPanelProps) => {
           className="w-full bg-white/10 hover:bg-white/20 text-white border-white/20 rounded-lg"
         >
           <Upload className="w-4 h-4 mr-2" />
-          Upload Background
+          Upload Custom Background
         </Button>
         
         {config.backgroundImage && (
@@ -174,9 +190,36 @@ const ControlPanel = ({ config, onConfigChange }: ControlPanelProps) => {
         )}
       </div>
 
+      {/* Character Presets */}
+      <div className="space-y-3">
+        <Label className="text-white mb-3 block font-medium flex items-center">
+          <User className="w-4 h-4 mr-2" />
+          Character Presets
+        </Label>
+        <div className="grid grid-cols-1 gap-2">
+          {characterPresets.map((character, index) => (
+            <button
+              key={index}
+              onClick={() => handleCharacterPreset(character.image)}
+              className="flex items-center space-x-3 p-3 bg-white/10 hover:bg-white/20 rounded-lg border border-white/20 transition-all duration-200"
+            >
+              <img 
+                src={character.image} 
+                alt={character.name}
+                className="w-12 h-12 object-cover rounded-lg"
+              />
+              <div className="text-left">
+                <h4 className="text-white font-medium text-sm">{character.name}</h4>
+                <p className="text-white/60 text-xs">{character.description}</p>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Overlay Image Section */}
       <div className="space-y-3">
-        <Label className="text-white mb-3 block font-medium">Character/Overlay Image</Label>
+        <Label className="text-white mb-3 block font-medium">Custom Character/Overlay</Label>
         <div className="grid grid-cols-2 gap-2">
           <input
             ref={overlayInputRef}
@@ -213,7 +256,7 @@ const ControlPanel = ({ config, onConfigChange }: ControlPanelProps) => {
             <img 
               src={config.overlayImage} 
               alt="Overlay preview" 
-              className="w-full h-24 object-cover rounded-lg border border-white/20"
+              className="w-full h-32 object-cover rounded-lg border border-white/20"
             />
             <Button
               onClick={removeOverlayImage}

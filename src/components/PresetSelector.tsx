@@ -28,6 +28,20 @@ const PresetSelector = ({ currentPreset, onPresetChange }: PresetSelectorProps) 
       accent: '#ff0080'
     },
     {
+      id: 'monaco-streets',
+      name: 'Monaco Streets',
+      description: 'Elegant destruction',
+      backgroundImage: '/lovable-uploads/ff01c07f-8a42-4b34-bd5d-814ea69de169.png',
+      accent: '#ffd700'
+    },
+    {
+      id: 'urban-battlefield',
+      name: 'Urban Battlefield',
+      description: 'Street warfare chaos',
+      backgroundImage: '/lovable-uploads/2385a088-db61-4395-a7df-433b98126931.png',
+      accent: '#ff6b35'
+    },
+    {
       id: 'smoke-dust',
       name: 'Smoke & Dust',
       description: 'Post-destruction haze',
@@ -75,7 +89,13 @@ const PresetSelector = ({ currentPreset, onPresetChange }: PresetSelectorProps) 
               ? 'border-white scale-105 shadow-lg'
               : 'border-white/20 hover:border-white/40 hover:scale-102'
           }`}
-          style={{ background: preset.gradient }}
+          style={{ 
+            background: preset.backgroundImage 
+              ? `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)), url(${preset.backgroundImage})`
+              : preset.gradient,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+          }}
         >
           <div className="flex items-center justify-between">
             <div className="text-left">

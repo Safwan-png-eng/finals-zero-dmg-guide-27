@@ -47,6 +47,14 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
         background: 'linear-gradient(135deg, #0f0f1a 0%, #1a1a3e 15%, #2d1b4e 30%, #3d2a78 50%, #ff0080 80%, #00d4ff 100%)',
         overlay: 'radial-gradient(circle at 25% 25%, rgba(255, 0, 128, 0.25) 0%, transparent 60%), radial-gradient(circle at 75% 75%, rgba(0, 212, 255, 0.2) 0%, transparent 50%)'
       },
+      'monaco-streets': {
+        background: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url(/lovable-uploads/ff01c07f-8a42-4b34-bd5d-814ea69de169.png)`,
+        overlay: 'radial-gradient(circle at 50% 50%, rgba(255, 215, 0, 0.2) 0%, transparent 70%)'
+      },
+      'urban-battlefield': {
+        background: `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)), url(/lovable-uploads/2385a088-db61-4395-a7df-433b98126931.png)`,
+        overlay: 'radial-gradient(circle at 40% 60%, rgba(255, 107, 53, 0.25) 0%, transparent 60%)'
+      },
       'smoke-dust': {
         background: 'linear-gradient(135deg, #2a2520 0%, #3d3528 20%, #5c5247 40%, #8b7355 70%, #d4c4a8 95%, #f0e6d2 100%)',
         overlay: 'radial-gradient(circle at 50% 80%, rgba(212, 196, 168, 0.3) 0%, transparent 70%), radial-gradient(circle at 20% 20%, rgba(139, 115, 85, 0.2) 0%, transparent 50%)'
@@ -72,6 +80,8 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
     const preset = presets[config.backgroundPreset as keyof typeof presets] || presets['neon-city'];
     return {
       background: preset.background,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
       '&::before': {
         content: '""',
         position: 'absolute',
@@ -84,10 +94,10 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
 
   const getFontSize = () => {
     const sizes = {
-      small: { main: 'text-3xl sm:text-4xl lg:text-5xl xl:text-6xl', sub: 'text-base sm:text-lg lg:text-xl xl:text-2xl' },
-      medium: { main: 'text-4xl sm:text-5xl lg:text-6xl xl:text-7xl', sub: 'text-lg sm:text-xl lg:text-2xl xl:text-3xl' },
-      large: { main: 'text-5xl sm:text-6xl lg:text-7xl xl:text-8xl', sub: 'text-xl sm:text-2xl lg:text-3xl xl:text-4xl' },
-      xlarge: { main: 'text-6xl sm:text-7xl lg:text-8xl xl:text-9xl', sub: 'text-2xl sm:text-3xl lg:text-4xl xl:text-5xl' }
+      small: { main: 'text-2xl sm:text-3xl lg:text-4xl xl:text-5xl', sub: 'text-sm sm:text-base lg:text-lg xl:text-xl' },
+      medium: { main: 'text-3xl sm:text-4xl lg:text-5xl xl:text-6xl', sub: 'text-base sm:text-lg lg:text-xl xl:text-2xl' },
+      large: { main: 'text-4xl sm:text-5xl lg:text-6xl xl:text-7xl', sub: 'text-lg sm:text-xl lg:text-2xl xl:text-3xl' },
+      xlarge: { main: 'text-5xl sm:text-6xl lg:text-7xl xl:text-8xl', sub: 'text-xl sm:text-2xl lg:text-3xl xl:text-4xl' }
     };
     return sizes[config.fontSize as keyof typeof sizes] || sizes.large;
   };
@@ -139,36 +149,13 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
         <div className="absolute inset-0 bg-gradient-to-r from-black/20 via-transparent to-black/20" />
         <div className="absolute inset-0 bg-gradient-to-br from-transparent via-black/5 to-black/40" />
 
-        {/* Destruction/Smoke Effect Overlay */}
-        {(config.backgroundPreset === 'destruction-zone' || config.backgroundPreset === 'smoke-dust') && (
-          <div className="absolute inset-0 opacity-30">
-            {[...Array(15)].map((_, i) => (
-              <div
-                key={i}
-                className="absolute rounded-full animate-pulse"
-                style={{
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
-                  width: `${Math.random() * 40 + 20}px`,
-                  height: `${Math.random() * 40 + 20}px`,
-                  backgroundColor: i % 3 === 0 ? '#8b7355' : i % 3 === 1 ? '#d4c4a8' : '#5c5247',
-                  animationDelay: `${Math.random() * 3}s`,
-                  animationDuration: `${4 + Math.random() * 8}s`,
-                  filter: 'blur(8px)',
-                  opacity: 0.4
-                }}
-              />
-            ))}
-          </div>
-        )}
-
         {/* Overlay Image */}
         {config.overlayImage && (
-          <div className="absolute bottom-4 right-4 sm:bottom-8 sm:right-8 w-24 h-24 sm:w-36 sm:h-36 lg:w-48 lg:h-48 rounded-xl overflow-hidden border-3 border-white/40 shadow-2xl">
+          <div className="absolute bottom-4 right-4 sm:bottom-8 sm:right-8 w-32 h-40 sm:w-48 sm:h-60 lg:w-64 lg:h-80 rounded-xl overflow-hidden border-3 border-white/40 shadow-2xl">
             <img 
               src={config.overlayImage} 
-              alt="Overlay" 
-              className="w-full h-full object-cover"
+              alt="Character" 
+              className="w-full h-full object-cover object-center"
               style={{
                 filter: config.glowEffect ? `drop-shadow(0 0 25px ${config.accentColor}60) contrast(1.1) saturate(1.2)` : 'contrast(1.1) saturate(1.2)'
               }}
@@ -186,9 +173,9 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
               fontFamily: '"Arial Black", "Helvetica Neue", Arial, sans-serif',
               fontWeight: '900',
               textShadow: config.textShadow ? 
-                `0 0 50px ${config.accentColor}, 0 0 100px ${config.accentColor}60, 8px 8px 16px rgba(0,0,0,0.9), 0 0 120px ${config.accentColor}40, 4px 4px 0px rgba(0,0,0,0.8), -4px -4px 0px rgba(0,0,0,0.8)` : 
-                '8px 8px 16px rgba(0,0,0,0.9), 4px 4px 0px rgba(0,0,0,0.8), -4px -4px 0px rgba(0,0,0,0.8)',
-              WebkitTextStroke: `4px ${config.accentColor}`,
+                `0 0 50px ${config.accentColor}, 0 0 100px ${config.accentColor}60, 6px 6px 12px rgba(0,0,0,0.9), 0 0 120px ${config.accentColor}40, 3px 3px 0px rgba(0,0,0,0.8), -3px -3px 0px rgba(0,0,0,0.8)` : 
+                '6px 6px 12px rgba(0,0,0,0.9), 3px 3px 0px rgba(0,0,0,0.8), -3px -3px 0px rgba(0,0,0,0.8)',
+              WebkitTextStroke: `3px ${config.accentColor}`,
               filter: config.glowEffect ? 
                 `drop-shadow(0 0 40px ${config.accentColor}) drop-shadow(0 0 80px ${config.accentColor}40) drop-shadow(0 0 120px ${config.accentColor}20) contrast(1.1)` : 
                 'contrast(1.1)',
@@ -202,14 +189,14 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
           {/* Sub Text */}
           {config.subText && (
             <p 
-              className={`font-bold uppercase tracking-widest opacity-95 mt-4 sm:mt-6 transition-all duration-300 ${getFontSize().sub}`}
+              className={`font-bold uppercase tracking-widest opacity-95 mt-3 sm:mt-4 transition-all duration-300 ${getFontSize().sub}`}
               style={{ 
                 color: config.accentColor,
                 fontFamily: '"Arial Black", "Helvetica Neue", Arial, sans-serif',
                 fontWeight: '800',
                 textShadow: config.textShadow ? 
-                  `0 0 40px ${config.accentColor}, 0 0 80px ${config.accentColor}50, 6px 6px 12px rgba(0,0,0,0.9), 0 0 100px ${config.accentColor}30, 2px 2px 0px rgba(0,0,0,0.8), -2px -2px 0px rgba(0,0,0,0.8)` : 
-                  '6px 6px 12px rgba(0,0,0,0.9), 2px 2px 0px rgba(0,0,0,0.8), -2px -2px 0px rgba(0,0,0,0.8)',
+                  `0 0 40px ${config.accentColor}, 0 0 80px ${config.accentColor}50, 4px 4px 8px rgba(0,0,0,0.9), 0 0 100px ${config.accentColor}30, 2px 2px 0px rgba(0,0,0,0.8), -2px -2px 0px rgba(0,0,0,0.8)` : 
+                  '4px 4px 8px rgba(0,0,0,0.9), 2px 2px 0px rgba(0,0,0,0.8), -2px -2px 0px rgba(0,0,0,0.8)',
                 filter: config.glowEffect ? 
                   `drop-shadow(0 0 30px ${config.accentColor}) drop-shadow(0 0 60px ${config.accentColor}40) contrast(1.1)` : 
                   'contrast(1.1)',
