@@ -14,6 +14,27 @@ const PresetSelector = ({ currentPreset, onPresetChange }: PresetSelectorProps) 
       accent: '#00ff88'
     },
     {
+      id: 'destruction-zone',
+      name: 'Destruction Zone',
+      description: 'Urban warfare chaos',
+      gradient: 'linear-gradient(135deg, #1a1a1a 0%, #4a4a4a 25%, #ff6b35 50%, #ffaa00 75%, #666 100%)',
+      accent: '#ff6b35'
+    },
+    {
+      id: 'finals-arena',
+      name: 'THE FINALS Arena',
+      description: 'Official tournament style',
+      gradient: 'linear-gradient(135deg, #0f0f1a 0%, #1a1a3e 20%, #3d2a78 40%, #ff0080 70%, #00d4ff 100%)',
+      accent: '#ff0080'
+    },
+    {
+      id: 'smoke-dust',
+      name: 'Smoke & Dust',
+      description: 'Post-destruction haze',
+      gradient: 'linear-gradient(135deg, #2a2520 0%, #5c5247 30%, #8b7355 60%, #d4c4a8 90%, #f0e6d2 100%)',
+      accent: '#d4c4a8'
+    },
+    {
       id: 'fire-storm',
       name: 'Fire Storm',
       description: 'Explosive destruction',
@@ -35,16 +56,16 @@ const PresetSelector = ({ currentPreset, onPresetChange }: PresetSelectorProps) 
       accent: '#32cd32'
     },
     {
-      id: 'royal-purple',
-      name: 'Royal Arena',
-      description: 'Premium tournament feel',
-      gradient: 'linear-gradient(135deg, #1a0033 0%, #6b46c1 45%, #a855f7 75%, #d8b4fe 100%)',
-      accent: '#8b5cf6'
+      id: 'cyberpunk-pink',
+      name: 'Cyberpunk Pink',
+      description: 'Neon-soaked future',
+      gradient: 'linear-gradient(135deg, #1a0033 0%, #4c0080 30%, #8000ff 60%, #ff00ff 90%, #ff80ff 100%)',
+      accent: '#ff00ff'
     }
   ];
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 max-h-[400px] overflow-y-auto custom-scrollbar">
       {presets.map((preset) => (
         <button
           key={preset.id}

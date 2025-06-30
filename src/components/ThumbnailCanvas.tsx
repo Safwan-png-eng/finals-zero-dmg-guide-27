@@ -39,6 +39,18 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
         background: 'linear-gradient(135deg, #0a0a0f 0%, #1a1b3e 15%, #2d1b69 35%, #4c1d95 55%, #6b46c1 75%, #3b1d4f 100%)',
         overlay: 'radial-gradient(circle at 20% 80%, rgba(0, 255, 136, 0.15) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(147, 51, 234, 0.1) 0%, transparent 50%)'
       },
+      'destruction-zone': {
+        background: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 20%, #4a4a4a 40%, #ff6b35 70%, #ffaa00 90%, #999 100%)',
+        overlay: 'radial-gradient(circle at 30% 70%, rgba(255, 107, 53, 0.3) 0%, transparent 60%), radial-gradient(circle at 70% 30%, rgba(255, 170, 0, 0.2) 0%, transparent 50%)'
+      },
+      'finals-arena': {
+        background: 'linear-gradient(135deg, #0f0f1a 0%, #1a1a3e 15%, #2d1b4e 30%, #3d2a78 50%, #ff0080 80%, #00d4ff 100%)',
+        overlay: 'radial-gradient(circle at 25% 25%, rgba(255, 0, 128, 0.25) 0%, transparent 60%), radial-gradient(circle at 75% 75%, rgba(0, 212, 255, 0.2) 0%, transparent 50%)'
+      },
+      'smoke-dust': {
+        background: 'linear-gradient(135deg, #2a2520 0%, #3d3528 20%, #5c5247 40%, #8b7355 70%, #d4c4a8 95%, #f0e6d2 100%)',
+        overlay: 'radial-gradient(circle at 50% 80%, rgba(212, 196, 168, 0.3) 0%, transparent 70%), radial-gradient(circle at 20% 20%, rgba(139, 115, 85, 0.2) 0%, transparent 50%)'
+      },
       'fire-storm': {
         background: 'linear-gradient(135deg, #0f0000 0%, #2a0505 15%, #4a0e0e 30%, #8b0000 50%, #b91c1c 70%, #dc2626 85%, #ff4500 100%)',
         overlay: 'radial-gradient(circle at 30% 30%, rgba(255, 69, 0, 0.3) 0%, transparent 60%), radial-gradient(circle at 70% 70%, rgba(220, 38, 38, 0.2) 0%, transparent 50%)'
@@ -51,9 +63,9 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
         background: 'linear-gradient(135deg, #0d1b0d 0%, #1a4d1a 15%, #166534 30%, #15803d 45%, #16a34a 60%, #22c55e 75%, #4ade80 90%, #86efac 100%)',
         overlay: 'radial-gradient(circle at 70% 30%, rgba(34, 197, 94, 0.25) 0%, transparent 60%), radial-gradient(circle at 30% 70%, rgba(74, 222, 128, 0.15) 0%, transparent 50%)'
       },
-      'royal-purple': {
-        background: 'linear-gradient(135deg, #1a0033 0%, #2d1b4e 15%, #4c1d95 30%, #6b46c1 45%, #8b5cf6 60%, #a855f7 75%, #c084fc 90%, #d8b4fe 100%)',
-        overlay: 'radial-gradient(circle at 80% 30%, rgba(139, 92, 246, 0.2) 0%, transparent 60%), radial-gradient(circle at 20% 70%, rgba(168, 85, 247, 0.15) 0%, transparent 50%)'
+      'cyberpunk-pink': {
+        background: 'linear-gradient(135deg, #1a0033 0%, #330066 20%, #4c0080 40%, #8000ff 60%, #ff00ff 80%, #ff80ff 100%)',
+        overlay: 'radial-gradient(circle at 60% 40%, rgba(255, 0, 255, 0.3) 0%, transparent 60%), radial-gradient(circle at 40% 60%, rgba(128, 0, 255, 0.2) 0%, transparent 50%)'
       }
     };
     
@@ -101,8 +113,8 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
       >
         {/* Enhanced Animated Particles Background */}
         {config.showParticles && (
-          <div className="absolute inset-0 opacity-50">
-            {[...Array(40)].map((_, i) => (
+          <div className="absolute inset-0 opacity-40">
+            {[...Array(50)].map((_, i) => (
               <div
                 key={i}
                 className="absolute rounded-full animate-pulse"
@@ -111,11 +123,11 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
                   top: `${Math.random() * 100}%`,
                   width: `${Math.random() * 8 + 2}px`,
                   height: `${Math.random() * 8 + 2}px`,
-                  backgroundColor: i % 4 === 0 ? config.accentColor : i % 4 === 1 ? '#ffffff' : i % 4 === 2 ? `${config.accentColor}80` : '#f0f0f0',
+                  backgroundColor: i % 5 === 0 ? config.accentColor : i % 5 === 1 ? '#ffffff' : i % 5 === 2 ? `${config.accentColor}80` : i % 5 === 3 ? '#f0f0f0' : '#ffdd00',
                   animationDelay: `${Math.random() * 4}s`,
                   animationDuration: `${2 + Math.random() * 6}s`,
                   filter: 'blur(0.5px)',
-                  boxShadow: `0 0 ${Math.random() * 10 + 5}px ${i % 2 === 0 ? config.accentColor : '#ffffff'}40`
+                  boxShadow: `0 0 ${Math.random() * 12 + 5}px ${i % 3 === 0 ? config.accentColor : i % 3 === 1 ? '#ffffff' : '#ffdd00'}50`
                 }}
               />
             ))}
@@ -123,9 +135,32 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
         )}
 
         {/* Enhanced Dynamic Gradient Overlays */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-black/30" />
-        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-black/10 to-black/50" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/20 via-transparent to-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-black/5 to-black/40" />
+
+        {/* Destruction/Smoke Effect Overlay */}
+        {(config.backgroundPreset === 'destruction-zone' || config.backgroundPreset === 'smoke-dust') && (
+          <div className="absolute inset-0 opacity-30">
+            {[...Array(15)].map((_, i) => (
+              <div
+                key={i}
+                className="absolute rounded-full animate-pulse"
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                  width: `${Math.random() * 40 + 20}px`,
+                  height: `${Math.random() * 40 + 20}px`,
+                  backgroundColor: i % 3 === 0 ? '#8b7355' : i % 3 === 1 ? '#d4c4a8' : '#5c5247',
+                  animationDelay: `${Math.random() * 3}s`,
+                  animationDuration: `${4 + Math.random() * 8}s`,
+                  filter: 'blur(8px)',
+                  opacity: 0.4
+                }}
+              />
+            ))}
+          </div>
+        )}
 
         {/* Overlay Image */}
         {config.overlayImage && (
@@ -135,7 +170,7 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
               alt="Overlay" 
               className="w-full h-full object-cover"
               style={{
-                filter: config.glowEffect ? `drop-shadow(0 0 20px ${config.accentColor}60)` : 'none'
+                filter: config.glowEffect ? `drop-shadow(0 0 25px ${config.accentColor}60) contrast(1.1) saturate(1.2)` : 'contrast(1.1) saturate(1.2)'
               }}
             />
           </div>
@@ -148,12 +183,16 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
             className={`font-black uppercase tracking-wider leading-tight transition-all duration-300 ${getFontSize().main}`}
             style={{ 
               color: config.textColor,
-              fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+              fontFamily: '"Arial Black", "Helvetica Neue", Arial, sans-serif',
               fontWeight: '900',
-              textShadow: config.textShadow ? `0 0 40px ${config.accentColor}, 0 0 80px ${config.accentColor}60, 6px 6px 12px rgba(0,0,0,0.9), 0 0 100px ${config.accentColor}40` : '6px 6px 12px rgba(0,0,0,0.9)',
-              WebkitTextStroke: `3px ${config.accentColor}`,
-              filter: config.glowEffect ? `drop-shadow(0 0 30px ${config.accentColor}) drop-shadow(0 0 60px ${config.accentColor}40) drop-shadow(0 0 90px ${config.accentColor}20)` : 'none',
-              letterSpacing: '0.08em',
+              textShadow: config.textShadow ? 
+                `0 0 50px ${config.accentColor}, 0 0 100px ${config.accentColor}60, 8px 8px 16px rgba(0,0,0,0.9), 0 0 120px ${config.accentColor}40, 4px 4px 0px rgba(0,0,0,0.8), -4px -4px 0px rgba(0,0,0,0.8)` : 
+                '8px 8px 16px rgba(0,0,0,0.9), 4px 4px 0px rgba(0,0,0,0.8), -4px -4px 0px rgba(0,0,0,0.8)',
+              WebkitTextStroke: `4px ${config.accentColor}`,
+              filter: config.glowEffect ? 
+                `drop-shadow(0 0 40px ${config.accentColor}) drop-shadow(0 0 80px ${config.accentColor}40) drop-shadow(0 0 120px ${config.accentColor}20) contrast(1.1)` : 
+                'contrast(1.1)',
+              letterSpacing: '0.1em',
               textTransform: 'uppercase'
             }}
           >
@@ -163,14 +202,18 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
           {/* Sub Text */}
           {config.subText && (
             <p 
-              className={`font-bold uppercase tracking-widest opacity-95 mt-3 sm:mt-5 transition-all duration-300 ${getFontSize().sub}`}
+              className={`font-bold uppercase tracking-widest opacity-95 mt-4 sm:mt-6 transition-all duration-300 ${getFontSize().sub}`}
               style={{ 
                 color: config.accentColor,
-                fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+                fontFamily: '"Arial Black", "Helvetica Neue", Arial, sans-serif',
                 fontWeight: '800',
-                textShadow: config.textShadow ? `0 0 30px ${config.accentColor}, 0 0 60px ${config.accentColor}50, 4px 4px 8px rgba(0,0,0,0.9), 0 0 80px ${config.accentColor}30` : '4px 4px 8px rgba(0,0,0,0.9)',
-                filter: config.glowEffect ? `drop-shadow(0 0 25px ${config.accentColor}) drop-shadow(0 0 50px ${config.accentColor}40)` : 'none',
-                letterSpacing: '0.15em'
+                textShadow: config.textShadow ? 
+                  `0 0 40px ${config.accentColor}, 0 0 80px ${config.accentColor}50, 6px 6px 12px rgba(0,0,0,0.9), 0 0 100px ${config.accentColor}30, 2px 2px 0px rgba(0,0,0,0.8), -2px -2px 0px rgba(0,0,0,0.8)` : 
+                  '6px 6px 12px rgba(0,0,0,0.9), 2px 2px 0px rgba(0,0,0,0.8), -2px -2px 0px rgba(0,0,0,0.8)',
+                filter: config.glowEffect ? 
+                  `drop-shadow(0 0 30px ${config.accentColor}) drop-shadow(0 0 60px ${config.accentColor}40) contrast(1.1)` : 
+                  'contrast(1.1)',
+                letterSpacing: '0.2em'
               }}
             >
               {config.subText}
@@ -187,8 +230,8 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
               style={{ 
                 backgroundColor: config.accentColor,
                 animationDelay: `${i * 0.4}s`,
-                filter: `drop-shadow(0 0 12px ${config.accentColor}) drop-shadow(0 0 24px ${config.accentColor}60)`,
-                boxShadow: `0 0 20px ${config.accentColor}80`
+                filter: `drop-shadow(0 0 15px ${config.accentColor}) drop-shadow(0 0 30px ${config.accentColor}60)`,
+                boxShadow: `0 0 25px ${config.accentColor}80`
               }}
             />
           ))}
@@ -196,17 +239,17 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
         
         <div className="absolute bottom-6 sm:bottom-10 left-6 sm:left-10">
           <div 
-            className="w-12 h-2 sm:w-16 sm:h-2.5 rounded-full animate-pulse"
+            className="w-16 h-2 sm:w-20 sm:h-3 rounded-full animate-pulse"
             style={{ 
               backgroundColor: config.accentColor,
-              filter: `drop-shadow(0 0 12px ${config.accentColor}) drop-shadow(0 0 24px ${config.accentColor}60)`,
-              boxShadow: `0 0 20px ${config.accentColor}80`
+              filter: `drop-shadow(0 0 15px ${config.accentColor}) drop-shadow(0 0 30px ${config.accentColor}60)`,
+              boxShadow: `0 0 25px ${config.accentColor}80`
             }}
           />
         </div>
 
         {/* Enhanced Corner Accents */}
-        <div className="absolute top-0 left-0 w-24 h-24 sm:w-40 sm:h-40">
+        <div className="absolute top-0 left-0 w-28 h-28 sm:w-44 sm:h-44">
           <div 
             className="w-full h-full rounded-br-3xl opacity-25"
             style={{ 
@@ -215,7 +258,7 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
           />
         </div>
 
-        <div className="absolute bottom-0 right-0 w-20 h-20 sm:w-32 sm:h-32">
+        <div className="absolute bottom-0 right-0 w-24 h-24 sm:w-36 sm:h-36">
           <div 
             className="w-full h-full rounded-tl-3xl opacity-20"
             style={{ 
@@ -224,14 +267,49 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
           />
         </div>
 
-        {/* Grid Pattern Overlay */}
+        {/* Enhanced Grid Pattern Overlay */}
         <div 
-          className="absolute inset-0 opacity-5"
+          className="absolute inset-0 opacity-8"
           style={{
             backgroundImage: `linear-gradient(${config.accentColor}40 1px, transparent 1px), linear-gradient(90deg, ${config.accentColor}40 1px, transparent 1px)`,
-            backgroundSize: '50px 50px'
+            backgroundSize: '60px 60px'
           }}
         />
+
+        {/* THE FINALS Style Corner Elements */}
+        <div className="absolute top-4 left-4 sm:top-8 sm:left-8">
+          <div 
+            className="w-8 h-1 sm:w-12 sm:h-1.5 mb-1 rounded-full"
+            style={{ 
+              backgroundColor: config.accentColor,
+              boxShadow: `0 0 20px ${config.accentColor}60`
+            }}
+          />
+          <div 
+            className="w-4 h-1 sm:w-6 sm:h-1 rounded-full opacity-60"
+            style={{ 
+              backgroundColor: config.accentColor,
+              boxShadow: `0 0 15px ${config.accentColor}40`
+            }}
+          />
+        </div>
+
+        <div className="absolute bottom-4 right-4 sm:bottom-8 sm:right-8 flex flex-col items-end">
+          <div 
+            className="w-6 h-1 sm:w-8 sm:h-1 mb-1 rounded-full opacity-60"
+            style={{ 
+              backgroundColor: config.accentColor,
+              boxShadow: `0 0 15px ${config.accentColor}40`
+            }}
+          />
+          <div 
+            className="w-10 h-1 sm:w-14 sm:h-1.5 rounded-full"
+            style={{ 
+              backgroundColor: config.accentColor,
+              boxShadow: `0 0 20px ${config.accentColor}60`
+            }}
+          />
+        </div>
       </div>
 
       {/* Enhanced Dimensions Label */}
