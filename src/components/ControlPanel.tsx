@@ -1,10 +1,10 @@
-
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
-import { Upload, X, Scissors, Sparkles, User } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
+import { Upload, X, Scissors, Sparkles, User, Type, Palette2, RotateCcw } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { removeBackground, loadImage } from '../utils/backgroundRemoval';
 import { useToast } from '@/hooks/use-toast';
@@ -152,6 +152,88 @@ const ControlPanel = ({ config, onConfigChange }: ControlPanelProps) => {
         </div>
       </div>
 
+      {/* NEW FEATURE 1: Font Selection */}
+      <div className="space-y-3">
+        <Label className="text-white mb-3 block font-medium flex items-center">
+          <Type className="w-4 h-4 mr-2" />
+          Font Family
+        </Label>
+        <Select value={config.customFont || 'impact'} onValueChange={(value) => onConfigChange('customFont', value)}>
+          <SelectTrigger className="bg-white/10 border-white/20 text-white rounded-lg">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent className="bg-slate-800 border-white/20">
+            <SelectItem value="impact" className="text-white">Impact (Bold)</SelectItem>
+            <SelectItem value="arial" className="text-white">Arial (Clean)</SelectItem>
+            <SelectItem value="bebas" className="text-white">Bebas Neue (Modern)</SelectItem>
+            <SelectItem value="oswald" className="text-white">Oswald (Sleek)</SelectItem>
+            <SelectItem value="roboto" className="text-white">Roboto (Minimal)</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* NEW FEATURE 2: Letter Spacing */}
+      <div className="space-y-3">
+        <Label className="text-white mb-2 block font-medium">Letter Spacing</Label>
+        <Select value={config.letterSpacing || 'normal'} onValueChange={(value) => onConfigChange('letterSpacing', value)}>
+          <SelectTrigger className="bg-white/10 border-white/20 text-white rounded-lg">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent className="bg-slate-800 border-white/20">
+            <SelectItem value="tight" className="text-white">Tight</SelectItem>
+            <SelectItem value="normal" className="text-white">Normal</SelectItem>
+            <SelectItem value="wide" className="text-white">Wide</SelectItem>
+            <SelectItem value="wider" className="text-white">Wider</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* NEW FEATURE 3: Line Height */}
+      <div className="space-y-3">
+        <Label className="text-white mb-2 block font-medium">Line Height</Label>
+        <Select value={config.lineHeight || 'normal'} onValueChange={(value) => onConfigChange('lineHeight', value)}>
+          <SelectTrigger className="bg-white/10 border-white/20 text-white rounded-lg">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent className="bg-slate-800 border-white/20">
+            <SelectItem value="tight" className="text-white">Tight</SelectItem>
+            <SelectItem value="normal" className="text-white">Normal</SelectItem>
+            <SelectItem value="relaxed" className="text-white">Relaxed</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* NEW FEATURE 4: Text Rotation */}
+      <div className="space-y-3">
+        <Label className="text-white mb-2 block font-medium flex items-center">
+          <RotateCcw className="w-4 h-4 mr-2" />
+          Text Rotation: {config.textRotation || 0}°
+        </Label>
+        <Slider
+          value={[config.textRotation || 0]}
+          onValueChange={(value) => onConfigChange('textRotation', value[0])}
+          max={15}
+          min={-15}
+          step={1}
+          className="w-full"
+        />
+      </div>
+
+      {/* NEW FEATURE 5: Text Opacity */}
+      <div className="space-y-3">
+        <Label className="text-white mb-2 block font-medium">
+          Text Opacity: {config.textOpacity || 100}%
+        </Label>
+        <Slider
+          value={[config.textOpacity || 100]}
+          onValueChange={(value) => onConfigChange('textOpacity', value[0])}
+          max={100}
+          min={30}
+          step={5}
+          className="w-full"
+        />
+      </div>
+
       {/* Background Image Section */}
       <div className="space-y-3">
         <Label className="text-white mb-3 block font-medium">Background Image</Label>
@@ -176,7 +258,7 @@ const ControlPanel = ({ config, onConfigChange }: ControlPanelProps) => {
             <img 
               src={config.backgroundImage} 
               alt="Background preview" 
-              className="w-full h-24 object-cover rounded-lg border border-white/20"
+              className="w-full h-20 object-cover rounded-lg border border-white/20"
             />
             <Button
               onClick={removeBackgroundImage}
@@ -206,7 +288,7 @@ const ControlPanel = ({ config, onConfigChange }: ControlPanelProps) => {
               <img 
                 src={character.image} 
                 alt={character.name}
-                className="w-12 h-12 object-cover rounded-lg"
+                className="w-10 h-10 object-cover rounded-lg"
               />
               <div className="text-left">
                 <h4 className="text-white font-medium text-sm">{character.name}</h4>
@@ -256,7 +338,7 @@ const ControlPanel = ({ config, onConfigChange }: ControlPanelProps) => {
             <img 
               src={config.overlayImage} 
               alt="Overlay preview" 
-              className="w-full h-32 object-cover rounded-lg border border-white/20"
+              className="w-full h-24 object-cover rounded-lg border border-white/20"
             />
             <Button
               onClick={removeOverlayImage}
@@ -302,15 +384,58 @@ const ControlPanel = ({ config, onConfigChange }: ControlPanelProps) => {
         </div>
       </div>
 
+      {/* NEW FEATURE 6: Text Background */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <Label htmlFor="textBackground" className="text-white font-medium">Text Background</Label>
+          <Switch
+            id="textBackground"
+            checked={config.textBackground || false}
+            onCheckedChange={(checked) => onConfigChange('textBackground', checked)}
+          />
+        </div>
+        
+        {config.textBackground && (
+          <>
+            <div>
+              <Label className="text-white mb-2 block font-medium">Background Color</Label>
+              <Input
+                type="color"
+                value={config.textBackgroundColor || '#000000'}
+                onChange={(e) => onConfigChange('textBackgroundColor', e.target.value)}
+                className="w-full h-10 bg-white/10 border-white/20 rounded-lg"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label className="text-white mb-2 block font-medium">
+                Background Opacity: {config.textBackgroundOpacity || 50}%
+              </Label>
+              <Slider
+                value={[config.textBackgroundOpacity || 50]}
+                onValueChange={(value) => onConfigChange('textBackgroundOpacity', value[0])}
+                max={100}
+                min={0}
+                step={5}
+                className="w-full"
+              />
+            </div>
+          </>
+        )}
+      </div>
+
       {/* Accent Color */}
       <div>
-        <Label className="text-white mb-3 block font-medium">Accent Color</Label>
+        <Label className="text-white mb-3 block font-medium flex items-center">
+          <Palette2 className="w-4 h-4 mr-2" />
+          Accent Color
+        </Label>
         <div className="grid grid-cols-2 gap-2 mb-3">
           {colorPresets.map((color) => (
             <button
               key={color.value}
               onClick={() => onConfigChange('accentColor', color.value)}
-              className={`p-3 rounded-lg border-2 transition-all text-xs font-medium ${
+              className={`p-2 rounded-lg border-2 transition-all text-xs font-medium ${
                 config.accentColor === color.value 
                   ? 'border-white scale-105 shadow-lg' 
                   : 'border-white/20 hover:border-white/40 hover:scale-102'
@@ -325,7 +450,7 @@ const ControlPanel = ({ config, onConfigChange }: ControlPanelProps) => {
           type="color"
           value={config.accentColor}
           onChange={(e) => onConfigChange('accentColor', e.target.value)}
-          className="w-full h-12 bg-white/10 border-white/20 rounded-lg"
+          className="w-full h-10 bg-white/10 border-white/20 rounded-lg"
         />
       </div>
 
@@ -364,6 +489,36 @@ const ControlPanel = ({ config, onConfigChange }: ControlPanelProps) => {
             id="borderGlow"
             checked={config.borderGlow}
             onCheckedChange={(checked) => onConfigChange('borderGlow', checked)}
+          />
+        </div>
+
+        {/* NEW FEATURE 7: Text Outline */}
+        <div className="flex items-center justify-between">
+          <Label htmlFor="textOutline" className="text-white font-medium">Text Outline</Label>
+          <Switch
+            id="textOutline"
+            checked={config.textOutline || false}
+            onCheckedChange={(checked) => onConfigChange('textOutline', checked)}
+          />
+        </div>
+
+        {/* NEW FEATURE 8: Animated Text */}
+        <div className="flex items-center justify-between">
+          <Label htmlFor="animatedText" className="text-white font-medium">Animated Text</Label>
+          <Switch
+            id="animatedText"
+            checked={config.animatedText || false}
+            onCheckedChange={(checked) => onConfigChange('animatedText', checked)}
+          />
+        </div>
+
+        {/* NEW FEATURE 9: Gradient Text */}
+        <div className="flex items-center justify-between">
+          <Label htmlFor="gradientText" className="text-white font-medium">Gradient Text</Label>
+          <Switch
+            id="gradientText"
+            checked={config.gradientText || false}
+            onCheckedChange={(checked) => onConfigChange('gradientText', checked)}
           />
         </div>
       </div>

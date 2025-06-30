@@ -4,7 +4,7 @@ import ThumbnailCanvas from '../components/ThumbnailCanvas';
 import ControlPanel from '../components/ControlPanel';
 import PresetSelector from '../components/PresetSelector';
 import { Button } from '@/components/ui/button';
-import { Download, Palette, Type, Image, Sparkles, Zap } from 'lucide-react';
+import { Download, Palette, Type, Image, Sparkles, Zap, RefreshCw } from 'lucide-react';
 import { exportThumbnail } from '../utils/canvasExport';
 import { useToast } from '@/hooks/use-toast';
 
@@ -16,14 +16,25 @@ const Index = () => {
     backgroundPreset: 'neon-city',
     textColor: '#ffffff',
     accentColor: '#00ff88',
-    fontSize: 'large',
+    fontSize: 'medium',
     textPosition: 'center',
     showParticles: true,
     glowEffect: true,
     backgroundImage: null as string | null,
     overlayImage: null as string | null,
     textShadow: true,
-    borderGlow: true
+    borderGlow: false,
+    textOutline: false,
+    textRotation: 0,
+    textOpacity: 100,
+    animatedText: false,
+    gradientText: false,
+    customFont: 'impact',
+    letterSpacing: 'normal',
+    lineHeight: 'normal',
+    textBackground: false,
+    textBackgroundColor: '#000000',
+    textBackgroundOpacity: 50
   });
 
   const [isExporting, setIsExporting] = useState(false);
@@ -33,6 +44,40 @@ const Index = () => {
       ...prev,
       [key]: value
     }));
+  };
+
+  // NEW FEATURE 10: Reset to Default
+  const resetToDefault = () => {
+    setThumbnailConfig({
+      mainText: 'CAN I WIN WITHOUT DAMAGE?',
+      subText: 'THE FINALS CHALLENGE',
+      backgroundPreset: 'neon-city',
+      textColor: '#ffffff',
+      accentColor: '#00ff88',
+      fontSize: 'medium',
+      textPosition: 'center',
+      showParticles: true,
+      glowEffect: true,
+      backgroundImage: null,
+      overlayImage: null,
+      textShadow: true,
+      borderGlow: false,
+      textOutline: false,
+      textRotation: 0,
+      textOpacity: 100,
+      animatedText: false,
+      gradientText: false,
+      customFont: 'impact',
+      letterSpacing: 'normal',
+      lineHeight: 'normal',
+      textBackground: false,
+      textBackgroundColor: '#000000',
+      textBackgroundOpacity: 50
+    });
+    toast({
+      title: "Reset Complete!",
+      description: "All settings have been restored to default values",
+    });
   };
 
   const handleExport = async () => {
@@ -76,23 +121,33 @@ const Index = () => {
                 <p className="text-sm text-white/60">Professional YouTube thumbnails in seconds</p>
               </div>
             </div>
-            <Button 
-              onClick={handleExport}
-              disabled={isExporting}
-              className="bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700 text-white font-semibold px-8 py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isExporting ? (
-                <>
-                  <Zap className="w-5 h-5 mr-2 animate-spin" />
-                  Exporting...
-                </>
-              ) : (
-                <>
-                  <Download className="w-5 h-5 mr-2" />
-                  Export HD Thumbnail
-                </>
-              )}
-            </Button>
+            <div className="flex space-x-3">
+              <Button 
+                onClick={resetToDefault}
+                variant="outline"
+                className="bg-white/10 hover:bg-white/20 text-white border-white/20 px-6 py-3 rounded-xl transition-all duration-300"
+              >
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Reset
+              </Button>
+              <Button 
+                onClick={handleExport}
+                disabled={isExporting}
+                className="bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700 text-white font-semibold px-8 py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isExporting ? (
+                  <>
+                    <Zap className="w-5 h-5 mr-2 animate-spin" />
+                    Exporting...
+                  </>
+                ) : (
+                  <>
+                    <Download className="w-5 h-5 mr-2" />
+                    Export HD Thumbnail
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -145,18 +200,31 @@ const Index = () => {
               <ThumbnailCanvas config={thumbnailConfig} />
             </div>
 
-            {/* Tips Section */}
+            {/* Enhanced Tips Section */}
             <div className="mt-6 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 backdrop-blur-sm rounded-2xl border border-cyan-300/20 p-6">
               <h3 className="text-lg font-semibold text-white mb-3 flex items-center space-x-2">
                 <Sparkles className="w-5 h-5 text-cyan-400" />
-                <span>Pro Tips</span>
+                <span>Pro Tips & New Features</span>
               </h3>
-              <ul className="text-white/80 space-y-2 text-sm">
-                <li>• Use contrasting colors for better readability</li>
-                <li>• Keep text short and impactful (under 10 words)</li>
-                <li>• Upload character images with transparent backgrounds</li>
-                <li>• Test your thumbnail at small sizes to ensure clarity</li>
-              </ul>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-white/80 text-sm">
+                <div>
+                  <h4 className="font-medium text-cyan-300 mb-2">Design Tips:</h4>
+                  <ul className="space-y-1">
+                    <li>• Use contrasting colors for readability</li>
+                    <li>• Keep text short and impactful</li>
+                    <li>• Test at small sizes for clarity</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="font-medium text-purple-300 mb-2">New Features:</h4>
+                  <ul className="space-y-1">
+                    <li>• Custom fonts & text styling</li>
+                    <li>• Text rotation & opacity controls</li>
+                    <li>• Gradient & animated text effects</li>
+                    <li>• Text backgrounds & outlines</li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
         </div>
