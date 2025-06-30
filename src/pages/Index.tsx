@@ -22,6 +22,7 @@ const Index = () => {
     glowEffect: true,
     backgroundImage: null as string | null,
     overlayImage: null as string | null,
+    overlayImageSize: 25, // New property for overlay image size (percentage)
     textShadow: true,
     borderGlow: false,
     textOutline: false,
@@ -60,6 +61,7 @@ const Index = () => {
       glowEffect: true,
       backgroundImage: null,
       overlayImage: null,
+      overlayImageSize: 25,
       textShadow: true,
       borderGlow: false,
       textOutline: false,

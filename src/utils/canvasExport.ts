@@ -1,4 +1,3 @@
-
 interface ThumbnailConfig {
   mainText: string;
   subText: string;
@@ -11,6 +10,7 @@ interface ThumbnailConfig {
   glowEffect: boolean;
   backgroundImage: string | null;
   overlayImage: string | null;
+  overlayImageSize: number;
   textShadow: boolean;
   borderGlow: boolean;
   textOutline: boolean;
@@ -41,7 +41,7 @@ export const exportThumbnail = async (config: ThumbnailConfig): Promise<void> =>
   
   // Draw overlay image if present
   if (config.overlayImage) {
-    await drawOverlayImage(ctx, canvas, config.overlayImage);
+    await drawOverlayImage(ctx, canvas, config.overlayImage, config.overlayImageSize || 25);
   }
   
   // Draw particles
@@ -108,7 +108,7 @@ const drawBackground = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasE
   }
 };
 
-const drawOverlayImage = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, imageSrc: string) => {
+const drawOverlayImage = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, imageSrc: string, size: number) => {
   const img = new Image();
   img.crossOrigin = 'anonymous';
   await new Promise((resolve, reject) => {
@@ -117,9 +117,10 @@ const drawOverlayImage = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanva
     img.src = imageSrc;
   });
   
-  // Fixed dimensions for character - proper sizing without cropping
-  const maxWidth = canvas.width * 0.15; // Reduced from 0.25
-  const maxHeight = canvas.height * 0.4; // Reduced from 0.55
+  // Calculate size based on the size parameter (percentage)
+  const sizeMultiplier = Math.max(0.1, Math.min(0.5, size / 100)); // Clamp between 10% and 50%
+  const maxWidth = canvas.width * sizeMultiplier;
+  const maxHeight = canvas.height * (sizeMultiplier * 1.2); // Slightly taller for character proportions
   
   // Calculate aspect ratio to maintain image proportions
   const aspectRatio = img.width / img.height;

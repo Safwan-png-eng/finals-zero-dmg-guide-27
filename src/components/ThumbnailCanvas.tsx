@@ -1,4 +1,3 @@
-
 import { useEffect, useRef } from 'react';
 
 interface ThumbnailConfig {
@@ -13,6 +12,7 @@ interface ThumbnailConfig {
   glowEffect: boolean;
   backgroundImage: string | null;
   overlayImage: string | null;
+  overlayImageSize: number; // New property
   textShadow: boolean;
   borderGlow: boolean;
   textOutline: boolean;
@@ -162,6 +162,14 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
     return heights[config.lineHeight as keyof typeof heights] || heights.normal;
   };
 
+  const getOverlayImageSize = () => {
+    const baseSize = config.overlayImageSize || 25; // Default 25%
+    return {
+      width: `${Math.max(10, Math.min(50, baseSize))}%`, // Clamp between 10% and 50%
+      aspectRatio: '3/4' // Maintain aspect ratio for character images
+    };
+  };
+
   const backgroundStyle = getBackgroundStyle();
   const containerStyle = {
     ...backgroundStyle,
@@ -199,16 +207,19 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
         {/* Background Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/15" />
 
-        {/* Overlay Image - Fixed sizing */}
+        {/* Overlay Image - Enhanced sizing */}
         {config.overlayImage && (
-          <div className="absolute bottom-2 right-2 sm:bottom-4 sm:right-4">
-            <div className="relative w-16 h-20 sm:w-20 sm:h-26 lg:w-24 lg:h-32 rounded-lg overflow-hidden border border-white/20 shadow-lg">
+          <div className="absolute bottom-4 right-4">
+            <div 
+              className="relative rounded-lg overflow-hidden border border-white/20 shadow-xl"
+              style={getOverlayImageSize()}
+            >
               <img 
                 src={config.overlayImage} 
                 alt="Character" 
                 className="w-full h-full object-contain bg-gradient-to-b from-transparent to-black/20"
                 style={{
-                  filter: config.glowEffect ? `drop-shadow(0 0 10px ${config.accentColor}30) contrast(1.02) saturate(1.05)` : 'contrast(1.02) saturate(1.05)',
+                  filter: config.glowEffect ? `drop-shadow(0 0 15px ${config.accentColor}40) contrast(1.05) saturate(1.1)` : 'contrast(1.05) saturate(1.1)',
                   objectFit: 'contain'
                 }}
               />
