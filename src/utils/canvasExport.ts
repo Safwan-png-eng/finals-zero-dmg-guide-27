@@ -13,6 +13,17 @@ interface ThumbnailConfig {
   overlayImage: string | null;
   textShadow: boolean;
   borderGlow: boolean;
+  textOutline: boolean;
+  textRotation: number;
+  textOpacity: number;
+  animatedText: boolean;
+  gradientText: boolean;
+  customFont: string;
+  letterSpacing: string;
+  lineHeight: string;
+  textBackground: boolean;
+  textBackgroundColor: string;
+  textBackgroundOpacity: number;
 }
 
 export const exportThumbnail = async (config: ThumbnailConfig): Promise<void> => {
@@ -102,9 +113,9 @@ const drawOverlayImage = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanva
     img.src = imageSrc;
   });
   
-  // Draw overlay image in bottom right corner with better proportions for character
-  const maxWidth = canvas.width * 0.25;
-  const maxHeight = canvas.height * 0.55;
+  // Fixed dimensions for character - proper sizing without cropping
+  const maxWidth = canvas.width * 0.15; // Reduced from 0.25
+  const maxHeight = canvas.height * 0.4; // Reduced from 0.55
   
   // Calculate aspect ratio to maintain image proportions
   const aspectRatio = img.width / img.height;
@@ -116,28 +127,33 @@ const drawOverlayImage = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanva
     width = height * aspectRatio;
   }
   
-  const x = canvas.width - width - 40;
-  const y = canvas.height - height - 40;
+  const x = canvas.width - width - 30;
+  const y = canvas.height - height - 30;
   
+  // Draw with better scaling
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(img, x, y, width, height);
 };
 
 const drawParticles = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, accentColor: string) => {
   ctx.fillStyle = accentColor;
-  for (let i = 0; i < 50; i++) {
+  ctx.globalAlpha = 0.6;
+  for (let i = 0; i < 40; i++) {
     const x = Math.random() * canvas.width;
     const y = Math.random() * canvas.height;
-    const size = Math.random() * 4 + 1;
+    const size = Math.random() * 3 + 1;
     
     ctx.beginPath();
     ctx.arc(x, y, size, 0, Math.PI * 2);
     ctx.fill();
   }
+  ctx.globalAlpha = 1.0;
 };
 
 const drawText = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, config: ThumbnailConfig) => {
   const fontSize = getFontSizeForCanvas(config.fontSize);
-  const subFontSize = Math.floor(fontSize * 0.4);
+  const subFontSize = Math.floor(fontSize * 0.45);
   
   // Set text properties
   ctx.textAlign = 'center';
@@ -148,39 +164,98 @@ const drawText = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, conf
   let centerY = canvas.height / 2;
   
   if (config.textPosition === 'top') {
-    centerY = canvas.height * 0.25;
+    centerY = canvas.height * 0.3;
   } else if (config.textPosition === 'bottom') {
-    centerY = canvas.height * 0.75;
+    centerY = canvas.height * 0.7;
+  }
+  
+  // Get font family
+  const fontFamily = getFontFamilyForCanvas(config.customFont);
+  
+  // Draw text background if enabled
+  if (config.textBackground) {
+    const textWidth = ctx.measureText(config.mainText.toUpperCase()).width;
+    const padding = 20;
+    
+    ctx.fillStyle = config.textBackgroundColor;
+    ctx.globalAlpha = config.textBackgroundOpacity / 100;
+    ctx.fillRect(
+      centerX - textWidth/2 - padding,
+      centerY - fontSize/2 - padding,
+      textWidth + padding * 2,
+      fontSize + subFontSize + padding * 2
+    );
+    ctx.globalAlpha = 1.0;
+  }
+  
+  // Apply rotation if needed
+  if (config.textRotation !== 0) {
+    ctx.save();
+    ctx.translate(centerX, centerY);
+    ctx.rotate((config.textRotation * Math.PI) / 180);
+    ctx.translate(-centerX, -centerY);
   }
   
   // Draw main text
-  ctx.font = `900 ${fontSize}px Arial, sans-serif`;
+  ctx.font = `900 ${fontSize}px ${fontFamily}`;
   
   if (config.textShadow) {
     ctx.shadowColor = config.accentColor;
-    ctx.shadowBlur = 20;
-    ctx.shadowOffsetX = 4;
-    ctx.shadowOffsetY = 4;
+    ctx.shadowBlur = 15;
+    ctx.shadowOffsetX = 2;
+    ctx.shadowOffsetY = 2;
   }
   
-  // Text stroke
-  ctx.strokeStyle = config.accentColor;
-  ctx.lineWidth = 6;
-  ctx.strokeText(config.mainText.toUpperCase(), centerX, centerY - subFontSize/2);
+  // Text outline
+  if (config.textOutline) {
+    ctx.strokeStyle = config.accentColor;
+    ctx.lineWidth = 4;
+    ctx.strokeText(config.mainText.toUpperCase(), centerX, centerY - subFontSize/3);
+  }
   
-  // Text fill
-  ctx.fillStyle = config.textColor;
-  ctx.fillText(config.mainText.toUpperCase(), centerX, centerY - subFontSize/2);
+  // Text fill with opacity
+  if (config.gradientText) {
+    const gradient = ctx.createLinearGradient(centerX - 200, centerY, centerX + 200, centerY);
+    gradient.addColorStop(0, config.textColor);
+    gradient.addColorStop(0.5, config.accentColor);
+    gradient.addColorStop(1, config.textColor);
+    ctx.fillStyle = gradient;
+  } else {
+    ctx.fillStyle = config.textColor;
+  }
+  
+  ctx.globalAlpha = config.textOpacity / 100;
+  ctx.fillText(config.mainText.toUpperCase(), centerX, centerY - subFontSize/3);
+  ctx.globalAlpha = 1.0;
   
   // Draw sub text
   if (config.subText) {
-    ctx.font = `700 ${subFontSize}px Arial, sans-serif`;
-    ctx.strokeStyle = config.accentColor;
-    ctx.lineWidth = 3;
-    ctx.strokeText(config.subText.toUpperCase(), centerX, centerY + fontSize/3);
+    ctx.font = `700 ${subFontSize}px ${fontFamily}`;
     
-    ctx.fillStyle = config.accentColor;
-    ctx.fillText(config.subText.toUpperCase(), centerX, centerY + fontSize/3);
+    if (config.textOutline) {
+      ctx.strokeStyle = config.accentColor;
+      ctx.lineWidth = 2;
+      ctx.strokeText(config.subText.toUpperCase(), centerX, centerY + fontSize/4);
+    }
+    
+    if (config.gradientText) {
+      const gradient = ctx.createLinearGradient(centerX - 150, centerY, centerX + 150, centerY);
+      gradient.addColorStop(0, config.accentColor);
+      gradient.addColorStop(0.5, config.textColor);
+      gradient.addColorStop(1, config.accentColor);
+      ctx.fillStyle = gradient;
+    } else {
+      ctx.fillStyle = config.accentColor;
+    }
+    
+    ctx.globalAlpha = (config.textOpacity / 100) * 0.85;
+    ctx.fillText(config.subText.toUpperCase(), centerX, centerY + fontSize/4);
+    ctx.globalAlpha = 1.0;
+  }
+  
+  // Restore rotation
+  if (config.textRotation !== 0) {
+    ctx.restore();
   }
   
   // Reset shadow
@@ -192,10 +267,10 @@ const drawText = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, conf
 
 const drawBorderGlow = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, accentColor: string) => {
   ctx.strokeStyle = accentColor;
-  ctx.lineWidth = 8;
+  ctx.lineWidth = 6;
   ctx.shadowColor = accentColor;
-  ctx.shadowBlur = 20;
-  ctx.strokeRect(4, 4, canvas.width - 8, canvas.height - 8);
+  ctx.shadowBlur = 15;
+  ctx.strokeRect(3, 3, canvas.width - 6, canvas.height - 6);
   
   // Reset shadow
   ctx.shadowColor = 'transparent';
@@ -228,10 +303,21 @@ const getGradientForPreset = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasE
 
 const getFontSizeForCanvas = (size: string): number => {
   const sizes: Record<string, number> = {
-    small: 70,
-    medium: 90,
-    large: 110,
-    xlarge: 130
+    small: 65,
+    medium: 80,
+    large: 95,
+    xlarge: 110
   };
-  return sizes[size] || 110;
+  return sizes[size] || 80;
+};
+
+const getFontFamilyForCanvas = (font: string): string => {
+  const fonts: Record<string, string> = {
+    'arial': 'Arial, sans-serif',
+    'impact': 'Impact, Arial Black, sans-serif',
+    'bebas': 'Bebas Neue, Impact, sans-serif',
+    'oswald': 'Oswald, Impact, sans-serif',
+    'roboto': 'Roboto, Arial, sans-serif'
+  };
+  return fonts[font] || 'Impact, Arial Black, sans-serif';
 };
