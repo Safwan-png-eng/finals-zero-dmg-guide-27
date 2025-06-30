@@ -4,7 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Upload, X, Scissors, Sparkles, User, Type, Palette2, RotateCcw } from 'lucide-react';
+import { Upload, X, Scissors, Sparkles, User, Type, Palette, RotateCcw } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { removeBackground, loadImage } from '../utils/backgroundRemoval';
 import { useToast } from '@/hooks/use-toast';
@@ -427,7 +427,7 @@ const ControlPanel = ({ config, onConfigChange }: ControlPanelProps) => {
       {/* Accent Color */}
       <div>
         <Label className="text-white mb-3 block font-medium flex items-center">
-          <Palette2 className="w-4 h-4 mr-2" />
+          <Palette className="w-4 h-4 mr-2" />
           Accent Color
         </Label>
         <div className="grid grid-cols-2 gap-2 mb-3">
