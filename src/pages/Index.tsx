@@ -16,7 +16,8 @@ const Index = () => {
     fontSize: 'large',
     textPosition: 'center',
     showParticles: true,
-    glowEffect: true
+    glowEffect: true,
+    backgroundImage: null as string | null
   });
 
   const handleConfigChange = (key: string, value: any) => {
@@ -36,12 +37,12 @@ const Index = () => {
       {/* Header */}
       <div className="border-b border-white/10 bg-black/20 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-lg flex items-center justify-center">
                 <Image className="w-5 h-5 text-white" />
               </div>
-              <h1 className="text-2xl font-bold text-white">THE FINALS Thumbnail Maker</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-white">THE FINALS Thumbnail Maker</h1>
             </div>
             <Button 
               onClick={handleExport}
@@ -54,11 +55,11 @@ const Index = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+      <div className="container mx-auto px-4 py-4 sm:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-8">
           {/* Left Sidebar - Controls */}
-          <div className="xl:col-span-1 space-y-6">
-            <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
+          <div className="lg:col-span-1 space-y-4 lg:space-y-6 order-2 lg:order-1">
+            <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 lg:p-6">
               <div className="flex items-center space-x-2 mb-4">
                 <Palette className="w-5 h-5 text-cyan-400" />
                 <h2 className="text-lg font-semibold text-white">Quick Presets</h2>
@@ -69,7 +70,7 @@ const Index = () => {
               />
             </div>
 
-            <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
+            <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 lg:p-6">
               <div className="flex items-center space-x-2 mb-4">
                 <Type className="w-5 h-5 text-purple-400" />
                 <h2 className="text-lg font-semibold text-white">Customize</h2>
@@ -82,9 +83,9 @@ const Index = () => {
           </div>
 
           {/* Main Canvas Area */}
-          <div className="xl:col-span-3">
-            <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
-              <h2 className="text-xl font-semibold text-white mb-6 text-center">
+          <div className="lg:col-span-3 order-1 lg:order-2">
+            <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 lg:p-6">
+              <h2 className="text-lg sm:text-xl font-semibold text-white mb-4 lg:mb-6 text-center">
                 Thumbnail Preview (1280x720)
               </h2>
               <ThumbnailCanvas config={thumbnailConfig} />

@@ -3,7 +3,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { Slider } from '@/components/ui/slider';
+import { Button } from '@/components/ui/button';
+import { Upload, X } from 'lucide-react';
+import { useRef } from 'react';
 
 interface ControlPanelProps {
   config: any;
@@ -11,6 +13,8 @@ interface ControlPanelProps {
 }
 
 const ControlPanel = ({ config, onConfigChange }: ControlPanelProps) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const colorPresets = [
     { name: 'Electric Blue', value: '#00d4ff' },
     { name: 'Neon Green', value: '#00ff88' },
@@ -20,8 +24,67 @@ const ControlPanel = ({ config, onConfigChange }: ControlPanelProps) => {
     { name: 'Gold Rush', value: '#ffd700' }
   ];
 
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        onConfigChange('backgroundImage', result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeBackgroundImage = () => {
+    onConfigChange('backgroundImage', null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 lg:space-y-6 max-h-[70vh] lg:max-h-none overflow-y-auto">
+      {/* Image Upload Section */}
+      <div>
+        <Label className="text-white mb-3 block">Background Image</Label>
+        <div className="space-y-3">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
+            className="hidden"
+          />
+          <Button
+            onClick={() => fileInputRef.current?.click()}
+            variant="secondary"
+            className="w-full bg-white/10 hover:bg-white/20 text-white border-white/20"
+          >
+            <Upload className="w-4 h-4 mr-2" />
+            Upload Image
+          </Button>
+          
+          {config.backgroundImage && (
+            <div className="relative">
+              <img 
+                src={config.backgroundImage} 
+                alt="Background preview" 
+                className="w-full h-20 object-cover rounded-lg border border-white/20"
+              />
+              <Button
+                onClick={removeBackgroundImage}
+                size="sm"
+                variant="destructive"
+                className="absolute top-1 right-1 h-6 w-6 p-0"
+              >
+                <X className="w-3 h-3" />
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Text Inputs */}
       <div className="space-y-4">
         <div>
@@ -86,14 +149,14 @@ const ControlPanel = ({ config, onConfigChange }: ControlPanelProps) => {
             <button
               key={color.value}
               onClick={() => onConfigChange('accentColor', color.value)}
-              className={`p-2 rounded-lg border-2 transition-all ${
+              className={`p-2 rounded-lg border-2 transition-all text-xs ${
                 config.accentColor === color.value 
                   ? 'border-white scale-105' 
                   : 'border-white/20 hover:border-white/40'
               }`}
               style={{ backgroundColor: color.value }}
             >
-              <span className="text-xs text-white font-medium">{color.name}</span>
+              <span className="text-white font-medium">{color.name}</span>
             </button>
           ))}
         </div>
