@@ -76,7 +76,11 @@ const drawBackground = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasE
   // Check if preset has a specific background image
   const presetBackgrounds: Record<string, string> = {
     'monaco-streets': '/lovable-uploads/ff01c07f-8a42-4b34-bd5d-814ea69de169.png',
-    'urban-battlefield': '/lovable-uploads/2385a088-db61-4395-a7df-433b98126931.png'
+    'urban-battlefield': '/lovable-uploads/2385a088-db61-4395-a7df-433b98126931.png',
+    'casino-royale': '/lovable-uploads/8f9ecc3b-dad0-4fd0-b0dc-95097941de66.png',
+    'skybridge-arena': '/lovable-uploads/ddad55a5-b9b9-46e0-ab90-b3f759cdb55e.png',
+    'neon-paradise': '/lovable-uploads/e859ab1d-04b2-4dc9-a666-a4a3411160ed.png',
+    'crystal-district': '/lovable-uploads/29e843a9-6fbf-4584-b09d-a99cdd7bd93b.png'
   };
 
   const backgroundImageUrl = config.backgroundImage || presetBackgrounds[config.backgroundPreset];

@@ -66,6 +66,22 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
         backgroundImage: `linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.3)), url(/lovable-uploads/2385a088-db61-4395-a7df-433b98126931.png)`,
         overlay: 'radial-gradient(circle at 40% 60%, rgba(255, 107, 53, 0.2) 0%, transparent 60%)'
       },
+      'casino-royale': {
+        backgroundImage: `linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.3)), url(/lovable-uploads/8f9ecc3b-dad0-4fd0-b0dc-95097941de66.png)`,
+        overlay: 'radial-gradient(circle at 50% 30%, rgba(255, 215, 0, 0.2) 0%, transparent 70%)'
+      },
+      'skybridge-arena': {
+        backgroundImage: `linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.35)), url(/lovable-uploads/ddad55a5-b9b9-46e0-ab90-b3f759cdb55e.png)`,
+        overlay: 'radial-gradient(circle at 70% 40%, rgba(0, 212, 255, 0.15) 0%, transparent 60%)'
+      },
+      'neon-paradise': {
+        backgroundImage: `linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.3)), url(/lovable-uploads/e859ab1d-04b2-4dc9-a666-a4a3411160ed.png)`,
+        overlay: 'radial-gradient(circle at 50% 50%, rgba(255, 0, 255, 0.2) 0%, transparent 70%)'
+      },
+      'crystal-district': {
+        backgroundImage: `linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.25)), url(/lovable-uploads/29e843a9-6fbf-4584-b09d-a99cdd7bd93b.png)`,
+        overlay: 'radial-gradient(circle at 60% 60%, rgba(139, 92, 246, 0.2) 0%, transparent 70%)'
+      },
       'smoke-dust': {
         backgroundImage: 'linear-gradient(135deg, #2a2520 0%, #3d3528 20%, #5c5247 40%, #8b7355 70%, #d4c4a8 95%, #f0e6d2 100%)',
         overlay: 'radial-gradient(circle at 50% 80%, rgba(212, 196, 168, 0.25) 0%, transparent 70%), radial-gradient(circle at 20% 20%, rgba(139, 115, 85, 0.15) 0%, transparent 50%)'

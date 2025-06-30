@@ -42,6 +42,34 @@ const PresetSelector = ({ currentPreset, onPresetChange }: PresetSelectorProps) 
       accent: '#ff6b35'
     },
     {
+      id: 'casino-royale',
+      name: 'Casino Royale',
+      description: 'Luxurious casino vibes',
+      backgroundImage: '/lovable-uploads/8f9ecc3b-dad0-4fd0-b0dc-95097941de66.png',
+      accent: '#ffd700'
+    },
+    {
+      id: 'skybridge-arena',
+      name: 'SkyBridge Arena',
+      description: 'Futuristic sky battles',
+      backgroundImage: '/lovable-uploads/ddad55a5-b9b9-46e0-ab90-b3f759cdb55e.png',
+      accent: '#00d4ff'
+    },
+    {
+      id: 'neon-paradise',
+      name: 'Neon Paradise',
+      description: 'Pink cyberpunk paradise',
+      backgroundImage: '/lovable-uploads/e859ab1d-04b2-4dc9-a666-a4a3411160ed.png',
+      accent: '#ff00ff'
+    },
+    {
+      id: 'crystal-district',
+      name: 'Crystal District',
+      description: 'Prismatic urban warfare',
+      backgroundImage: '/lovable-uploads/29e843a9-6fbf-4584-b09d-a99cdd7bd93b.png',
+      accent: '#8b5cf6'
+    },
+    {
       id: 'smoke-dust',
       name: 'Smoke & Dust',
       description: 'Post-destruction haze',
