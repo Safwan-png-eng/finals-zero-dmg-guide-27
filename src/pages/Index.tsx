@@ -4,9 +4,12 @@ import ThumbnailCanvas from '../components/ThumbnailCanvas';
 import ControlPanel from '../components/ControlPanel';
 import PresetSelector from '../components/PresetSelector';
 import { Button } from '@/components/ui/button';
-import { Download, Palette, Type, Image } from 'lucide-react';
+import { Download, Palette, Type, Image, Sparkles, Zap } from 'lucide-react';
+import { exportThumbnail } from '../utils/canvasExport';
+import { useToast } from '@/hooks/use-toast';
 
 const Index = () => {
+  const { toast } = useToast();
   const [thumbnailConfig, setThumbnailConfig] = useState({
     mainText: 'CAN I WIN WITHOUT DAMAGE?',
     subText: 'THE FINALS CHALLENGE',
@@ -17,8 +20,13 @@ const Index = () => {
     textPosition: 'center',
     showParticles: true,
     glowEffect: true,
-    backgroundImage: null as string | null
+    backgroundImage: null as string | null,
+    overlayImage: null as string | null,
+    textShadow: true,
+    borderGlow: true
   });
+
+  const [isExporting, setIsExporting] = useState(false);
 
   const handleConfigChange = (key: string, value: any) => {
     setThumbnailConfig(prev => ({
@@ -27,42 +35,79 @@ const Index = () => {
     }));
   };
 
-  const handleExport = () => {
-    // In a real implementation, this would capture the canvas and download it
-    console.log('Exporting thumbnail with config:', thumbnailConfig);
+  const handleExport = async () => {
+    setIsExporting(true);
+    try {
+      await exportThumbnail(thumbnailConfig);
+      toast({
+        title: "Success!",
+        description: "Thumbnail exported successfully",
+      });
+    } catch (error) {
+      console.error('Export failed:', error);
+      toast({
+        title: "Export Failed",
+        description: "Failed to export thumbnail. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 overflow-x-hidden">
+      {/* Animated Background Elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full filter blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full filter blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+      </div>
+
       {/* Header */}
-      <div className="border-b border-white/10 bg-black/20 backdrop-blur-sm">
+      <div className="relative z-10 border-b border-white/10 bg-black/20 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-lg flex items-center justify-center">
-                <Image className="w-5 h-5 text-white" />
+              <div className="w-10 h-10 bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
+                <Sparkles className="w-6 h-6 text-white" />
               </div>
-              <h1 className="text-xl sm:text-2xl font-bold text-white">THE FINALS Thumbnail Maker</h1>
+              <div>
+                <h1 className="text-xl sm:text-2xl font-bold text-white">THE FINALS Thumbnail Maker</h1>
+                <p className="text-sm text-white/60">Professional YouTube thumbnails in seconds</p>
+              </div>
             </div>
             <Button 
               onClick={handleExport}
-              className="bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700 text-white font-semibold px-6 py-2 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
+              disabled={isExporting}
+              className="bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700 text-white font-semibold px-8 py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Download className="w-4 h-4 mr-2" />
-              Export Thumbnail
+              {isExporting ? (
+                <>
+                  <Zap className="w-5 h-5 mr-2 animate-spin" />
+                  Exporting...
+                </>
+              ) : (
+                <>
+                  <Download className="w-5 h-5 mr-2" />
+                  Export HD Thumbnail
+                </>
+              )}
             </Button>
           </div>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-4 sm:py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-8">
+      <div className="relative z-10 container mx-auto px-4 py-6 lg:py-8">
+        <div className="grid grid-cols-1 xl:grid-cols-5 gap-6 lg:gap-8">
           {/* Left Sidebar - Controls */}
-          <div className="lg:col-span-1 space-y-4 lg:space-y-6 order-2 lg:order-1">
-            <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 lg:p-6">
-              <div className="flex items-center space-x-2 mb-4">
-                <Palette className="w-5 h-5 text-cyan-400" />
-                <h2 className="text-lg font-semibold text-white">Quick Presets</h2>
+          <div className="xl:col-span-2 space-y-6 order-2 xl:order-1">
+            {/* Quick Presets */}
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 shadow-2xl">
+              <div className="flex items-center space-x-3 mb-6">
+                <div className="w-8 h-8 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-lg flex items-center justify-center">
+                  <Palette className="w-5 h-5 text-white" />
+                </div>
+                <h2 className="text-xl font-bold text-white">Quick Presets</h2>
               </div>
               <PresetSelector 
                 currentPreset={thumbnailConfig.backgroundPreset}
@@ -70,10 +115,13 @@ const Index = () => {
               />
             </div>
 
-            <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 lg:p-6">
-              <div className="flex items-center space-x-2 mb-4">
-                <Type className="w-5 h-5 text-purple-400" />
-                <h2 className="text-lg font-semibold text-white">Customize</h2>
+            {/* Customization Panel */}
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 shadow-2xl">
+              <div className="flex items-center space-x-3 mb-6">
+                <div className="w-8 h-8 bg-gradient-to-r from-purple-400 to-pink-500 rounded-lg flex items-center justify-center">
+                  <Type className="w-5 h-5 text-white" />
+                </div>
+                <h2 className="text-xl font-bold text-white">Customize Design</h2>
               </div>
               <ControlPanel 
                 config={thumbnailConfig}
@@ -83,12 +131,32 @@ const Index = () => {
           </div>
 
           {/* Main Canvas Area */}
-          <div className="lg:col-span-3 order-1 lg:order-2">
-            <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 lg:p-6">
-              <h2 className="text-lg sm:text-xl font-semibold text-white mb-4 lg:mb-6 text-center">
-                Thumbnail Preview (1280x720)
-              </h2>
+          <div className="xl:col-span-3 order-1 xl:order-2">
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 shadow-2xl">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center space-x-3">
+                  <Image className="w-6 h-6 text-cyan-400" />
+                  <span>Live Preview</span>
+                </h2>
+                <div className="text-sm text-white/60 bg-white/10 px-3 py-1 rounded-full">
+                  1280×720 • YouTube Ready
+                </div>
+              </div>
               <ThumbnailCanvas config={thumbnailConfig} />
+            </div>
+
+            {/* Tips Section */}
+            <div className="mt-6 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 backdrop-blur-sm rounded-2xl border border-cyan-300/20 p-6">
+              <h3 className="text-lg font-semibold text-white mb-3 flex items-center space-x-2">
+                <Sparkles className="w-5 h-5 text-cyan-400" />
+                <span>Pro Tips</span>
+              </h3>
+              <ul className="text-white/80 space-y-2 text-sm">
+                <li>• Use contrasting colors for better readability</li>
+                <li>• Keep text short and impactful (under 10 words)</li>
+                <li>• Upload character images with transparent backgrounds</li>
+                <li>• Test your thumbnail at small sizes to ensure clarity</li>
+              </ul>
             </div>
           </div>
         </div>
