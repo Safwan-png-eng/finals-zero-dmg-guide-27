@@ -118,9 +118,9 @@ const drawOverlayImage = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanva
   });
   
   // Calculate size based on the size parameter (percentage) - now supports up to 100%
-  const sizeMultiplier = Math.max(0.15, Math.min(1.0, size / 100)); // Increased max to 100%
+  const sizeMultiplier = Math.max(0.15, Math.min(1.0, size / 100));
   const maxWidth = canvas.width * sizeMultiplier;
-  const maxHeight = canvas.height * (sizeMultiplier * 1.2); // Slightly taller for character proportions
+  const maxHeight = canvas.height * (sizeMultiplier * 1.2);
   
   // Calculate aspect ratio to maintain image proportions
   const aspectRatio = img.width / img.height;
@@ -132,10 +132,25 @@ const drawOverlayImage = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanva
     width = height * aspectRatio;
   }
   
-  // Position character based on size - larger characters get more centered positioning
-  const padding = Math.max(20, (100 - size) * 0.5); // Dynamic padding based on size
+  // Position character based on size
+  const padding = Math.max(20, (100 - size) * 0.5);
   const x = canvas.width - width - padding;
   const y = canvas.height - height - padding;
+  
+  // Draw character ground shadow for better integration
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+  ctx.beginPath();
+  ctx.ellipse(x + width/2, y + height - 10, width * 0.3, 15, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Add atmospheric background glow
+  if (size > 50) {
+    const gradient = ctx.createRadialGradient(x + width/2, y + height/2, 0, x + width/2, y + height/2, Math.max(width, height) * 0.8);
+    gradient.addColorStop(0, 'rgba(0, 212, 255, 0.15)');
+    gradient.addColorStop(1, 'transparent');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(x - 50, y - 50, width + 100, height + 100);
+  }
   
   // Add glow effect for larger characters
   if (size > 50) {
@@ -149,6 +164,53 @@ const drawOverlayImage = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanva
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(img, x, y, width, height);
+  
+  // Draw NO DAMAGE badge
+  const badgeX = x + 30;
+  const badgeY = y + 30;
+  const badgeWidth = 140;
+  const badgeHeight = 35;
+  
+  // Badge background glow
+  ctx.shadowColor = '#ff0000';
+  ctx.shadowBlur = 15;
+  ctx.fillStyle = 'rgba(255, 0, 0, 0.3)';
+  ctx.beginPath();
+  ctx.roundRect(badgeX - 5, badgeY - 5, badgeWidth + 10, badgeHeight + 10, 20);
+  ctx.fill();
+  
+  // Main badge background
+  const badgeGradient = ctx.createLinearGradient(badgeX, badgeY, badgeX + badgeWidth, badgeY);
+  badgeGradient.addColorStop(0, '#dc2626');
+  badgeGradient.addColorStop(0.5, '#ef4444');
+  badgeGradient.addColorStop(1, '#f97316');
+  ctx.fillStyle = badgeGradient;
+  ctx.beginPath();
+  ctx.roundRect(badgeX, badgeY, badgeWidth, badgeHeight, 17);
+  ctx.fill();
+  
+  // Badge border
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.roundRect(badgeX, badgeY, badgeWidth, badgeHeight, 17);
+  ctx.stroke();
+  
+  // Badge text
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+  ctx.shadowBlur = 3;
+  ctx.fillStyle = 'white';
+  ctx.font = 'bold 16px Impact, Arial Black, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  
+  // Draw indicator dot
+  ctx.beginPath();
+  ctx.arc(badgeX + 20, badgeY + badgeHeight/2, 6, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Draw badge text
+  ctx.fillText('NO DAMAGE', badgeX + badgeWidth/2 + 15, badgeY + badgeHeight/2);
   
   // Reset shadow
   ctx.shadowColor = 'transparent';

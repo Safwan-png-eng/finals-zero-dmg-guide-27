@@ -1,3 +1,4 @@
+
 import { useEffect, useRef } from 'react';
 
 interface ThumbnailConfig {
@@ -173,7 +174,7 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
 
   const getOverlayImageSize = () => {
     const baseSize = config.overlayImageSize || 25;
-    const clampedSize = Math.max(15, Math.min(100, baseSize)); // Increased max size to 100%
+    const clampedSize = Math.max(15, Math.min(100, baseSize));
     console.log('Overlay image size calculation:', { baseSize, clampedSize });
     return {
       width: `${clampedSize}%`,
@@ -218,88 +219,128 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
         )}
 
         {/* Enhanced Background Overlay with Multiple Layers */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20" />
-        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-black/10 to-transparent" />
-
-        {/* Enhanced Overlay Image with More Visual Impact */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-black/20 to-black/40" />
+        
+        {/* Character Integration Layer - helps blend character with background */}
         {config.overlayImage && (
-          <div className="absolute bottom-4 right-4 z-10">
+          <div className="absolute bottom-0 right-0 w-full h-full">
             <div 
-              className="relative rounded-xl overflow-hidden border-4 border-white/50 shadow-2xl transition-all duration-500 hover:scale-105 backdrop-blur-sm bg-white/10"
+              className="absolute bottom-0 right-0 w-1/2 h-3/4 opacity-30"
+              style={{
+                background: `radial-gradient(ellipse at bottom right, ${config.accentColor}20 0%, ${config.accentColor}10 40%, transparent 70%)`,
+              }}
+            />
+          </div>
+        )}
+
+        {/* Enhanced Overlay Image with Better Integration */}
+        {config.overlayImage && (
+          <div className="absolute bottom-0 right-0 z-10">
+            <div 
+              className="relative transition-all duration-500"
               style={getOverlayImageSize()}
             >
-              {/* Multiple Character Background Glows for More Impact */}
+              {/* Character Ground Shadow - makes character feel grounded */}
               <div 
-                className="absolute -inset-4 rounded-xl opacity-30 animate-pulse"
+                className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-3/4 h-4 opacity-40 rounded-full blur-md"
                 style={{
-                  background: `radial-gradient(circle at center, ${config.accentColor}60 0%, transparent 70%)`
+                  background: `radial-gradient(ellipse, rgba(0,0,0,0.8) 0%, transparent 70%)`,
                 }}
               />
+
+              {/* Enhanced Character Background Integration */}
               <div 
-                className="absolute -inset-2 rounded-xl opacity-20 animate-pulse"
+                className="absolute -inset-8 rounded-full opacity-20 animate-pulse"
                 style={{
-                  background: `radial-gradient(circle at center, #ffffff40 0%, transparent 60%)`,
-                  animationDelay: '0.5s'
-                }}
-              />
-              
-              {/* Spotlight Effect Behind Character */}
-              <div 
-                className="absolute -inset-8 rounded-full opacity-25"
-                style={{
-                  background: `radial-gradient(ellipse at center, ${config.accentColor}50 0%, ${config.accentColor}20 40%, transparent 70%)`,
-                  animation: 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                  background: `radial-gradient(ellipse at center, ${config.accentColor}40 0%, ${config.accentColor}20 50%, transparent 80%)`,
+                  animation: 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite'
                 }}
               />
               
-              {/* Main Character Image with Enhanced Effects */}
+              {/* Atmospheric Lighting Effect */}
+              <div 
+                className="absolute -inset-12 opacity-15"
+                style={{
+                  background: `conic-gradient(from 45deg at center, transparent 0deg, ${config.accentColor}30 90deg, transparent 180deg, ${config.accentColor}20 270deg, transparent 360deg)`,
+                  borderRadius: '50%',
+                  animation: 'spin 12s linear infinite'
+                }}
+              />
+              
+              {/* Character Color Matching Overlay */}
+              <div 
+                className="absolute inset-0 rounded-xl opacity-10 mix-blend-overlay"
+                style={{
+                  background: `linear-gradient(135deg, ${config.accentColor}60 0%, transparent 50%, ${config.textColor}40 100%)`
+                }}
+              />
+
+              {/* Main Character Image with Enhanced Integration */}
               <img 
                 src={config.overlayImage} 
                 alt="Character" 
                 className="w-full h-full object-contain relative z-10"
                 style={{
                   filter: config.glowEffect ? 
-                    `drop-shadow(0 0 30px ${config.accentColor}80) drop-shadow(0 0 60px ${config.accentColor}40) drop-shadow(0 8px 20px rgba(0,0,0,0.6)) contrast(1.15) saturate(1.3) brightness(1.1)` : 
-                    'drop-shadow(0 4px 15px rgba(0,0,0,0.4)) contrast(1.1) saturate(1.15) brightness(1.05)',
+                    `drop-shadow(0 0 30px ${config.accentColor}60) drop-shadow(0 0 60px ${config.accentColor}30) drop-shadow(0 12px 25px rgba(0,0,0,0.7)) contrast(1.1) saturate(1.2) brightness(1.05) hue-rotate(5deg)` : 
+                    'drop-shadow(0 8px 20px rgba(0,0,0,0.5)) contrast(1.05) saturate(1.1) brightness(1.02)',
                   objectFit: 'contain'
                 }}
                 onLoad={() => console.log('Overlay image loaded successfully')}
                 onError={() => console.error('Failed to load overlay image')}
               />
-              
-              {/* Enhanced Character Frame Effects */}
-              <div className="absolute inset-0 rounded-xl border-2 border-white/30 shadow-inner" />
-              <div 
-                className="absolute -inset-2 rounded-xl opacity-40 animate-pulse"
-                style={{
-                  background: `linear-gradient(45deg, transparent 20%, ${config.accentColor}30 40%, transparent 60%, ${config.accentColor}20 80%, transparent 100%)`
-                }}
-              />
-              
-              {/* Character Info Badges with Better Visibility */}
-              <div className="absolute top-3 left-3 bg-gradient-to-r from-black/90 to-black/70 text-white text-sm px-3 py-1 rounded-full border-2 border-white/30 backdrop-blur-sm shadow-lg">
-                <span className="font-bold text-cyan-400">{config.overlayImageSize || 25}%</span>
+
+              {/* NO DAMAGE Badge - positioned near character */}
+              <div className="absolute top-6 left-6 z-20">
+                <div className="relative">
+                  {/* Badge Background Glow */}
+                  <div 
+                    className="absolute -inset-2 rounded-full opacity-60 animate-pulse blur-sm"
+                    style={{
+                      background: `radial-gradient(circle, #ff0000 0%, #ff6600 50%, transparent 100%)`,
+                    }}
+                  />
+                  
+                  {/* Main Badge */}
+                  <div className="relative bg-gradient-to-r from-red-600 via-red-500 to-orange-500 text-white px-4 py-2 rounded-full border-3 border-white/80 shadow-2xl backdrop-blur-sm">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-3 h-3 bg-white rounded-full animate-pulse shadow-lg"></div>
+                      <span className="font-black text-sm tracking-wider drop-shadow-lg">NO DAMAGE</span>
+                    </div>
+                  </div>
+                  
+                  {/* Badge Shine Effect */}
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse" style={{animationDelay: '1s'}} />
+                </div>
               </div>
               
-              <div className="absolute bottom-3 left-3 bg-gradient-to-r from-purple-600/90 to-blue-600/90 text-white text-sm px-3 py-1 rounded-full border-2 border-white/30 backdrop-blur-sm shadow-lg">
-                <span className="font-semibold">★ CHARACTER</span>
+              {/* Enhanced Character Stats Badge */}
+              <div className="absolute bottom-6 left-6 bg-gradient-to-r from-black/90 to-black/70 text-white text-sm px-4 py-2 rounded-full border-2 border-white/40 backdrop-blur-sm shadow-xl">
+                <span className="font-bold text-cyan-400">{config.overlayImageSize || 25}%</span>
+                <span className="text-white/60 ml-2">SIZE</span>
+              </div>
+              
+              {/* Character Class Badge */}
+              <div className="absolute bottom-6 right-6 bg-gradient-to-r from-purple-600/90 to-blue-600/90 text-white text-sm px-4 py-2 rounded-full border-2 border-white/40 backdrop-blur-sm shadow-xl">
+                <span className="font-semibold">★ HEAVY</span>
               </div>
 
-              {/* New: Character Highlight Ring */}
+              {/* Enhanced Character Highlight Effects */}
               <div 
-                className="absolute -inset-1 rounded-xl border-2 opacity-60 animate-pulse"
+                className="absolute -inset-1 rounded-xl border-2 opacity-50 animate-pulse"
                 style={{
                   borderColor: config.accentColor,
-                  boxShadow: `0 0 20px ${config.accentColor}60, inset 0 0 20px ${config.accentColor}20`
+                  boxShadow: `0 0 25px ${config.accentColor}50, inset 0 0 25px ${config.accentColor}15`
                 }}
               />
 
-              {/* New: Animated Energy Rings */}
+              {/* Animated Energy Rings */}
               <div 
-                className="absolute -inset-6 rounded-full border border-white/20 opacity-30 animate-spin"
+                className="absolute -inset-8 rounded-full border border-white/15 opacity-25"
                 style={{
-                  animation: 'spin 8s linear infinite',
-                  background: `conic-gradient(from 0deg, transparent 0deg, ${config.accentColor}20 60deg, transparent 120deg, ${config.accentColor}15 180deg, transparent 240deg, ${config.accentColor}10 300deg, transparent 360deg)`
+                  animation: 'spin 10s linear infinite',
+                  background: `conic-gradient(from 0deg, transparent 0deg, ${config.accentColor}15 60deg, transparent 120deg, ${config.accentColor}10 180deg, transparent 240deg, ${config.accentColor}20 300deg, transparent 360deg)`
                 }}
               />
             </div>
@@ -328,11 +369,11 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
               fontFamily: getFontFamily(),
               fontWeight: '900',
               textShadow: config.textShadow ? 
-                `2px 2px 4px rgba(0,0,0,0.9), 0 0 20px ${config.accentColor}50, 0 0 40px ${config.accentColor}30` : 
-                '2px 2px 4px rgba(0,0,0,0.9)',
-              WebkitTextStroke: config.textOutline ? `1px ${config.accentColor}` : 'none',
+                `3px 3px 6px rgba(0,0,0,0.9), 0 0 25px ${config.accentColor}60, 0 0 50px ${config.accentColor}40, 1px 1px 0px ${config.accentColor}80` : 
+                '3px 3px 6px rgba(0,0,0,0.9), 1px 1px 0px rgba(0,0,0,0.5)',
+              WebkitTextStroke: config.textOutline ? `2px ${config.accentColor}` : 'none',
               filter: config.glowEffect ? 
-                `drop-shadow(0 0 20px ${config.accentColor}50) drop-shadow(0 0 40px ${config.accentColor}25) contrast(1.05)` : 
+                `drop-shadow(0 0 25px ${config.accentColor}60) drop-shadow(0 0 50px ${config.accentColor}35) contrast(1.1)` : 
                 'contrast(1.05)',
               letterSpacing: getLetterSpacing(),
               lineHeight: getLineHeight(),
@@ -359,10 +400,10 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
                 fontFamily: getFontFamily(),
                 fontWeight: '700',
                 textShadow: config.textShadow ? 
-                  `1px 1px 3px rgba(0,0,0,0.9), 0 0 15px ${config.accentColor}40` : 
-                  '1px 1px 3px rgba(0,0,0,0.9)',
+                  `2px 2px 4px rgba(0,0,0,0.9), 0 0 20px ${config.accentColor}50, 1px 1px 0px ${config.accentColor}60` : 
+                  '2px 2px 4px rgba(0,0,0,0.9)',
                 filter: config.glowEffect ? 
-                  `drop-shadow(0 0 15px ${config.accentColor}40) contrast(1.05)` : 
+                  `drop-shadow(0 0 20px ${config.accentColor}50) contrast(1.05)` : 
                   'contrast(1.05)',
                 letterSpacing: getLetterSpacing(),
                 opacity: (config.textOpacity / 100) * 0.9,
