@@ -31,6 +31,7 @@ interface ThumbnailConfig {
   characterVerticalOffset?: number;
   characterBlendMode?: string;
   characterRemoveBackground?: boolean;
+  characterShadow?: boolean;
 }
 
 interface ThumbnailCanvasProps {
@@ -338,13 +339,13 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
               />
 
               {/* Smart Character Ground Shadow - Scene Aware */}
-              {config.glowEffect && (
+              {config.glowEffect && config.characterShadow !== false && (
                 <div 
-                  className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-2/3 h-3 opacity-30 rounded-full blur-sm"
+                  className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1/2 h-2 opacity-20 rounded-full blur-sm"
                   style={{
                     background: config.backgroundPreset === 'las-vegas' ? 
-                      'radial-gradient(ellipse, rgba(255, 204, 0, 0.6) 0%, rgba(255, 102, 0, 0.3) 40%, transparent 80%)' :
-                      `radial-gradient(ellipse, ${config.accentColor}60 0%, ${config.accentColor}20 40%, transparent 80%)`,
+                      'radial-gradient(ellipse, rgba(255, 204, 0, 0.4) 0%, rgba(255, 102, 0, 0.2) 40%, transparent 80%)' :
+                      `radial-gradient(ellipse, ${config.accentColor}40 0%, ${config.accentColor}15 40%, transparent 80%)`,
                   }}
                 />
               )}

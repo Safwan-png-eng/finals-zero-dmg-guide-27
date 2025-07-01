@@ -406,6 +406,18 @@ const ControlPanel = ({ config, onConfigChange }: ControlPanelProps) => {
                 onCheckedChange={(checked) => onConfigChange('characterRemoveBackground', checked)}
               />
             </div>
+            
+            {/* Character Shadow Toggle */}
+            <div className="flex items-center justify-between bg-white/5 p-3 rounded-lg">
+              <div>
+                <Label className="text-white text-sm font-medium">Character Shadow</Label>
+                <p className="text-white/60 text-xs">Show ground shadow below character</p>
+              </div>
+              <Switch
+                checked={config.characterShadow !== false}
+                onCheckedChange={(checked) => onConfigChange('characterShadow', checked)}
+              />
+            </div>
 
             {/* Blending Mode - Only if background removal is off */}
             {!config.characterRemoveBackground && (
