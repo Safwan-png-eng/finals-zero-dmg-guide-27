@@ -114,6 +114,16 @@ Changelog:
   * Enhanced Vegas AI image picker with better selection logic
   * Added Vegas image cycling feature for variety
   * Fixed character positioning to work with all uploaded Vegas backgrounds
+- July 01, 2025. Major UI/UX Improvements and Preview Fixes:
+  * Fixed character box issue - removed visible borders around characters
+  * Added comprehensive AI Auto Enhance All feature for viral optimization
+  * Implemented visual grid-based position selector with 9 placement options
+  * Added real-time preview with live position indicators
+  * Enhanced character size controls with visual feedback and presets
+  * Added fine-tuning adjustments (horizontal/vertical offset controls)
+  * Improved gaming HUD elements with dynamic energy bars
+  * Added export preview with quality indicators
+  * Enhanced text effects with better shadows and animations
 ```
 
 ## User Preferences

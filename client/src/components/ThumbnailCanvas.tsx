@@ -27,6 +27,8 @@ interface ThumbnailConfig {
   textBackgroundColor: string;
   textBackgroundOpacity: number;
   characterPosition?: string;
+  characterHorizontalOffset?: number;
+  characterVerticalOffset?: number;
 }
 
 interface ThumbnailCanvasProps {
@@ -147,35 +149,55 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
     const size = config.overlayImageSize || 25;
     const position = config.characterPosition || 'bottom-right';
     
-    // Base positioning classes based on AI recommendation
+    // Enhanced positioning classes with all grid positions
     const positionClasses = {
       'bottom-right': 'bottom-0 right-0 items-end justify-end',
       'bottom-left': 'bottom-0 left-0 items-end justify-start',
+      'bottom-center': 'bottom-0 left-1/2 -translate-x-1/2 items-end justify-center',
       'center-right': 'top-1/2 right-0 -translate-y-1/2 items-center justify-end',
       'center-left': 'top-1/2 left-0 -translate-y-1/2 items-center justify-start',
       'top-right': 'top-0 right-0 items-start justify-end',
       'top-left': 'top-0 left-0 items-start justify-start',
+      'top-center': 'top-0 left-1/2 -translate-x-1/2 items-start justify-center',
       'full-center': 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 items-center justify-center'
     };
     
-    // Adjust padding based on character size and position
+    // Dynamic padding based on character size and position
     let padding = 'p-4';
-    if (size >= 70) {
+    if (size >= 80) {
+      padding = 'p-1';
+    } else if (size >= 60) {
       padding = 'p-2';
     } else if (size >= 40) {
-      padding = 'p-4';
+      padding = 'p-3';
     } else {
-      padding = 'p-6';
+      padding = 'p-4';
     }
     
     // Special handling for center positions
     if (position === 'full-center') {
       padding = 'p-0';
+    } else if (position.includes('center')) {
+      padding = size >= 60 ? 'p-2' : 'p-3';
     }
     
     const baseClasses = positionClasses[position as keyof typeof positionClasses] || positionClasses['bottom-right'];
     
-    return `absolute z-10 flex ${baseClasses} ${padding}`;
+    // Add fine adjustment offsets
+    const horizontalOffset = config.characterHorizontalOffset || 0;
+    const verticalOffset = config.characterVerticalOffset || 0;
+    
+    return `absolute z-10 flex ${baseClasses} ${padding} transition-all duration-300`;
+  };
+
+  const getCharacterStyles = () => {
+    const horizontalOffset = config.characterHorizontalOffset || 0;
+    const verticalOffset = config.characterVerticalOffset || 0;
+    
+    return {
+      transform: `translate(${horizontalOffset}px, ${verticalOffset}px)`,
+      transition: 'transform 0.3s ease'
+    };
   };
 
   const getTextContainerClass = () => {
@@ -277,7 +299,7 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
           <div className={getCharacterPosition()}>
             <div 
               className="relative transition-all duration-500"
-              style={getOverlayImageSize()}
+              style={{...getOverlayImageSize(), ...getCharacterStyles()}}
             >
               {/* Smart Character Ground Shadow - AI Controlled */}
               {config.glowEffect && (
