@@ -133,3 +133,29 @@ All colors MUST be HSL.
 .animate-float {
   animation: float 3s ease-in-out infinite;
 }
+
+/* Character Background Removal Effects */
+.bg-removal-chroma {
+  /* Advanced background removal for green/blue screen characters */
+  position: relative;
+}
+
+.bg-removal-chroma::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    linear-gradient(
+      135deg,
+      rgba(0, 255, 0, 0.1) 0%,
+      transparent 20%,
+      transparent 80%,
+      rgba(0, 0, 255, 0.1) 100%
+    );
+  mix-blend-mode: difference;
+  pointer-events: none;
+  opacity: 0.3;
+}

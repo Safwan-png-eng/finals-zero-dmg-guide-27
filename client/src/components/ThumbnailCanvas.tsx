@@ -30,6 +30,7 @@ interface ThumbnailConfig {
   characterHorizontalOffset?: number;
   characterVerticalOffset?: number;
   characterBlendMode?: string;
+  characterRemoveBackground?: boolean;
 }
 
 interface ThumbnailCanvasProps {
@@ -348,29 +349,65 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
                 />
               )}
 
-              {/* Main Character Image - Natural Integration */}
+              {/* Background Removal Layer */}
+              {config.characterRemoveBackground && (
+                <div 
+                  className="absolute inset-0 w-full h-full z-5"
+                  style={{
+                    background: `
+                      radial-gradient(ellipse 80% 90% at center bottom, 
+                        rgba(0,0,0,0.6) 0%, 
+                        rgba(0,0,0,0.3) 30%, 
+                        rgba(0,0,0,0.1) 60%, 
+                        transparent 80%
+                      )
+                    `,
+                    mixBlendMode: 'multiply'
+                  }}
+                />
+              )}
+
+              {/* Main Character Image - Clean Background Removal */}
               <img 
                 src={config.overlayImage} 
                 alt="Character" 
-                className="w-full h-full relative z-10"
+                className={`w-full h-full relative z-10 ${
+                  config.characterRemoveBackground ? 'bg-removal-chroma' : ''
+                }`}
                 style={{
-                  filter: config.glowEffect ? 
-                    config.backgroundPreset === 'las-vegas' ?
-                      `drop-shadow(0 0 20px rgba(255, 204, 0, 0.4)) drop-shadow(0 0 40px rgba(255, 102, 0, 0.2)) drop-shadow(0 12px 30px rgba(0,0,0,0.6)) contrast(1.08) saturate(1.1) brightness(1.12) sepia(0.15)` :
-                      config.backgroundPreset === 'finals-arena' ?
-                      `drop-shadow(0 0 20px rgba(128, 0, 255, 0.4)) drop-shadow(0 0 40px rgba(255, 0, 128, 0.2)) drop-shadow(0 12px 30px rgba(0,0,0,0.6)) contrast(1.08) saturate(1.15) brightness(1.06)` :
-                      `drop-shadow(0 0 25px ${config.accentColor}50) drop-shadow(0 0 50px ${config.accentColor}30) drop-shadow(0 12px 30px rgba(0,0,0,0.7)) contrast(1.1) saturate(1.2) brightness(1.08)` :
-                    config.backgroundPreset === 'las-vegas' ?
-                      'drop-shadow(0 8px 20px rgba(0,0,0,0.5)) contrast(1.04) saturate(1.08) brightness(1.1) sepia(0.1)' :
-                      'drop-shadow(0 8px 20px rgba(0,0,0,0.5)) contrast(1.06) saturate(1.12) brightness(1.05)',
+                  filter: `
+                    ${config.characterRemoveBackground ? 
+                      `
+                        saturate(1.4) 
+                        contrast(1.25) 
+                        brightness(1.15) 
+                        hue-rotate(0deg)
+                        drop-shadow(0 10px 30px rgba(0,0,0,0.5))
+                        drop-shadow(0 0 20px ${config.accentColor}50)
+                      ` : 
+                      config.glowEffect ? 
+                        config.backgroundPreset === 'las-vegas' ?
+                          `drop-shadow(0 0 20px rgba(255, 204, 0, 0.4)) drop-shadow(0 0 40px rgba(255, 102, 0, 0.2)) drop-shadow(0 12px 30px rgba(0,0,0,0.6)) contrast(1.08) saturate(1.1) brightness(1.12) sepia(0.15)` :
+                          config.backgroundPreset === 'finals-arena' ?
+                          `drop-shadow(0 0 20px rgba(128, 0, 255, 0.4)) drop-shadow(0 0 40px rgba(255, 0, 128, 0.2)) drop-shadow(0 12px 30px rgba(0,0,0,0.6)) contrast(1.08) saturate(1.15) brightness(1.06)` :
+                          `drop-shadow(0 0 25px ${config.accentColor}50) drop-shadow(0 0 50px ${config.accentColor}30) drop-shadow(0 12px 30px rgba(0,0,0,0.7)) contrast(1.1) saturate(1.2) brightness(1.08)` :
+                        config.backgroundPreset === 'las-vegas' ?
+                          'drop-shadow(0 8px 20px rgba(0,0,0,0.5)) contrast(1.04) saturate(1.08) brightness(1.1) sepia(0.1)' :
+                          'drop-shadow(0 8px 20px rgba(0,0,0,0.5)) contrast(1.06) saturate(1.12) brightness(1.05)'
+                    }
+                  `,
                   objectFit: 'contain',
                   objectPosition: 'center bottom',
-                  maskImage: (config.characterBlendMode || 'natural') === 'natural' ? 
-                    `radial-gradient(ellipse at center, black 0%, black 50%, rgba(0,0,0,0.9) 70%, rgba(0,0,0,0.6) 85%, rgba(0,0,0,0.2) 95%, transparent 100%)` :
-                    'none',
-                  WebkitMaskImage: (config.characterBlendMode || 'natural') === 'natural' ? 
-                    `radial-gradient(ellipse at center, black 0%, black 50%, rgba(0,0,0,0.9) 70%, rgba(0,0,0,0.6) 85%, rgba(0,0,0,0.2) 95%, transparent 100%)` :
-                    'none'
+                  maskImage: config.characterRemoveBackground ? 
+                    'none' :
+                    (config.characterBlendMode || 'natural') === 'natural' ? 
+                      `radial-gradient(ellipse at center, black 0%, black 50%, rgba(0,0,0,0.9) 70%, rgba(0,0,0,0.6) 85%, rgba(0,0,0,0.2) 95%, transparent 100%)` :
+                      'none',
+                  WebkitMaskImage: config.characterRemoveBackground ? 
+                    'none' :
+                    (config.characterBlendMode || 'natural') === 'natural' ? 
+                      `radial-gradient(ellipse at center, black 0%, black 50%, rgba(0,0,0,0.9) 70%, rgba(0,0,0,0.6) 85%, rgba(0,0,0,0.2) 95%, transparent 100%)` :
+                      'none'
                 }}
                 onLoad={() => console.log('Overlay image loaded successfully')}
                 onError={() => console.error('Failed to load overlay image')}

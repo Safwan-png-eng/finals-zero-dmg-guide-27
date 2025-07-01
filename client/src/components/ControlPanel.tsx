@@ -391,39 +391,56 @@ const ControlPanel = ({ config, onConfigChange }: ControlPanelProps) => {
             </div>
           </div>
 
-          {/* Character Blending Mode */}
+          {/* Character Background Controls */}
           <div className="space-y-3">
-            <Label className="text-white block font-medium">Character Blending</Label>
-            <div className="grid grid-cols-2 gap-2">
-              <Button
-                onClick={() => onConfigChange('characterBlendMode', 'natural')}
-                variant="outline"
-                className={`text-xs p-3 ${
-                  (config.characterBlendMode || 'natural') === 'natural' 
-                    ? 'bg-green-400/20 border-green-400 text-green-400' 
-                    : 'bg-white/5 border-white/20 text-white hover:bg-white/10'
-                }`}
-              >
-                <div className="text-center">
-                  <div className="font-medium">Natural Blend</div>
-                  <div className="text-xs opacity-70">Soft edges</div>
-                </div>
-              </Button>
-              <Button
-                onClick={() => onConfigChange('characterBlendMode', 'sharp')}
-                variant="outline"
-                className={`text-xs p-3 ${
-                  (config.characterBlendMode || 'natural') === 'sharp' 
-                    ? 'bg-blue-400/20 border-blue-400 text-blue-400' 
-                    : 'bg-white/5 border-white/20 text-white hover:bg-white/10'
-                }`}
-              >
-                <div className="text-center">
-                  <div className="font-medium">Sharp Cut</div>
-                  <div className="text-xs opacity-70">Clean edges</div>
-                </div>
-              </Button>
+            <Label className="text-white block font-medium">Character Background</Label>
+            
+            {/* Background Removal Toggle */}
+            <div className="flex items-center justify-between bg-white/5 p-3 rounded-lg">
+              <div>
+                <Label className="text-white text-sm font-medium">Remove Green/Blue Screen</Label>
+                <p className="text-white/60 text-xs">Auto-remove colored backgrounds</p>
+              </div>
+              <Switch
+                checked={config.characterRemoveBackground || false}
+                onCheckedChange={(checked) => onConfigChange('characterRemoveBackground', checked)}
+              />
             </div>
+
+            {/* Blending Mode - Only if background removal is off */}
+            {!config.characterRemoveBackground && (
+              <div className="space-y-2">
+                <Label className="text-white text-sm">Edge Blending</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    onClick={() => onConfigChange('characterBlendMode', 'natural')}
+                    variant="outline"
+                    className={`text-xs p-2 ${
+                      (config.characterBlendMode || 'natural') === 'natural' 
+                        ? 'bg-green-400/20 border-green-400 text-green-400' 
+                        : 'bg-white/5 border-white/20 text-white hover:bg-white/10'
+                    }`}
+                  >
+                    <div className="text-center">
+                      <div className="font-medium text-xs">Natural Blend</div>
+                    </div>
+                  </Button>
+                  <Button
+                    onClick={() => onConfigChange('characterBlendMode', 'sharp')}
+                    variant="outline"
+                    className={`text-xs p-2 ${
+                      (config.characterBlendMode || 'natural') === 'sharp' 
+                        ? 'bg-blue-400/20 border-blue-400 text-blue-400' 
+                        : 'bg-white/5 border-white/20 text-white hover:bg-white/10'
+                    }`}
+                  >
+                    <div className="text-center">
+                      <div className="font-medium text-xs">Sharp Cut</div>
+                    </div>
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
           
 
