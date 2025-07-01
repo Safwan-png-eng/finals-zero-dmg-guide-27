@@ -118,12 +118,12 @@ const drawOverlayImage = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanva
     img.src = imageSrc;
   });
   
-  // Much more aggressive size scaling - characters should be prominent
-  const sizeMultiplier = Math.max(0.4, Math.min(1.2, sizePercentage / 100));
+  // Much more aggressive size scaling - make characters HUGE
+  const sizeMultiplier = Math.max(0.6, Math.min(1.5, sizePercentage / 100));
   
-  // Significantly increased dimensions for better visibility
-  const maxWidth = canvas.width * sizeMultiplier * 0.6; // Increased from 0.35 to 0.6
-  const maxHeight = canvas.height * sizeMultiplier * 0.85; // Increased from 0.55 to 0.85
+  // Massive dimensions for maximum visibility
+  const maxWidth = canvas.width * sizeMultiplier * 0.8; // Increased from 0.6 to 0.8
+  const maxHeight = canvas.height * sizeMultiplier * 1.0; // Increased from 0.85 to 1.0
   
   const aspectRatio = img.width / img.height;
   let width = maxWidth;
@@ -134,44 +134,44 @@ const drawOverlayImage = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanva
     width = height * aspectRatio;
   }
   
-  // Adjusted positioning with larger characters in mind
+  // Position character to take up most of the right side
   let x, y;
   
   if (sizePercentage >= 70) {
-    // Large character - positioned right with space for text
-    x = canvas.width - width - 60; // Reduced margin to show more character
-    y = canvas.height - height - 40; // Reduced margin
+    // Large character - fill most of right side
+    x = canvas.width - width - 20; // Minimal margin
+    y = canvas.height - height - 20; // Minimal margin
   } else if (sizePercentage >= 40) {
-    // Medium character - positioned lower right
-    x = canvas.width - width - 80;
-    y = canvas.height - height - 60;
+    // Medium character - still very large
+    x = canvas.width - width - 40;
+    y = canvas.height - height - 40;
   } else {
-    // Small character - but still make it visible
-    x = canvas.width - width - 100;
-    y = canvas.height - height - 80;
+    // Small character - but make it bigger than before
+    x = canvas.width - width - 60;
+    y = canvas.height - height - 60;
   }
   
   // Character background effects
-  if (sizePercentage > 20) { // Lowered threshold
+  if (sizePercentage > 15) {
     // Draw character ground shadow
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
     ctx.beginPath();
-    ctx.ellipse(x + width/2, y + height - 10, width * 0.4, 25, 0, 0, Math.PI * 2);
+    ctx.ellipse(x + width/2, y + height - 15, width * 0.5, 35, 0, 0, Math.PI * 2);
     ctx.fill();
     
     // Add atmospheric glow
-    const glowIntensity = Math.min(0.4, sizePercentage * 0.006);
-    const gradient = ctx.createRadialGradient(x + width/2, y + height/2, 0, x + width/2, y + height/2, Math.max(width, height) * 0.9);
+    const glowIntensity = Math.min(0.5, sizePercentage * 0.008);
+    const gradient = ctx.createRadialGradient(x + width/2, y + height/2, 0, x + width/2, y + height/2, Math.max(width, height) * 1.1);
     gradient.addColorStop(0, `rgba(0, 212, 255, ${glowIntensity})`);
     gradient.addColorStop(1, 'transparent');
     ctx.fillStyle = gradient;
-    ctx.fillRect(x - 80, y - 80, width + 160, height + 160);
+    ctx.fillRect(x - 100, y - 100, width + 200, height + 200);
   }
   
-  // Enhanced character effects for larger visibility
-  if (sizePercentage > 30) { // Lowered threshold
+  // Enhanced character effects
+  if (sizePercentage > 20) {
     ctx.shadowColor = '#00d4ff';
-    ctx.shadowBlur = Math.min(35, sizePercentage * 0.5);
+    ctx.shadowBlur = Math.min(50, sizePercentage * 0.8);
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 0;
   }
@@ -182,7 +182,7 @@ const drawOverlayImage = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanva
   ctx.drawImage(img, x, y, width, height);
   
   // Draw NO DAMAGE badge with better positioning
-  if (sizePercentage > 15) { // Lowered threshold
+  if (sizePercentage > 10) {
     drawNoDamageBadge(ctx, x, y, sizePercentage, width, height);
   }
   
@@ -195,38 +195,39 @@ const drawOverlayImage = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanva
 };
 
 const drawNoDamageBadge = (ctx: CanvasRenderingContext2D, characterX: number, characterY: number, size: number, characterWidth: number, characterHeight: number) => {
-  // Better badge scaling - more visible
-  const badgeScale = Math.max(0.8, Math.min(1.4, size / 60)); // Increased scale
-  const badgeWidth = 110 * badgeScale; // Slightly larger
-  const badgeHeight = 28 * badgeScale;
+  // Larger badge scaling
+  const badgeScale = Math.max(1.0, Math.min(1.6, size / 50));
+  const badgeWidth = 120 * badgeScale;
+  const badgeHeight = 32 * badgeScale;
   
-  // Better positioning to avoid text overlap
+  // Position badge to avoid overlapping with text area
   let badgeX, badgeY;
   
   if (size >= 70) {
-    // Large character - position badge in safe zone
-    badgeX = characterX + characterWidth - badgeWidth - 20;
-    badgeY = characterY + 20;
-  } else if (size >= 40) {
-    // Medium character - position more conservatively
-    badgeX = characterX + characterWidth * 0.7;
-    badgeY = characterY + characterHeight * 0.1;
-  } else {
-    // Small character - keep badge visible but not overlapping
-    badgeX = characterX + characterWidth * 0.6;
+    // Large character - position badge in top right of character
+    badgeX = characterX + characterWidth - badgeWidth - 10;
     badgeY = characterY + 15;
+  } else if (size >= 40) {
+    // Medium character - position above character
+    badgeX = characterX + characterWidth * 0.7;
+    badgeY = characterY + 10;
+  } else {
+    // Small character - position safely
+    badgeX = characterX + characterWidth * 0.6;
+    badgeY = characterY + 10;
   }
   
-  // Ensure badge stays within character bounds
+  // Ensure badge stays within character area
   badgeX = Math.min(badgeX, characterX + characterWidth - badgeWidth - 5);
+  badgeX = Math.max(badgeX, characterX + 5);
   badgeY = Math.max(badgeY, characterY + 5);
   
   // Badge background glow
   ctx.shadowColor = '#ff0000';
-  ctx.shadowBlur = 15 * badgeScale;
-  ctx.fillStyle = 'rgba(255, 0, 0, 0.4)';
+  ctx.shadowBlur = 20 * badgeScale;
+  ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
   ctx.beginPath();
-  ctx.roundRect(badgeX - 6, badgeY - 6, badgeWidth + 12, badgeHeight + 12, 20);
+  ctx.roundRect(badgeX - 8, badgeY - 8, badgeWidth + 16, badgeHeight + 16, 25);
   ctx.fill();
   
   // Main badge background
@@ -236,31 +237,31 @@ const drawNoDamageBadge = (ctx: CanvasRenderingContext2D, characterX: number, ch
   badgeGradient.addColorStop(1, '#f97316');
   ctx.fillStyle = badgeGradient;
   ctx.beginPath();
-  ctx.roundRect(badgeX, badgeY, badgeWidth, badgeHeight, 15);
+  ctx.roundRect(badgeX, badgeY, badgeWidth, badgeHeight, 18);
   ctx.fill();
   
   // Badge border
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
-  ctx.lineWidth = 3 * badgeScale;
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
+  ctx.lineWidth = 4 * badgeScale;
   ctx.beginPath();
-  ctx.roundRect(badgeX, badgeY, badgeWidth, badgeHeight, 15);
+  ctx.roundRect(badgeX, badgeY, badgeWidth, badgeHeight, 18);
   ctx.stroke();
   
   // Badge text
-  ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-  ctx.shadowBlur = 2 * badgeScale;
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+  ctx.shadowBlur = 3 * badgeScale;
   ctx.fillStyle = 'white';
-  ctx.font = `bold ${13 * badgeScale}px Impact, Arial Black, sans-serif`; // Smaller font
+  ctx.font = `bold ${14 * badgeScale}px Impact, Arial Black, sans-serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   
   // Draw indicator dot
   ctx.beginPath();
-  ctx.arc(badgeX + 15 * badgeScale, badgeY + badgeHeight/2, 4 * badgeScale, 0, Math.PI * 2);
+  ctx.arc(badgeX + 18 * badgeScale, badgeY + badgeHeight/2, 5 * badgeScale, 0, Math.PI * 2);
   ctx.fill();
   
   // Draw badge text
-  ctx.fillText('NO DAMAGE', badgeX + badgeWidth/2 + 10 * badgeScale, badgeY + badgeHeight/2);
+  ctx.fillText('NO DAMAGE', badgeX + badgeWidth/2 + 12 * badgeScale, badgeY + badgeHeight/2);
   
   // Reset shadow
   ctx.shadowColor = 'transparent';
@@ -290,33 +291,32 @@ const drawText = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, conf
   ctx.textAlign = 'left';
   ctx.textBaseline = 'middle';
   
-  // Much more conservative text positioning with larger characters
-  let textX = 80;
+  // Much more aggressive text positioning to avoid character overlap
+  let textX = 60;
   let textY = canvas.height / 2;
-  let maxTextWidth = canvas.width - 160;
+  let maxTextWidth = canvas.width - 120;
   
   if (characterBounds) {
     const characterSize = config.overlayImageSize || 25;
     
     if (characterSize >= 70) {
-      // Large character - text on left side with much more space
+      // Large character - text confined to left 40% of canvas
       textX = 60;
       textY = canvas.height * 0.35;
-      maxTextWidth = characterBounds.x - 180; // Much larger gap
+      maxTextWidth = canvas.width * 0.35; // Only use 35% of width
     } else if (characterSize >= 40) {
-      // Medium character - text in upper area with safe spacing
-      textX = 80;
-      textY = canvas.height * 0.2; // Moved higher
-      maxTextWidth = canvas.width - 300; // Very conservative width
-      ctx.textAlign = 'left';
+      // Medium character - text in upper left area
+      textX = 60;
+      textY = canvas.height * 0.25;
+      maxTextWidth = canvas.width * 0.45; // Use 45% of width
     } else {
-      // Small character - text on left with moderate spacing
-      textX = 80;
+      // Small character - more space but still safe
+      textX = 60;
       textY = canvas.height * 0.4;
-      maxTextWidth = characterBounds.x - 140; // Safe gap
+      maxTextWidth = canvas.width * 0.55; // Use 55% of width
     }
   } else {
-    // No character - use selected position
+    // No character - use selected position with full width
     ctx.textAlign = 'center';
     textX = canvas.width / 2;
     if (config.textPosition === 'top') {
@@ -324,6 +324,7 @@ const drawText = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, conf
     } else if (config.textPosition === 'bottom') {
       textY = canvas.height * 0.7;
     }
+    maxTextWidth = canvas.width - 120;
   }
   
   // Get font family
@@ -386,7 +387,7 @@ const drawText = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, conf
   
   ctx.globalAlpha = config.textOpacity / 100;
   
-  // Word wrapping for long text
+  // Word wrapping for long text with stricter width limits
   const words = config.mainText.toUpperCase().split(' ');
   const lines = [];
   let currentLine = '';
