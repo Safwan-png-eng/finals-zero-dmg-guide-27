@@ -151,10 +151,12 @@ const AIEnhancer = ({ config, onConfigChange }: AIEnhancerProps) => {
       // Fetch Vegas background options from backend
       const res = await fetch('/api/las-vegas-images');
       const vegasOptions = await res.json();
+      console.log('Vegas options received:', vegasOptions);
       if (!Array.isArray(vegasOptions) || vegasOptions.length === 0) throw new Error('No Vegas options found');
 
       // Extract names for the prompt
       const optionNames = vegasOptions.map(option => option.name);
+      console.log('Option names for prompt:', optionNames);
       
       // Compose prompt for Gemini
       const prompt = `Given the YouTube thumbnail title: "${config.mainText}" and subtitle: "${config.subText}", which Vegas background would work best for a gaming thumbnail? Options: ${optionNames.join(', ')}. Return only the exact option name.`;
@@ -168,11 +170,21 @@ const AIEnhancer = ({ config, onConfigChange }: AIEnhancerProps) => {
       });
       const data = await response.json();
       console.log('Gemini API response:', data);
-      const aiChoice = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-      const found = vegasOptions.find(option => aiChoice && aiChoice.toLowerCase().includes(option.name.toLowerCase()));
+      const aiChoice = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim().replace(/\n/g, '');
+      console.log('AI Choice cleaned:', aiChoice);
+      const found = vegasOptions.find(option => {
+        const match = aiChoice && (
+          aiChoice.toLowerCase().includes(option.name.toLowerCase()) ||
+          option.name.toLowerCase().includes(aiChoice.toLowerCase())
+        );
+        console.log(`Checking ${option.name} against ${aiChoice}: ${match}`);
+        return match;
+      });
       
       if (found) {
         // Set both the background preset to vegas and the selected image URL
+        console.log('Found matching image:', found);
+        console.log('Setting background image to:', found.url);
         onConfigChange('backgroundPreset', 'las-vegas');
         onConfigChange('backgroundImage', found.url);
         toast({
@@ -181,7 +193,9 @@ const AIEnhancer = ({ config, onConfigChange }: AIEnhancerProps) => {
         });
       } else {
         // Fallback to random vegas image
+        console.log('No match found, using random image');
         const randomImage = vegasOptions[Math.floor(Math.random() * vegasOptions.length)];
+        console.log('Random image selected:', randomImage);
         onConfigChange('backgroundPreset', 'las-vegas');
         onConfigChange('backgroundImage', randomImage.url);
         toast({
