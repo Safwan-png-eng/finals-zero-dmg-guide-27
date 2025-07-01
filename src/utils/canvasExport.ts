@@ -44,13 +44,14 @@ export const exportThumbnail = async (config: ThumbnailConfig): Promise<void> =>
     drawParticles(ctx, canvas, config.accentColor);
   }
   
-  // Smart positioning: Draw overlay image if present with proper sizing
+  // Draw overlay image if present with proper sizing
+  let characterBounds = null;
   if (config.overlayImage) {
-    await drawOverlayImage(ctx, canvas, config.overlayImage, config.overlayImageSize || 25);
+    characterBounds = await drawOverlayImage(ctx, canvas, config.overlayImage, config.overlayImageSize || 25);
   }
   
-  // Draw text with smart positioning based on character presence
-  drawText(ctx, canvas, config);
+  // Draw text with smart positioning based on character presence and bounds
+  drawText(ctx, canvas, config, characterBounds);
   
   // Draw border glow
   if (config.borderGlow) {
@@ -117,12 +118,12 @@ const drawOverlayImage = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanva
     img.src = imageSrc;
   });
   
-  // Calculate size with better spacing to prevent overlaps
-  const sizeMultiplier = Math.max(0.15, Math.min(1.0, sizePercentage / 100));
+  // Better size scaling to prevent overlaps
+  const sizeMultiplier = Math.max(0.15, Math.min(0.8, sizePercentage / 100));
   
-  // Reduced max dimensions to prevent overlap
-  const maxWidth = canvas.width * sizeMultiplier * 0.5; // Reduced from 0.6 to 0.5
-  const maxHeight = canvas.height * sizeMultiplier * 0.7; // Reduced from 0.8 to 0.7
+  // Significantly reduced max dimensions to prevent text overlap
+  const maxWidth = canvas.width * sizeMultiplier * 0.35; // Reduced from 0.5 to 0.35
+  const maxHeight = canvas.height * sizeMultiplier * 0.55; // Reduced from 0.7 to 0.55
   
   const aspectRatio = img.width / img.height;
   let width = maxWidth;
@@ -133,21 +134,21 @@ const drawOverlayImage = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanva
     width = height * aspectRatio;
   }
   
-  // Improved positioning with better spacing
+  // Much more conservative positioning with larger margins
   let x, y;
   
   if (sizePercentage >= 70) {
-    // Large character - positioned to leave more space for text
-    x = canvas.width - width - 80; // Increased margin
-    y = canvas.height - height - 60; // Increased margin
+    // Large character - positioned far right with large margins
+    x = canvas.width - width - 120; // Increased from 80
+    y = canvas.height - height - 100; // Increased from 60
   } else if (sizePercentage >= 40) {
-    // Medium character - positioned lower to avoid text overlap
-    x = canvas.width - width - 100; // Increased margin
-    y = canvas.height - height - 80; // Increased margin
+    // Medium character - positioned lower right with safe margins
+    x = canvas.width - width - 140; // Increased from 100
+    y = canvas.height - height - 120; // Increased from 80
   } else {
-    // Small character - more corner placement
-    x = canvas.width - width - 120; // Increased margin
-    y = canvas.height - height - 100; // Increased margin
+    // Small character - corner placement with maximum margins
+    x = canvas.width - width - 160; // Increased from 120
+    y = canvas.height - height - 140; // Increased from 100
   }
   
   // Character background effects
@@ -180,40 +181,52 @@ const drawOverlayImage = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanva
   ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(img, x, y, width, height);
   
-  // Draw enhanced NO DAMAGE badge with better positioning
+  // Draw NO DAMAGE badge with better positioning to avoid text overlap
   if (sizePercentage > 25) {
-    drawNoDamageBadge(ctx, x, y, sizePercentage);
+    drawNoDamageBadge(ctx, x, y, sizePercentage, width, height);
   }
   
   // Reset shadow
   ctx.shadowColor = 'transparent';
   ctx.shadowBlur = 0;
+  
+  // Return character bounds for text positioning
+  return { x, y, width, height };
 };
 
-const drawNoDamageBadge = (ctx: CanvasRenderingContext2D, characterX: number, characterY: number, size: number) => {
-  // Scale badge with character size
-  const badgeScale = Math.max(0.8, Math.min(1.2, size / 60)); // Reduced max scale
-  const badgeWidth = 120 * badgeScale; // Reduced width
-  const badgeHeight = 30 * badgeScale; // Reduced height
+const drawNoDamageBadge = (ctx: CanvasRenderingContext2D, characterX: number, characterY: number, size: number, characterWidth: number, characterHeight: number) => {
+  // Scale badge with character size but keep it smaller
+  const badgeScale = Math.max(0.6, Math.min(1.0, size / 80)); // Reduced scale
+  const badgeWidth = 100 * badgeScale; // Reduced from 120
+  const badgeHeight = 26 * badgeScale; // Reduced from 30
   
-  // Position badge to avoid overlap with text
+  // Position badge to avoid text overlap - much more conservative positioning
   let badgeX, badgeY;
+  
   if (size >= 70) {
-    // Large character - position badge in top right area
-    badgeX = characterX + 40 * badgeScale;
-    badgeY = characterY + 20 * badgeScale;
+    // Large character - position badge in upper right corner of character, not extending beyond
+    badgeX = characterX + characterWidth - badgeWidth - 10;
+    badgeY = characterY + 15;
+  } else if (size >= 40) {
+    // Medium character - position more towards character center
+    badgeX = characterX + characterWidth * 0.6;
+    badgeY = characterY + characterHeight * 0.15;
   } else {
-    // Smaller characters - standard positioning
-    badgeX = characterX + 30 * badgeScale;
-    badgeY = characterY + 30 * badgeScale;
+    // Small character - keep badge close to character
+    badgeX = characterX + characterWidth * 0.5;
+    badgeY = characterY + 20;
   }
+  
+  // Ensure badge doesn't go beyond canvas boundaries
+  badgeX = Math.min(badgeX, characterX + characterWidth - badgeWidth);
+  badgeY = Math.max(badgeY, characterY + 10);
   
   // Badge background glow
   ctx.shadowColor = '#ff0000';
-  ctx.shadowBlur = 20 * badgeScale;
+  ctx.shadowBlur = 15 * badgeScale;
   ctx.fillStyle = 'rgba(255, 0, 0, 0.4)';
   ctx.beginPath();
-  ctx.roundRect(badgeX - 8, badgeY - 8, badgeWidth + 16, badgeHeight + 16, 25);
+  ctx.roundRect(badgeX - 6, badgeY - 6, badgeWidth + 12, badgeHeight + 12, 20);
   ctx.fill();
   
   // Main badge background
@@ -223,31 +236,31 @@ const drawNoDamageBadge = (ctx: CanvasRenderingContext2D, characterX: number, ch
   badgeGradient.addColorStop(1, '#f97316');
   ctx.fillStyle = badgeGradient;
   ctx.beginPath();
-  ctx.roundRect(badgeX, badgeY, badgeWidth, badgeHeight, 20);
+  ctx.roundRect(badgeX, badgeY, badgeWidth, badgeHeight, 15);
   ctx.fill();
   
   // Badge border
   ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
-  ctx.lineWidth = 4 * badgeScale;
+  ctx.lineWidth = 3 * badgeScale;
   ctx.beginPath();
-  ctx.roundRect(badgeX, badgeY, badgeWidth, badgeHeight, 20);
+  ctx.roundRect(badgeX, badgeY, badgeWidth, badgeHeight, 15);
   ctx.stroke();
   
   // Badge text
   ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-  ctx.shadowBlur = 3 * badgeScale;
+  ctx.shadowBlur = 2 * badgeScale;
   ctx.fillStyle = 'white';
-  ctx.font = `bold ${16 * badgeScale}px Impact, Arial Black, sans-serif`; // Reduced font size
+  ctx.font = `bold ${13 * badgeScale}px Impact, Arial Black, sans-serif`; // Smaller font
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   
   // Draw indicator dot
   ctx.beginPath();
-  ctx.arc(badgeX + 20 * badgeScale, badgeY + badgeHeight/2, 6 * badgeScale, 0, Math.PI * 2); // Reduced dot size
+  ctx.arc(badgeX + 15 * badgeScale, badgeY + badgeHeight/2, 4 * badgeScale, 0, Math.PI * 2);
   ctx.fill();
   
   // Draw badge text
-  ctx.fillText('NO DAMAGE', badgeX + badgeWidth/2 + 15 * badgeScale, badgeY + badgeHeight/2);
+  ctx.fillText('NO DAMAGE', badgeX + badgeWidth/2 + 10 * badgeScale, badgeY + badgeHeight/2);
   
   // Reset shadow
   ctx.shadowColor = 'transparent';
@@ -269,39 +282,38 @@ const drawParticles = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement,
   ctx.globalAlpha = 1.0;
 };
 
-const drawText = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, config: ThumbnailConfig) => {
+const drawText = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, config: ThumbnailConfig, characterBounds: any) => {
   const fontSize = getFontSizeForCanvas(config.fontSize);
   const subFontSize = Math.floor(fontSize * 0.45);
   
   // Set text properties
-  ctx.textAlign = 'left'; // Changed to left align for better positioning
+  ctx.textAlign = 'left';
   ctx.textBaseline = 'middle';
   
-  // Improved text positioning with better spacing calculations
+  // Smart text positioning with character bounds consideration
   let textX = 80;
   let textY = canvas.height / 2;
   let maxTextWidth = canvas.width - 160;
   
-  if (config.overlayImage) {
+  if (characterBounds) {
     const characterSize = config.overlayImageSize || 25;
     
     if (characterSize >= 70) {
-      // Large character - text takes left 65% with more spacing
+      // Large character - text on left side with safe margins
       textX = 60;
-      textY = canvas.height * 0.45;
-      maxTextWidth = canvas.width * 0.42; // Reduced to prevent overlap
+      textY = canvas.height * 0.4;
+      maxTextWidth = characterBounds.x - 120; // Leave large gap from character
     } else if (characterSize >= 40) {
-      // Medium character - text in upper area with better spacing
-      textX = canvas.width * 0.1;
-      textY = canvas.height * 0.32; // Moved higher
-      maxTextWidth = canvas.width * 0.75; // Reduced width
-      ctx.textAlign = 'center';
-      textX = canvas.width / 2;
+      // Medium character - text in upper area, well clear of character
+      textX = 80;
+      textY = canvas.height * 0.25; // Moved higher to avoid overlap
+      maxTextWidth = canvas.width - 200; // More conservative width
+      ctx.textAlign = 'left'; // Keep left aligned for better control
     } else {
-      // Small character - centered with more margin
-      textX = canvas.width * 0.15;
-      textY = canvas.height * 0.5;
-      maxTextWidth = canvas.width * 0.6; // Reduced width
+      // Small character - text on left side with moderate spacing
+      textX = 80;
+      textY = canvas.height * 0.45;
+      maxTextWidth = characterBounds.x - 100; // Safe gap from character
     }
   } else {
     // No character - use selected position
@@ -344,7 +356,7 @@ const drawText = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, conf
     ctx.translate(-textX, -textY);
   }
   
-  // Draw main text with better spacing
+  // Draw main text with better spacing and word wrapping
   ctx.font = `900 ${fontSize}px ${fontFamily}`;
   
   if (config.textShadow) {
@@ -373,7 +385,35 @@ const drawText = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, conf
   }
   
   ctx.globalAlpha = config.textOpacity / 100;
-  ctx.fillText(config.mainText.toUpperCase(), textX, textY - subFontSize/2);
+  
+  // Word wrapping for long text
+  const words = config.mainText.toUpperCase().split(' ');
+  const lines = [];
+  let currentLine = '';
+  
+  for (const word of words) {
+    const testLine = currentLine ? `${currentLine} ${word}` : word;
+    const metrics = ctx.measureText(testLine);
+    
+    if (metrics.width > maxTextWidth && currentLine) {
+      lines.push(currentLine);
+      currentLine = word;
+    } else {
+      currentLine = testLine;
+    }
+  }
+  if (currentLine) lines.push(currentLine);
+  
+  // Draw text lines with proper spacing
+  const lineHeight = fontSize * 1.1;
+  const totalHeight = lines.length * lineHeight;
+  let startY = textY - totalHeight / 2 + lineHeight / 2;
+  
+  lines.forEach((line, index) => {
+    const lineY = startY + index * lineHeight;
+    ctx.fillText(line, textX, lineY);
+  });
+  
   ctx.globalAlpha = 1.0;
   
   // Draw sub text with improved spacing
@@ -383,7 +423,7 @@ const drawText = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, conf
     if (config.textOutline) {
       ctx.strokeStyle = config.accentColor;
       ctx.lineWidth = 3;
-      ctx.strokeText(config.subText.toUpperCase(), textX, textY + fontSize/3);
+      ctx.strokeText(config.subText.toUpperCase(), textX, startY + lines.length * lineHeight + subFontSize);
     }
     
     if (config.gradientText) {
@@ -397,7 +437,7 @@ const drawText = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, conf
     }
     
     ctx.globalAlpha = (config.textOpacity / 100) * 0.85;
-    ctx.fillText(config.subText.toUpperCase(), textX, textY + fontSize/3);
+    ctx.fillText(config.subText.toUpperCase(), textX, startY + lines.length * lineHeight + subFontSize);
     ctx.globalAlpha = 1.0;
   }
   
