@@ -134,13 +134,23 @@ All colors MUST be HSL.
   animation: float 3s ease-in-out infinite;
 }
 
-/* Character Background Removal Effects */
-.bg-removal-chroma {
-  /* Advanced background removal for green/blue screen characters */
+/* Enhanced Character Background Removal - No Gray Artifacts */
+.character-clean {
   position: relative;
+  background: transparent;
 }
 
-.bg-removal-chroma::after {
+/* Green screen removal using CSS filters */
+.character-clean.remove-green {
+  filter: 
+    contrast(1.15) 
+    saturate(1.1) 
+    brightness(1.05)
+    drop-shadow(0 10px 30px rgba(0,0,0,0.6));
+}
+
+/* Advanced chroma key simulation */
+.character-clean.remove-green::before {
   content: '';
   position: absolute;
   top: 0;
@@ -148,14 +158,53 @@ All colors MUST be HSL.
   right: 0;
   bottom: 0;
   background: 
-    linear-gradient(
-      135deg,
-      rgba(0, 255, 0, 0.1) 0%,
-      transparent 20%,
-      transparent 80%,
-      rgba(0, 0, 255, 0.1) 100%
+    radial-gradient(
+      ellipse at center,
+      hsla(120, 100%, 50%, 0.1) 0%,
+      hsla(240, 100%, 50%, 0.1) 30%,
+      transparent 60%
     );
   mix-blend-mode: difference;
   pointer-events: none;
-  opacity: 0.3;
+  opacity: 0.8;
+  z-index: 1;
+}
+
+/* Character enhancement for better visibility */
+.character-enhanced {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  will-change: transform, filter;
+}
+
+/* Gaming character effects */
+.character-glow-vegas {
+  filter: 
+    drop-shadow(0 0 20px rgba(255, 204, 0, 0.4)) 
+    drop-shadow(0 0 40px rgba(255, 102, 0, 0.2)) 
+    drop-shadow(0 12px 30px rgba(0,0,0,0.6)) 
+    contrast(1.08) 
+    saturate(1.1) 
+    brightness(1.12);
+}
+
+.character-glow-arena {
+  filter: 
+    drop-shadow(0 0 20px rgba(128, 0, 255, 0.4)) 
+    drop-shadow(0 0 40px rgba(255, 0, 128, 0.2)) 
+    drop-shadow(0 12px 30px rgba(0,0,0,0.6)) 
+    contrast(1.08) 
+    saturate(1.15) 
+    brightness(1.06);
+}
+
+.character-glow-default {
+  filter: 
+    drop-shadow(0 8px 20px rgba(0,0,0,0.5)) 
+    contrast(1.06) 
+    saturate(1.12) 
+    brightness(1.05);
 }

@@ -1,3 +1,11 @@
+import { 
+  createCharacterSprite, 
+  renderCharacterOnCanvas, 
+  addGamingEffects, 
+  getCharacterPosition,
+  CharacterRenderOptions 
+} from './characterRenderer';
+
 interface ThumbnailConfig {
   mainText: string;
   subText: string;
@@ -168,144 +176,128 @@ const removeGreenBlueBackground = (imageData: ImageData): ImageData => {
 };
 
 const drawOverlayImage = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, imageSrc: string, sizePercentage: number, config: ThumbnailConfig) => {
-  const img = new Image();
-  img.crossOrigin = 'anonymous';
-  await new Promise((resolve, reject) => {
-    img.onload = resolve;
-    img.onerror = reject;
-    img.src = imageSrc;
-  });
-  
-  // Much more aggressive size scaling - make characters HUGE
-  const sizeMultiplier = Math.max(0.6, Math.min(1.5, sizePercentage / 100));
-  
-  // Massive dimensions for maximum visibility
-  const maxWidth = canvas.width * sizeMultiplier * 0.8; // Increased from 0.6 to 0.8
-  const maxHeight = canvas.height * sizeMultiplier * 1.0; // Increased from 0.85 to 1.0
-  
-  const aspectRatio = img.width / img.height;
-  let width = maxWidth;
-  let height = width / aspectRatio;
-  
-  if (height > maxHeight) {
-    height = maxHeight;
-    width = height * aspectRatio;
-  }
-  
-  // Position character to take up most of the right side
-  let x, y;
-  
-  if (sizePercentage >= 70) {
-    // Large character - fill most of right side
-    x = canvas.width - width - 20; // Minimal margin
-    y = canvas.height - height - 20; // Minimal margin
-  } else if (sizePercentage >= 40) {
-    // Medium character - still very large
-    x = canvas.width - width - 40;
-    y = canvas.height - height - 40;
-  } else {
-    // Small character - but make it bigger than before
-    x = canvas.width - width - 60;
-    y = canvas.height - height - 60;
-  }
-  
-  // Character background effects
-  if (sizePercentage > 15) {
-    // Draw character ground shadow
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-    ctx.beginPath();
-    ctx.ellipse(x + width/2, y + height - 15, width * 0.5, 35, 0, 0, Math.PI * 2);
-    ctx.fill();
+  try {
+    // Create character render options based on config
+    const renderOptions: CharacterRenderOptions = {
+      removeBackground: config.characterRemoveBackground !== false, // Default to true for better results
+      enhanceColors: true,
+      addShadow: config.glowEffect || false,
+      blendMode: config.characterBlendMode || 'normal',
+      backgroundColor: config.backgroundPreset || 'las-vegas'
+    };
+
+    // Create clean character sprite using new system
+    const characterCanvas = await createCharacterSprite(imageSrc, renderOptions);
     
-    // Add atmospheric glow
-    const glowIntensity = Math.min(0.5, sizePercentage * 0.008);
-    const gradient = ctx.createRadialGradient(x + width/2, y + height/2, 0, x + width/2, y + height/2, Math.max(width, height) * 1.1);
-    gradient.addColorStop(0, `rgba(0, 212, 255, ${glowIntensity})`);
-    gradient.addColorStop(1, 'transparent');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(x - 100, y - 100, width + 200, height + 200);
-  }
-  
-  // Enhanced character effects with scene-aware lighting
-  if (sizePercentage > 20) {
-    // Apply scene-specific lighting based on background preset
-    if (config.backgroundPreset === 'las-vegas') {
-      ctx.shadowColor = 'rgba(255, 204, 0, 0.8)';
-      ctx.shadowBlur = Math.min(40, sizePercentage * 0.6);
-    } else if (config.backgroundPreset === 'finals-arena') {
-      ctx.shadowColor = 'rgba(128, 0, 255, 0.8)';
-      ctx.shadowBlur = Math.min(40, sizePercentage * 0.6);
-    } else {
-      ctx.shadowColor = '#00d4ff';
-      ctx.shadowBlur = Math.min(50, sizePercentage * 0.8);
+    // Calculate character size with better scaling
+    const sizeMultiplier = Math.max(0.4, Math.min(1.2, sizePercentage / 100));
+    const maxWidth = canvas.width * sizeMultiplier * 0.75;
+    const maxHeight = canvas.height * sizeMultiplier * 0.9;
+    
+    const aspectRatio = characterCanvas.width / characterCanvas.height;
+    let width = maxWidth;
+    let height = width / aspectRatio;
+    
+    if (height > maxHeight) {
+      height = maxHeight;
+      width = height * aspectRatio;
     }
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 0;
-  }
-  
-  // Apply background removal (always enabled for exports to remove green/blue backgrounds)
-  if (config.characterRemoveBackground || true) {
-    // Create temporary canvas for background removal processing
-    const tempCanvas = document.createElement('canvas');
-    const tempCtx = tempCanvas.getContext('2d');
-    if (!tempCtx) throw new Error('Could not get temp canvas context');
     
-    tempCanvas.width = width;
-    tempCanvas.height = height;
+    // Get character position using the new positioning system
+    const position = config.characterPosition || 'bottom-right';
+    const offsetX = config.characterHorizontalOffset || 0;
+    const offsetY = config.characterVerticalOffset || 0;
     
-    // Draw character on temp canvas
-    tempCtx.imageSmoothingEnabled = true;
-    tempCtx.imageSmoothingQuality = 'high';
-    tempCtx.drawImage(img, 0, 0, width, height);
+    const { x, y } = getCharacterPosition(
+      position, 
+      canvas.width, 
+      canvas.height, 
+      width, 
+      height, 
+      offsetX, 
+      offsetY
+    );
     
-    // Get image data and remove background
-    const imageData = tempCtx.getImageData(0, 0, width, height);
-    const processedImageData = removeGreenBlueBackground(imageData);
+    // Draw ground shadow first (under character)
+    if (sizePercentage > 15) {
+      ctx.save();
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+      ctx.beginPath();
+      ctx.ellipse(x + width/2, y + height - 10, width * 0.4, 25, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
     
-    // Put processed image data back
-    tempCtx.putImageData(processedImageData, 0, 0);
+    // Add gaming effects based on background preset
+    let effectType: 'warrior' | 'mage' | 'assassin' | 'tank' = 'warrior';
+    if (config.backgroundPreset === 'finals-arena') effectType = 'mage';
+    else if (config.backgroundPreset === 'las-vegas') effectType = 'tank';
+    else if (config.backgroundPreset === 'urban-battlefield') effectType = 'assassin';
     
-    // Draw processed image to main canvas
-    ctx.drawImage(tempCanvas, x, y);
-  } else {
-    // Draw the character normally with high quality scaling
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
+    addGamingEffects(ctx, x, y, width, height, effectType);
+    
+    // Render the clean character sprite
+    renderCharacterOnCanvas(ctx, characterCanvas, x, y, width, height, renderOptions);
+    
+    // Add scene-specific atmospheric effects
+    if (sizePercentage > 20) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      
+      if (config.backgroundPreset === 'las-vegas') {
+        // Golden Vegas lighting
+        const vegasGradient = ctx.createRadialGradient(
+          x + width/2, y + height/2, 0,
+          x + width/2, y + height/2, Math.max(width, height) * 0.8
+        );
+        vegasGradient.addColorStop(0, 'rgba(255, 204, 0, 0.15)');
+        vegasGradient.addColorStop(0.5, 'rgba(255, 102, 0, 0.08)');
+        vegasGradient.addColorStop(1, 'transparent');
+        ctx.fillStyle = vegasGradient;
+        ctx.fillRect(x - 50, y - 50, width + 100, height + 100);
+      } else if (config.backgroundPreset === 'finals-arena') {
+        // Cyber arena effects
+        const arenaGradient = ctx.createRadialGradient(
+          x + width/2, y + height/2, 0,
+          x + width/2, y + height/2, Math.max(width, height) * 0.9
+        );
+        arenaGradient.addColorStop(0, 'rgba(128, 0, 255, 0.12)');
+        arenaGradient.addColorStop(0.5, 'rgba(255, 0, 128, 0.06)');
+        arenaGradient.addColorStop(1, 'transparent');
+        ctx.fillStyle = arenaGradient;
+        ctx.fillRect(x - 60, y - 60, width + 120, height + 120);
+      }
+      
+      ctx.restore();
+    }
+    
+    // Draw NO DAMAGE badge with better positioning
+    if (sizePercentage > 10) {
+      drawNoDamageBadge(ctx, x, y, sizePercentage, width, height);
+    }
+    
+    // Return character bounds for text positioning
+    return { x, y, width, height };
+    
+  } catch (error) {
+    console.error('Error rendering character:', error);
+    // Fallback to simple image rendering if new system fails
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    await new Promise((resolve, reject) => {
+      img.onload = resolve;
+      img.onerror = reject;
+      img.src = imageSrc;
+    });
+    
+    const width = canvas.width * 0.3;
+    const height = (width / img.width) * img.height;
+    const x = canvas.width - width - 50;
+    const y = canvas.height - height - 50;
+    
     ctx.drawImage(img, x, y, width, height);
+    return { x, y, width, height };
   }
-  
-  // Apply ambient lighting overlay for better scene integration
-  if (config.backgroundPreset === 'las-vegas' && sizePercentage > 15) {
-    ctx.globalCompositeOperation = 'overlay';
-    const lightingGradient = ctx.createRadialGradient(x + width/2, y + height/2, 0, x + width/2, y + height/2, Math.max(width, height));
-    lightingGradient.addColorStop(0, 'rgba(255, 204, 0, 0.25)');
-    lightingGradient.addColorStop(0.4, 'rgba(255, 102, 0, 0.15)');
-    lightingGradient.addColorStop(1, 'transparent');
-    ctx.fillStyle = lightingGradient;
-    ctx.fillRect(x, y, width, height);
-    ctx.globalCompositeOperation = 'source-over';
-  } else if (config.backgroundPreset === 'finals-arena' && sizePercentage > 15) {
-    ctx.globalCompositeOperation = 'overlay';
-    const lightingGradient = ctx.createRadialGradient(x + width/2, y + height/2, 0, x + width/2, y + height/2, Math.max(width, height));
-    lightingGradient.addColorStop(0, 'rgba(128, 0, 255, 0.2)');
-    lightingGradient.addColorStop(0.4, 'rgba(255, 0, 128, 0.1)');
-    lightingGradient.addColorStop(1, 'transparent');
-    ctx.fillStyle = lightingGradient;
-    ctx.fillRect(x, y, width, height);
-    ctx.globalCompositeOperation = 'source-over';
-  }
-  
-  // Draw NO DAMAGE badge with better positioning
-  if (sizePercentage > 10) {
-    drawNoDamageBadge(ctx, x, y, sizePercentage, width, height);
-  }
-  
-  // Reset shadow
-  ctx.shadowColor = 'transparent';
-  ctx.shadowBlur = 0;
-  
-  // Return character bounds for text positioning
-  return { x, y, width, height };
 };
 
 const drawNoDamageBadge = (ctx: CanvasRenderingContext2D, characterX: number, characterY: number, size: number, characterWidth: number, characterHeight: number) => {
