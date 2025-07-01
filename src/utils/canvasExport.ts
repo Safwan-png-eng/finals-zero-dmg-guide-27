@@ -118,12 +118,12 @@ const drawOverlayImage = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanva
     img.src = imageSrc;
   });
   
-  // Better size scaling to prevent overlaps
-  const sizeMultiplier = Math.max(0.15, Math.min(0.8, sizePercentage / 100));
+  // Much more aggressive size scaling - characters should be prominent
+  const sizeMultiplier = Math.max(0.4, Math.min(1.2, sizePercentage / 100));
   
-  // Significantly reduced max dimensions to prevent text overlap
-  const maxWidth = canvas.width * sizeMultiplier * 0.35; // Reduced from 0.5 to 0.35
-  const maxHeight = canvas.height * sizeMultiplier * 0.55; // Reduced from 0.7 to 0.55
+  // Significantly increased dimensions for better visibility
+  const maxWidth = canvas.width * sizeMultiplier * 0.6; // Increased from 0.35 to 0.6
+  const maxHeight = canvas.height * sizeMultiplier * 0.85; // Increased from 0.55 to 0.85
   
   const aspectRatio = img.width / img.height;
   let width = maxWidth;
@@ -134,44 +134,44 @@ const drawOverlayImage = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanva
     width = height * aspectRatio;
   }
   
-  // Much more conservative positioning with larger margins
+  // Adjusted positioning with larger characters in mind
   let x, y;
   
   if (sizePercentage >= 70) {
-    // Large character - positioned far right with large margins
-    x = canvas.width - width - 120; // Increased from 80
-    y = canvas.height - height - 100; // Increased from 60
+    // Large character - positioned right with space for text
+    x = canvas.width - width - 60; // Reduced margin to show more character
+    y = canvas.height - height - 40; // Reduced margin
   } else if (sizePercentage >= 40) {
-    // Medium character - positioned lower right with safe margins
-    x = canvas.width - width - 140; // Increased from 100
-    y = canvas.height - height - 120; // Increased from 80
+    // Medium character - positioned lower right
+    x = canvas.width - width - 80;
+    y = canvas.height - height - 60;
   } else {
-    // Small character - corner placement with maximum margins
-    x = canvas.width - width - 160; // Increased from 120
-    y = canvas.height - height - 140; // Increased from 100
+    // Small character - but still make it visible
+    x = canvas.width - width - 100;
+    y = canvas.height - height - 80;
   }
   
   // Character background effects
-  if (sizePercentage > 30) {
+  if (sizePercentage > 20) { // Lowered threshold
     // Draw character ground shadow
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
     ctx.beginPath();
-    ctx.ellipse(x + width/2, y + height - 15, width * 0.35, 20, 0, 0, Math.PI * 2);
+    ctx.ellipse(x + width/2, y + height - 10, width * 0.4, 25, 0, 0, Math.PI * 2);
     ctx.fill();
     
     // Add atmospheric glow
-    const glowIntensity = Math.min(0.3, sizePercentage * 0.004);
-    const gradient = ctx.createRadialGradient(x + width/2, y + height/2, 0, x + width/2, y + height/2, Math.max(width, height) * 0.8);
+    const glowIntensity = Math.min(0.4, sizePercentage * 0.006);
+    const gradient = ctx.createRadialGradient(x + width/2, y + height/2, 0, x + width/2, y + height/2, Math.max(width, height) * 0.9);
     gradient.addColorStop(0, `rgba(0, 212, 255, ${glowIntensity})`);
     gradient.addColorStop(1, 'transparent');
     ctx.fillStyle = gradient;
-    ctx.fillRect(x - 60, y - 60, width + 120, height + 120);
+    ctx.fillRect(x - 80, y - 80, width + 160, height + 160);
   }
   
-  // Enhanced character effects for larger sizes
-  if (sizePercentage > 50) {
+  // Enhanced character effects for larger visibility
+  if (sizePercentage > 30) { // Lowered threshold
     ctx.shadowColor = '#00d4ff';
-    ctx.shadowBlur = Math.min(25, sizePercentage * 0.4);
+    ctx.shadowBlur = Math.min(35, sizePercentage * 0.5);
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 0;
   }
@@ -181,8 +181,8 @@ const drawOverlayImage = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanva
   ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(img, x, y, width, height);
   
-  // Draw NO DAMAGE badge with better positioning to avoid text overlap
-  if (sizePercentage > 25) {
+  // Draw NO DAMAGE badge with better positioning
+  if (sizePercentage > 15) { // Lowered threshold
     drawNoDamageBadge(ctx, x, y, sizePercentage, width, height);
   }
   
@@ -195,31 +195,31 @@ const drawOverlayImage = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanva
 };
 
 const drawNoDamageBadge = (ctx: CanvasRenderingContext2D, characterX: number, characterY: number, size: number, characterWidth: number, characterHeight: number) => {
-  // Scale badge with character size but keep it smaller
-  const badgeScale = Math.max(0.6, Math.min(1.0, size / 80)); // Reduced scale
-  const badgeWidth = 100 * badgeScale; // Reduced from 120
-  const badgeHeight = 26 * badgeScale; // Reduced from 30
+  // Better badge scaling - more visible
+  const badgeScale = Math.max(0.8, Math.min(1.4, size / 60)); // Increased scale
+  const badgeWidth = 110 * badgeScale; // Slightly larger
+  const badgeHeight = 28 * badgeScale;
   
-  // Position badge to avoid text overlap - much more conservative positioning
+  // Better positioning to avoid text overlap
   let badgeX, badgeY;
   
   if (size >= 70) {
-    // Large character - position badge in upper right corner of character, not extending beyond
-    badgeX = characterX + characterWidth - badgeWidth - 10;
-    badgeY = characterY + 15;
-  } else if (size >= 40) {
-    // Medium character - position more towards character center
-    badgeX = characterX + characterWidth * 0.6;
-    badgeY = characterY + characterHeight * 0.15;
-  } else {
-    // Small character - keep badge close to character
-    badgeX = characterX + characterWidth * 0.5;
+    // Large character - position badge in safe zone
+    badgeX = characterX + characterWidth - badgeWidth - 20;
     badgeY = characterY + 20;
+  } else if (size >= 40) {
+    // Medium character - position more conservatively
+    badgeX = characterX + characterWidth * 0.7;
+    badgeY = characterY + characterHeight * 0.1;
+  } else {
+    // Small character - keep badge visible but not overlapping
+    badgeX = characterX + characterWidth * 0.6;
+    badgeY = characterY + 15;
   }
   
-  // Ensure badge doesn't go beyond canvas boundaries
-  badgeX = Math.min(badgeX, characterX + characterWidth - badgeWidth);
-  badgeY = Math.max(badgeY, characterY + 10);
+  // Ensure badge stays within character bounds
+  badgeX = Math.min(badgeX, characterX + characterWidth - badgeWidth - 5);
+  badgeY = Math.max(badgeY, characterY + 5);
   
   // Badge background glow
   ctx.shadowColor = '#ff0000';
@@ -290,7 +290,7 @@ const drawText = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, conf
   ctx.textAlign = 'left';
   ctx.textBaseline = 'middle';
   
-  // Smart text positioning with character bounds consideration
+  // Much more conservative text positioning with larger characters
   let textX = 80;
   let textY = canvas.height / 2;
   let maxTextWidth = canvas.width - 160;
@@ -299,21 +299,21 @@ const drawText = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, conf
     const characterSize = config.overlayImageSize || 25;
     
     if (characterSize >= 70) {
-      // Large character - text on left side with safe margins
+      // Large character - text on left side with much more space
       textX = 60;
-      textY = canvas.height * 0.4;
-      maxTextWidth = characterBounds.x - 120; // Leave large gap from character
+      textY = canvas.height * 0.35;
+      maxTextWidth = characterBounds.x - 180; // Much larger gap
     } else if (characterSize >= 40) {
-      // Medium character - text in upper area, well clear of character
+      // Medium character - text in upper area with safe spacing
       textX = 80;
-      textY = canvas.height * 0.25; // Moved higher to avoid overlap
-      maxTextWidth = canvas.width - 200; // More conservative width
-      ctx.textAlign = 'left'; // Keep left aligned for better control
+      textY = canvas.height * 0.2; // Moved higher
+      maxTextWidth = canvas.width - 300; // Very conservative width
+      ctx.textAlign = 'left';
     } else {
-      // Small character - text on left side with moderate spacing
+      // Small character - text on left with moderate spacing
       textX = 80;
-      textY = canvas.height * 0.45;
-      maxTextWidth = characterBounds.x - 100; // Safe gap from character
+      textY = canvas.height * 0.4;
+      maxTextWidth = characterBounds.x - 140; // Safe gap
     }
   } else {
     // No character - use selected position
