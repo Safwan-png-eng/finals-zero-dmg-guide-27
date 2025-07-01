@@ -12,7 +12,7 @@ interface ThumbnailConfig {
   glowEffect: boolean;
   backgroundImage: string | null;
   overlayImage: string | null;
-  overlayImageSize: number; // New property
+  overlayImageSize: number;
   textShadow: boolean;
   borderGlow: boolean;
   textOutline: boolean;
@@ -35,8 +35,16 @@ interface ThumbnailCanvasProps {
 const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
   const canvasRef = useRef<HTMLDivElement>(null);
 
+  console.log('ThumbnailCanvas render with config:', {
+    overlayImage: config.overlayImage ? 'present' : 'null',
+    overlayImageSize: config.overlayImageSize,
+    backgroundImage: config.backgroundImage ? 'present' : 'null',
+    backgroundPreset: config.backgroundPreset
+  });
+
   const getBackgroundStyle = () => {
     if (config.backgroundImage) {
+      console.log('Using custom background image');
       return {
         backgroundImage: `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.4)), url(${config.backgroundImage})`,
         backgroundSize: 'cover',
@@ -105,6 +113,7 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
     };
     
     const preset = presets[config.backgroundPreset as keyof typeof presets] || presets['neon-city'];
+    console.log('Using preset background:', config.backgroundPreset);
     return {
       backgroundImage: preset.backgroundImage,
       backgroundSize: 'cover',
@@ -163,10 +172,12 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
   };
 
   const getOverlayImageSize = () => {
-    const baseSize = config.overlayImageSize || 25; // Default 25%
+    const baseSize = config.overlayImageSize || 25;
+    const clampedSize = Math.max(10, Math.min(50, baseSize));
+    console.log('Overlay image size calculation:', { baseSize, clampedSize });
     return {
-      width: `${Math.max(10, Math.min(50, baseSize))}%`, // Clamp between 10% and 50%
-      aspectRatio: '3/4' // Maintain aspect ratio for character images
+      width: `${clampedSize}%`,
+      aspectRatio: '3/4'
     };
   };
 
@@ -209,20 +220,26 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
 
         {/* Overlay Image - Enhanced sizing */}
         {config.overlayImage && (
-          <div className="absolute bottom-4 right-4">
+          <div className="absolute bottom-4 right-4 z-10">
             <div 
-              className="relative rounded-lg overflow-hidden border border-white/20 shadow-xl"
+              className="relative rounded-lg overflow-hidden border border-white/20 shadow-xl transition-all duration-300"
               style={getOverlayImageSize()}
             >
               <img 
                 src={config.overlayImage} 
                 alt="Character" 
-                className="w-full h-full object-contain bg-gradient-to-b from-transparent to-black/20"
+                className="w-full h-full object-contain"
                 style={{
                   filter: config.glowEffect ? `drop-shadow(0 0 15px ${config.accentColor}40) contrast(1.05) saturate(1.1)` : 'contrast(1.05) saturate(1.1)',
                   objectFit: 'contain'
                 }}
+                onLoad={() => console.log('Overlay image loaded successfully')}
+                onError={() => console.error('Failed to load overlay image')}
               />
+              {/* Visual indicator for size adjustment */}
+              <div className="absolute top-1 left-1 bg-black/50 text-white text-xs px-1 rounded">
+                {config.overlayImageSize || 25}%
+              </div>
             </div>
           </div>
         )}
