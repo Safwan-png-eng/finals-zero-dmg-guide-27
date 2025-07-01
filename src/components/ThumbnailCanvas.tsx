@@ -133,17 +133,17 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
   };
 
   const getTextPosition = () => {
-    // Smart text positioning based on character presence and size
+    // Improved text positioning with better spacing calculations
     if (config.overlayImage) {
       const characterSize = config.overlayImageSize || 25;
       if (characterSize >= 70) {
-        // Large character - position text on left side
-        return 'items-center justify-start pl-6';
+        // Large character - text takes left 60% of space
+        return 'items-center justify-start';
       } else if (characterSize >= 40) {
-        // Medium character - position text in upper area
-        return 'items-start justify-center pt-8';
+        // Medium character - text in upper 70% of space
+        return 'items-start justify-center pt-4';
       } else {
-        // Small character - center text
+        // Small character - text centered with more space
         return 'items-center justify-center';
       }
     }
@@ -192,10 +192,10 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
     const clampedSize = Math.max(15, Math.min(100, baseSize));
     console.log('Overlay image size calculation:', { baseSize, clampedSize });
     
-    // Better size scaling with proper aspect ratio
+    // Better size scaling with proper aspect ratio and improved spacing
     return {
-      width: `${Math.min(clampedSize * 0.6, 60)}%`,
-      maxHeight: `${Math.min(clampedSize * 0.8, 80)}%`,
+      width: `${Math.min(clampedSize * 0.5, 50)}%`, // Reduced max width to prevent overlap
+      maxHeight: `${Math.min(clampedSize * 0.7, 75)}%`, // Reduced max height
       aspectRatio: 'auto'
     };
   };
@@ -203,28 +203,45 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
   const getCharacterPosition = () => {
     const size = config.overlayImageSize || 25;
     if (size >= 70) {
-      // Large character takes right side
-      return 'absolute bottom-0 right-0 z-10 flex items-end justify-end p-4';
+      // Large character - positioned to leave space for text
+      return 'absolute bottom-0 right-0 z-10 flex items-end justify-end pr-4 pb-4';
     } else if (size >= 40) {
-      // Medium character in bottom right
-      return 'absolute bottom-0 right-0 z-10 flex items-end justify-end p-6';
+      // Medium character - positioned lower to avoid text overlap
+      return 'absolute bottom-0 right-0 z-10 flex items-end justify-end pr-6 pb-6';
     } else {
-      // Small character in corner
-      return 'absolute bottom-0 right-0 z-10 flex items-end justify-end p-8';
+      // Small character - corner placement with more margin
+      return 'absolute bottom-0 right-0 z-10 flex items-end justify-end pr-8 pb-8';
     }
   };
 
   const getTextContainerClass = () => {
     const size = config.overlayImageSize || 25;
     if (config.overlayImage && size >= 70) {
-      // Large character - text takes left space
-      return 'relative z-20 h-full flex flex-col text-left px-6 sm:px-8 w-1/2';
+      // Large character - text takes left 65% with proper padding
+      return 'relative z-20 h-full flex flex-col text-left px-6 sm:px-8 w-3/5 pr-12';
     } else if (config.overlayImage && size >= 40) {
-      // Medium character - text in upper area
-      return 'relative z-20 h-3/5 flex flex-col text-center px-4 sm:px-6 w-full';
+      // Medium character - text in upper area with better spacing
+      return 'relative z-20 h-2/3 flex flex-col text-center px-4 sm:px-6 w-full pb-8';
+    } else if (config.overlayImage) {
+      // Small character - more centered with padding
+      return 'relative z-20 h-full flex flex-col text-center px-4 sm:px-6 pr-16 pb-12';
     } else {
-      // Default full width text
+      // No character - full width
       return 'relative z-20 h-full flex flex-col text-center px-4 sm:px-6';
+    }
+  };
+
+  const getNoDamageBadgePosition = () => {
+    const size = config.overlayImageSize || 25;
+    if (size >= 70) {
+      // Large character - badge positioned to avoid text overlap
+      return 'absolute top-6 right-8 z-30';
+    } else if (size >= 40) {
+      // Medium character - badge positioned higher
+      return 'absolute top-4 right-6 z-30';
+    } else {
+      // Small character - standard position
+      return 'absolute top-4 right-4 z-30';
     }
   };
 
@@ -280,7 +297,7 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
           </div>
         )}
 
-        {/* Fixed Character Overlay with Proper Sizing */}
+        {/* Improved Character Overlay with Better Spacing */}
         {config.overlayImage && (
           <div className={getCharacterPosition()}>
             <div 
@@ -322,7 +339,7 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
                 }}
               />
 
-              {/* Main Character Image with Enhanced Effects and Proper Scaling */}
+              {/* Main Character Image with Better Positioning */}
               <img 
                 src={config.overlayImage} 
                 alt="Character" 
@@ -339,41 +356,44 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
                 onError={() => console.error('Failed to load overlay image')}
               />
 
-              {/* NO DAMAGE Badge - Enhanced and Scaled with Character */}
-              <div className="absolute top-4 left-4 z-20" style={{ transform: `scale(${Math.max(0.8, Math.min(1.5, (config.overlayImageSize || 25) / 50))})` }}>
-                <div className="relative">
-                  {/* Badge Background Glow - More Intense */}
-                  <div 
-                    className="absolute -inset-3 rounded-2xl opacity-80 animate-pulse blur-md"
-                    style={{
-                      background: `radial-gradient(circle, #ff0000 0%, #ff3300 30%, #ff6600 60%, transparent 100%)`,
-                    }}
-                  />
-                  
-                  {/* Main Badge - Larger and More Prominent */}
-                  <div className="relative bg-gradient-to-r from-red-600 via-red-500 to-orange-500 text-white px-5 py-3 rounded-2xl border-3 border-white/90 shadow-2xl backdrop-blur-md">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-3 h-3 bg-white rounded-full animate-pulse shadow-lg"></div>
-                      <span className="font-black text-base tracking-wider drop-shadow-lg">NO DAMAGE</span>
+              {/* NO DAMAGE Badge - Repositioned to Avoid Overlaps */}
+              {config.overlayImage && (
+                <div className={getNoDamageBadgePosition()}>
+                  <div className="relative">
+                    {/* Badge Background Glow - More Intense */}
+                    <div 
+                      className="absolute -inset-2 rounded-xl opacity-60 animate-pulse blur-sm"
+                      style={{
+                        background: `radial-gradient(circle, #ff0000 0%, #ff3300 30%, #ff6600 60%, transparent 100%)`,
+                      }}
+                    />
+                    
+                    {/* Main Badge - Compact Design */}
+                    <div className="relative bg-gradient-to-r from-red-600 via-red-500 to-orange-500 text-white px-3 py-2 rounded-xl border-2 border-white/90 shadow-xl backdrop-blur-md"
+                         style={{ transform: `scale(${Math.max(0.8, Math.min(1.2, (config.overlayImageSize || 25) / 60))})` }}>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-white rounded-full animate-pulse shadow-sm"></div>
+                        <span className="font-black text-sm tracking-wide drop-shadow-sm">NO DAMAGE</span>
+                      </div>
                     </div>
+                    
+                    {/* Badge Shine Effect - More Visible */}
+                    <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse" style={{animationDelay: '1s'}} />
                   </div>
-                  
-                  {/* Badge Shine Effect - More Visible */}
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-white/40 to-transparent animate-pulse" style={{animationDelay: '1s'}} />
                 </div>
-              </div>
+              )}
               
-              {/* Character Stats Badge - Repositioned and Scaled */}
-              <div className="absolute bottom-4 left-4 bg-gradient-to-r from-black/95 to-black/80 text-white text-sm px-4 py-2 rounded-2xl border-2 border-white/50 backdrop-blur-md shadow-xl"
-                   style={{ transform: `scale(${Math.max(0.8, Math.min(1.2, (config.overlayImageSize || 25) / 60))})` }}>
+              {/* Character Stats Badge - Better Positioned */}
+              <div className="absolute -bottom-2 -left-2 bg-gradient-to-r from-black/95 to-black/80 text-white text-xs px-3 py-1 rounded-xl border border-white/50 backdrop-blur-md shadow-lg"
+                   style={{ transform: `scale(${Math.max(0.7, Math.min(1.0, (config.overlayImageSize || 25) / 70))})` }}>
                 <span className="font-bold text-cyan-400">{config.overlayImageSize || 25}%</span>
-                <span className="text-white/70 ml-2">SIZE</span>
+                <span className="text-white/70 ml-1 text-xs">SIZE</span>
               </div>
               
-              {/* Character Class Badge - Enhanced and Scaled */}
-              <div className="absolute bottom-4 right-4 bg-gradient-to-r from-purple-600/95 to-blue-600/95 text-white text-sm px-4 py-2 rounded-2xl border-2 border-white/50 backdrop-blur-md shadow-xl"
-                   style={{ transform: `scale(${Math.max(0.8, Math.min(1.2, (config.overlayImageSize || 25) / 60))})` }}>
-                <span className="font-bold">⭐ HEAVY</span>
+              {/* Character Class Badge - Better Positioned */}
+              <div className="absolute -bottom-2 -right-2 bg-gradient-to-r from-purple-600/95 to-blue-600/95 text-white text-xs px-3 py-1 rounded-xl border border-white/50 backdrop-blur-md shadow-lg"
+                   style={{ transform: `scale(${Math.max(0.7, Math.min(1.0, (config.overlayImageSize || 25) / 70))})` }}>
+                <span className="font-bold text-xs">⭐ HEAVY</span>
               </div>
 
               {/* Enhanced Character Frame Effect */}
@@ -388,7 +408,7 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
           </div>
         )}
 
-        {/* Smart Text Container with Fixed Positioning */}
+        {/* Improved Text Container with Better Spacing */}
         <div className={`${getTextContainerClass()} ${config.animatedText ? 'animate-pulse' : ''}`}>
           {/* Enhanced Text Background */}
           {config.textBackground && (
@@ -402,7 +422,7 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
             />
           )}
 
-          {/* Main Text with Smart Sizing and Positioning */}
+          {/* Main Text with Improved Spacing */}
           <h1 
             className={`font-black uppercase leading-tight transition-all duration-300 ${getFontSize().main} relative z-10 max-w-full break-words`}
             style={{ 
@@ -426,16 +446,17 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
               WebkitBackgroundClip: config.gradientText ? 'text' : 'unset',
               backgroundClip: config.gradientText ? 'text' : 'unset',
               wordWrap: 'break-word',
-              hyphens: 'auto'
+              hyphens: 'auto',
+              marginBottom: config.subText ? '0.5rem' : '0'
             }}
           >
             {config.mainText}
           </h1>
 
-          {/* Sub Text with Enhanced Styling */}
+          {/* Sub Text with Better Spacing */}
           {config.subText && (
             <p 
-              className={`font-bold uppercase tracking-wide opacity-90 mt-2 transition-all duration-300 ${getFontSize().sub} relative z-10 max-w-full break-words`}
+              className={`font-bold uppercase tracking-wide opacity-90 transition-all duration-300 ${getFontSize().sub} relative z-10 max-w-full break-words`}
               style={{ 
                 color: config.gradientText ? 'transparent' : config.accentColor,
                 fontFamily: getFontFamily(),

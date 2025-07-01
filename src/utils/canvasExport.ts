@@ -1,4 +1,3 @@
-
 interface ThumbnailConfig {
   mainText: string;
   subText: string;
@@ -118,12 +117,12 @@ const drawOverlayImage = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanva
     img.src = imageSrc;
   });
   
-  // Calculate size based on the size parameter (15% to 100%)
+  // Calculate size with better spacing to prevent overlaps
   const sizeMultiplier = Math.max(0.15, Math.min(1.0, sizePercentage / 100));
   
-  // Calculate dimensions maintaining aspect ratio
-  const maxWidth = canvas.width * sizeMultiplier * 0.6; // Max 60% of canvas width
-  const maxHeight = canvas.height * sizeMultiplier * 0.8; // Max 80% of canvas height
+  // Reduced max dimensions to prevent overlap
+  const maxWidth = canvas.width * sizeMultiplier * 0.5; // Reduced from 0.6 to 0.5
+  const maxHeight = canvas.height * sizeMultiplier * 0.7; // Reduced from 0.8 to 0.7
   
   const aspectRatio = img.width / img.height;
   let width = maxWidth;
@@ -134,21 +133,21 @@ const drawOverlayImage = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanva
     width = height * aspectRatio;
   }
   
-  // Smart positioning based on size
+  // Improved positioning with better spacing
   let x, y;
   
   if (sizePercentage >= 70) {
-    // Large character - right side, leaving space for text on left
-    x = canvas.width - width - 50;
-    y = canvas.height - height - 40;
+    // Large character - positioned to leave more space for text
+    x = canvas.width - width - 80; // Increased margin
+    y = canvas.height - height - 60; // Increased margin
   } else if (sizePercentage >= 40) {
-    // Medium character - bottom right corner
-    x = canvas.width - width - 80;
-    y = canvas.height - height - 60;
+    // Medium character - positioned lower to avoid text overlap
+    x = canvas.width - width - 100; // Increased margin
+    y = canvas.height - height - 80; // Increased margin
   } else {
-    // Small character - small corner placement
-    x = canvas.width - width - 100;
-    y = canvas.height - height - 80;
+    // Small character - more corner placement
+    x = canvas.width - width - 120; // Increased margin
+    y = canvas.height - height - 100; // Increased margin
   }
   
   // Character background effects
@@ -181,7 +180,7 @@ const drawOverlayImage = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanva
   ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(img, x, y, width, height);
   
-  // Draw enhanced NO DAMAGE badge for larger characters
+  // Draw enhanced NO DAMAGE badge with better positioning
   if (sizePercentage > 25) {
     drawNoDamageBadge(ctx, x, y, sizePercentage);
   }
@@ -193,11 +192,21 @@ const drawOverlayImage = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanva
 
 const drawNoDamageBadge = (ctx: CanvasRenderingContext2D, characterX: number, characterY: number, size: number) => {
   // Scale badge with character size
-  const badgeScale = Math.max(0.8, Math.min(1.5, size / 50));
-  const badgeWidth = 140 * badgeScale;
-  const badgeHeight = 35 * badgeScale;
-  const badgeX = characterX + 30 * badgeScale;
-  const badgeY = characterY + 30 * badgeScale;
+  const badgeScale = Math.max(0.8, Math.min(1.2, size / 60)); // Reduced max scale
+  const badgeWidth = 120 * badgeScale; // Reduced width
+  const badgeHeight = 30 * badgeScale; // Reduced height
+  
+  // Position badge to avoid overlap with text
+  let badgeX, badgeY;
+  if (size >= 70) {
+    // Large character - position badge in top right area
+    badgeX = characterX + 40 * badgeScale;
+    badgeY = characterY + 20 * badgeScale;
+  } else {
+    // Smaller characters - standard positioning
+    badgeX = characterX + 30 * badgeScale;
+    badgeY = characterY + 30 * badgeScale;
+  }
   
   // Badge background glow
   ctx.shadowColor = '#ff0000';
@@ -226,19 +235,19 @@ const drawNoDamageBadge = (ctx: CanvasRenderingContext2D, characterX: number, ch
   
   // Badge text
   ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-  ctx.shadowBlur = 4 * badgeScale;
+  ctx.shadowBlur = 3 * badgeScale;
   ctx.fillStyle = 'white';
-  ctx.font = `bold ${18 * badgeScale}px Impact, Arial Black, sans-serif`;
+  ctx.font = `bold ${16 * badgeScale}px Impact, Arial Black, sans-serif`; // Reduced font size
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   
   // Draw indicator dot
   ctx.beginPath();
-  ctx.arc(badgeX + 25 * badgeScale, badgeY + badgeHeight/2, 8 * badgeScale, 0, Math.PI * 2);
+  ctx.arc(badgeX + 20 * badgeScale, badgeY + badgeHeight/2, 6 * badgeScale, 0, Math.PI * 2); // Reduced dot size
   ctx.fill();
   
   // Draw badge text
-  ctx.fillText('NO DAMAGE', badgeX + badgeWidth/2 + 20 * badgeScale, badgeY + badgeHeight/2);
+  ctx.fillText('NO DAMAGE', badgeX + badgeWidth/2 + 15 * badgeScale, badgeY + badgeHeight/2);
   
   // Reset shadow
   ctx.shadowColor = 'transparent';
@@ -268,31 +277,31 @@ const drawText = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, conf
   ctx.textAlign = 'left'; // Changed to left align for better positioning
   ctx.textBaseline = 'middle';
   
-  // Smart text positioning based on character presence and size
-  let textX = 80; // Default left margin
+  // Improved text positioning with better spacing calculations
+  let textX = 80;
   let textY = canvas.height / 2;
-  let maxTextWidth = canvas.width - 160; // Default max width
+  let maxTextWidth = canvas.width - 160;
   
   if (config.overlayImage) {
     const characterSize = config.overlayImageSize || 25;
     
     if (characterSize >= 70) {
-      // Large character - text on left half
+      // Large character - text takes left 65% with more spacing
       textX = 60;
       textY = canvas.height * 0.45;
-      maxTextWidth = canvas.width * 0.45;
+      maxTextWidth = canvas.width * 0.42; // Reduced to prevent overlap
     } else if (characterSize >= 40) {
-      // Medium character - text in upper area
+      // Medium character - text in upper area with better spacing
       textX = canvas.width * 0.1;
-      textY = canvas.height * 0.35;
-      maxTextWidth = canvas.width * 0.8;
+      textY = canvas.height * 0.32; // Moved higher
+      maxTextWidth = canvas.width * 0.75; // Reduced width
       ctx.textAlign = 'center';
       textX = canvas.width / 2;
     } else {
-      // Small character - more centered text
+      // Small character - centered with more margin
       textX = canvas.width * 0.15;
       textY = canvas.height * 0.5;
-      maxTextWidth = canvas.width * 0.65;
+      maxTextWidth = canvas.width * 0.6; // Reduced width
     }
   } else {
     // No character - use selected position
@@ -335,7 +344,7 @@ const drawText = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, conf
     ctx.translate(-textX, -textY);
   }
   
-  // Draw main text with word wrapping for long text
+  // Draw main text with better spacing
   ctx.font = `900 ${fontSize}px ${fontFamily}`;
   
   if (config.textShadow) {
@@ -349,7 +358,7 @@ const drawText = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, conf
   if (config.textOutline) {
     ctx.strokeStyle = config.accentColor;
     ctx.lineWidth = 6;
-    ctx.strokeText(config.mainText.toUpperCase(), textX, textY - subFontSize/3);
+    ctx.strokeText(config.mainText.toUpperCase(), textX, textY - subFontSize/2);
   }
   
   // Text fill with opacity and gradient
@@ -364,17 +373,17 @@ const drawText = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, conf
   }
   
   ctx.globalAlpha = config.textOpacity / 100;
-  ctx.fillText(config.mainText.toUpperCase(), textX, textY - subFontSize/3);
+  ctx.fillText(config.mainText.toUpperCase(), textX, textY - subFontSize/2);
   ctx.globalAlpha = 1.0;
   
-  // Draw sub text
+  // Draw sub text with improved spacing
   if (config.subText) {
     ctx.font = `700 ${subFontSize}px ${fontFamily}`;
     
     if (config.textOutline) {
       ctx.strokeStyle = config.accentColor;
       ctx.lineWidth = 3;
-      ctx.strokeText(config.subText.toUpperCase(), textX, textY + fontSize/4);
+      ctx.strokeText(config.subText.toUpperCase(), textX, textY + fontSize/3);
     }
     
     if (config.gradientText) {
@@ -388,7 +397,7 @@ const drawText = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, conf
     }
     
     ctx.globalAlpha = (config.textOpacity / 100) * 0.85;
-    ctx.fillText(config.subText.toUpperCase(), textX, textY + fontSize/4);
+    ctx.fillText(config.subText.toUpperCase(), textX, textY + fontSize/3);
     ctx.globalAlpha = 1.0;
   }
   
