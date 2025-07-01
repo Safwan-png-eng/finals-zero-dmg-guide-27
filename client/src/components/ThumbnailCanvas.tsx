@@ -289,32 +289,17 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
                 />
               )}
 
-              {/* Enhanced Character Background Integration */}
-              <div 
-                className="absolute -inset-8 rounded-full opacity-25 animate-pulse"
-                style={{
-                  background: `radial-gradient(ellipse at center, ${config.accentColor}50 0%, ${config.accentColor}25 40%, transparent 80%)`,
-                  animation: 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite'
-                }}
-              />
-              
-              {/* Character Spotlight Effect */}
-              <div 
-                className="absolute -inset-16 opacity-20"
-                style={{
-                  background: `conic-gradient(from 45deg at center, transparent 0deg, ${config.accentColor}40 60deg, transparent 120deg, ${config.accentColor}30 180deg, transparent 240deg, ${config.accentColor}40 300deg, transparent 360deg)`,
-                  borderRadius: '50%',
-                  animation: 'spin 15s linear infinite'
-                }}
-              />
-              
-              {/* Character Color Harmony Layer */}
-              <div 
-                className="absolute inset-0 rounded-xl opacity-15 mix-blend-soft-light"
-                style={{
-                  background: `linear-gradient(135deg, ${config.accentColor}70 0%, transparent 60%, ${config.textColor}50 100%)`
-                }}
-              />
+              {/* Subtle Character Aura - Only if glow enabled */}
+              {config.glowEffect && (
+                <div 
+                  className="absolute -inset-4 opacity-20 animate-pulse pointer-events-none"
+                  style={{
+                    background: `radial-gradient(ellipse at center, ${config.accentColor}30 0%, transparent 70%)`,
+                    animation: 'pulse 6s ease-in-out infinite',
+                    borderRadius: '50%'
+                  }}
+                />
+              )}
 
               {/* Main Character Image with Better Positioning */}
               <img 
@@ -485,39 +470,38 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
           )}
         </div>
 
-        <div className="absolute top-3 right-3 flex space-x-2">
-          {[...Array(4)].map((_, i) => (
+        {/* Dynamic Gaming HUD Elements */}
+        {config.glowEffect && (
+          <div className="absolute top-3 right-3 flex space-x-2">
+            {[...Array(3)].map((_, i) => (
+              <div 
+                key={i}
+                className="w-3 h-3 rounded-full animate-pulse border-2 border-white/30 backdrop-blur-sm"
+                style={{ 
+                  backgroundColor: `${config.accentColor}80`,
+                  animationDelay: `${i * 0.3}s`,
+                  opacity: 0.8,
+                  boxShadow: `0 0 12px ${config.accentColor}60, inset 0 0 8px rgba(255,255,255,0.3)`
+                }}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Energy Bar Visual */}
+        {config.showParticles && (
+          <div className="absolute bottom-3 left-3 w-24 h-2 bg-black/40 rounded-full border border-white/20 backdrop-blur-sm overflow-hidden">
             <div 
-              key={i}
-              className="w-2 h-2 rounded-full animate-pulse border border-white/20"
+              className="h-full rounded-full animate-pulse"
               style={{ 
-                backgroundColor: config.accentColor,
-                animationDelay: `${i * 0.4}s`,
-                opacity: 0.7,
-                boxShadow: `0 0 8px ${config.accentColor}40`
+                background: `linear-gradient(90deg, ${config.accentColor} 0%, ${config.textColor} 100%)`,
+                width: '85%',
+                boxShadow: `0 0 8px ${config.accentColor}50`
               }}
             />
-          ))}
-        </div>
-        
-        <div className="absolute bottom-3 left-3 flex space-x-1">
-          <div 
-            className="w-12 h-1 rounded-full animate-pulse border-t border-white/20"
-            style={{ 
-              backgroundColor: config.accentColor,
-              opacity: 0.6,
-              boxShadow: `0 0 10px ${config.accentColor}30`
-            }}
-          />
-          <div 
-            className="w-6 h-1 rounded-full animate-pulse"
-            style={{ 
-              backgroundColor: config.accentColor,
-              opacity: 0.4,
-              animationDelay: '0.5s'
-            }}
-          />
-        </div>
+          </div>
+        )}
+
 
         <div className="absolute top-0 left-0 w-16 h-16">
           <div 

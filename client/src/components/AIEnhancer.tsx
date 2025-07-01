@@ -435,6 +435,117 @@ Return ONLY the exact background name (before the colon), nothing else.`;
     }
   };
 
+  // NEW FEATURE: Auto-enhance entire thumbnail with AI
+  const autoEnhanceThumbnail = async () => {
+    setIsGenerating(true);
+    try {
+      const prompt = `You are a viral YouTube thumbnail expert. Analyze this gaming thumbnail and provide optimal settings for maximum click-through rate:
+
+CURRENT THUMBNAIL:
+Title: "${config.mainText}"
+Subtitle: "${config.subText}"
+Background: ${config.backgroundPreset}
+Has Character: ${config.overlayImage ? 'Yes' : 'No'}
+Current Colors: Text(${config.textColor}), Accent(${config.accentColor})
+
+ENHANCEMENT GOALS:
+1. Maximum visual impact and click-worthiness
+2. Professional gaming thumbnail aesthetics  
+3. High contrast for mobile viewing
+4. Trending YouTube gaming styles
+5. Psychological triggers for engagement
+
+PROVIDE OPTIMAL SETTINGS:
+Return format: TEXT_COLOR|ACCENT_COLOR|FONT_SIZE|EFFECTS|EXPLANATION
+
+Effects options: glow+particles+shadow+outline (use + to combine)
+Font sizes: small|medium|large|xlarge
+Colors: Use hex codes that create maximum contrast and appeal
+
+Example: #FFFFFF|#FF6B35|xlarge|glow+particles+outline|High contrast orange accent with large text creates maximum impact for action content`;
+
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }]
+        })
+      });
+
+      const data = await response.json();
+      const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+      
+      if (aiResponse && aiResponse.includes('|')) {
+        const [textColor, accentColor, fontSize, effects, explanation] = aiResponse.split('|');
+        
+        // Apply AI recommendations
+        if (textColor.trim().startsWith('#')) {
+          onConfigChange('textColor', textColor.trim());
+        }
+        if (accentColor.trim().startsWith('#')) {
+          onConfigChange('accentColor', accentColor.trim());
+        }
+        if (['small', 'medium', 'large', 'xlarge'].includes(fontSize.trim())) {
+          onConfigChange('fontSize', fontSize.trim());
+        }
+        
+        // Apply effects
+        const effectsList = effects.trim().toLowerCase();
+        onConfigChange('glowEffect', effectsList.includes('glow'));
+        onConfigChange('showParticles', effectsList.includes('particles'));
+        onConfigChange('textShadow', effectsList.includes('shadow'));
+        onConfigChange('textOutline', effectsList.includes('outline'));
+        onConfigChange('borderGlow', effectsList.includes('glow'));
+        
+        // Auto-optimize for mobile
+        onConfigChange('textOpacity', 100);
+        onConfigChange('animatedText', true);
+        
+        toast({
+          title: "Thumbnail Auto-Enhanced!",
+          description: `AI applied viral-worthy settings: ${explanation?.substring(0, 60)}...`,
+          duration: 6000
+        });
+      } else {
+        // Fallback enhancement based on content analysis
+        const isActionContent = (config.mainText + config.subText).toLowerCase().includes('damage') || 
+                              (config.mainText + config.subText).toLowerCase().includes('win') ||
+                              (config.mainText + config.subText).toLowerCase().includes('challenge');
+        
+        if (isActionContent) {
+          onConfigChange('textColor', '#FFFFFF');
+          onConfigChange('accentColor', '#FF4500'); 
+          onConfigChange('fontSize', 'xlarge');
+          onConfigChange('glowEffect', true);
+          onConfigChange('showParticles', true);
+          onConfigChange('textShadow', true);
+          onConfigChange('borderGlow', true);
+        } else {
+          onConfigChange('textColor', '#FFFFFF');
+          onConfigChange('accentColor', '#00D4FF');
+          onConfigChange('fontSize', 'large');
+          onConfigChange('glowEffect', true);
+          onConfigChange('showParticles', false);
+          onConfigChange('textShadow', true);
+        }
+        
+        toast({
+          title: "Smart Enhancement Applied!",
+          description: "Auto-optimized for maximum visual impact based on content analysis.",
+        });
+      }
+    } catch (error) {
+      console.error('Auto enhancement failed:', error);
+      toast({
+        title: "Enhancement Failed",
+        description: "Could not auto-enhance. Please try individual AI tools.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   return (
     <div className="space-y-4 p-4 bg-gradient-to-r from-purple-500/10 to-cyan-500/10 rounded-xl border border-purple-300/20">
       <div className="flex items-center space-x-2 mb-3">
@@ -517,6 +628,24 @@ Return ONLY the exact background name (before the colon), nothing else.`;
             </>
           )}
         </Button>
+
+        <Button
+          onClick={autoEnhanceThumbnail}
+          disabled={isGenerating}
+          className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white transition-all duration-300"
+        >
+          {isGenerating ? (
+            <>
+              <Zap className="w-4 h-4 mr-2 animate-spin" />
+              Auto Enhancing...
+            </>
+          ) : (
+            <>
+              <Sparkles className="w-4 h-4 mr-2" />
+              AI Auto Enhance All
+            </>
+          )}
+        </Button>
         
         <div className="grid grid-cols-2 gap-2">
           <Button
@@ -558,7 +687,7 @@ Return ONLY the exact background name (before the colon), nothing else.`;
       </div>
       
       <div className="text-xs text-white/60 mt-3 p-2 bg-black/20 rounded">
-        🎯 Tip: AI now analyzes ALL Vegas images to pick the perfect match! Use "Try Different" to cycle through options.
+        ⚡ NEW: AI Auto Enhance applies viral-worthy colors, effects, and sizing in one click! Character box issue fixed.
       </div>
     </div>
   );
