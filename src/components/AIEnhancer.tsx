@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sparkles, Wand2, Brain, Zap } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -145,6 +144,54 @@ const AIEnhancer = ({ config, onConfigChange }: AIEnhancerProps) => {
     }
   };
 
+  // NEW: Let Gemini AI pick the best Las Vegas image
+  const pickBestVegasImage = async () => {
+    setIsGenerating(true);
+    try {
+      // Fetch all images in the Las Vegas folder from backend
+      const res = await fetch('http://localhost:3001/api/las-vegas-images');
+      const imageUrls = await res.json();
+      if (!Array.isArray(imageUrls) || imageUrls.length === 0) throw new Error('No images found in Las Vegas folder');
+
+      // Compose prompt for Gemini
+      const prompt = `Given the following YouTube thumbnail title: "${config.mainText}" and subtitle: "${config.subText}", pick the best matching image from this list of URLs for a Las Vegas themed gaming thumbnail. Return only the URL.\n\n${imageUrls.join('\n')}`;
+
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }]
+        })
+      });
+      const data = await response.json();
+      console.log('Gemini API response:', data);
+      const aiUrl = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+      const found = imageUrls.find(url => aiUrl && aiUrl.includes(url));
+      if (found) {
+        onConfigChange('backgroundImage', found);
+        toast({
+          title: 'AI Selected Image!',
+          description: 'Gemini picked the best Las Vegas image for your title.'
+        });
+      } else {
+        toast({
+          title: 'AI Did Not Pick an Image',
+          description: 'No valid image URL was returned by Gemini.',
+          variant: 'destructive'
+        });
+      }
+    } catch (error) {
+      console.error('AI image selection failed:', error);
+      toast({
+        title: 'AI Image Selection Failed',
+        description: 'Could not select an image. Please try again.',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   return (
     <div className="space-y-4 p-4 bg-gradient-to-r from-purple-500/10 to-cyan-500/10 rounded-xl border border-purple-300/20">
       <div className="flex items-center space-x-2 mb-3">
@@ -206,6 +253,24 @@ const AIEnhancer = ({ config, onConfigChange }: AIEnhancerProps) => {
             <>
               <Brain className="w-4 h-4 mr-2" />
               AI Perfect Preset
+            </>
+          )}
+        </Button>
+        
+        <Button
+          onClick={pickBestVegasImage}
+          disabled={isGenerating}
+          className="bg-gradient-to-r from-yellow-600 to-pink-600 hover:from-yellow-700 hover:to-pink-700 text-white transition-all duration-300"
+        >
+          {isGenerating ? (
+            <>
+              <Zap className="w-4 h-4 mr-2 animate-spin" />
+              AI Picking Image...
+            </>
+          ) : (
+            <>
+              <Sparkles className="w-4 h-4 mr-2" />
+              AI Pick Vegas Image
             </>
           )}
         </Button>

@@ -74,17 +74,8 @@ export const exportThumbnail = async (config: ThumbnailConfig): Promise<void> =>
 };
 
 const drawBackground = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, config: ThumbnailConfig) => {
-  // Check if preset has a specific background image
-  const presetBackgrounds: Record<string, string> = {
-    'monaco-streets': '/lovable-uploads/ff01c07f-8a42-4b34-bd5d-814ea69de169.png',
-    'urban-battlefield': '/lovable-uploads/2385a088-db61-4395-a7df-433b98126931.png',
-    'casino-royale': '/lovable-uploads/8f9ecc3b-dad0-4fd0-b0dc-95097941de66.png',
-    'skybridge-arena': '/lovable-uploads/ddad55a5-b9b9-46e0-ab90-b3f759cdb55e.png',
-    'neon-paradise': '/lovable-uploads/e859ab1d-04b2-4dc9-a666-a4a3411160ed.png',
-    'crystal-district': '/lovable-uploads/29e843a9-6fbf-4584-b09d-a99cdd7bd93b.png'
-  };
-
-  const backgroundImageUrl = config.backgroundImage || presetBackgrounds[config.backgroundPreset];
+  // Only support Las Vegas preset, use uploaded image if present
+  const backgroundImageUrl = config.backgroundImage;
 
   if (backgroundImageUrl) {
     const img = new Image();
@@ -94,17 +85,12 @@ const drawBackground = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasE
       img.onerror = reject;
       img.src = backgroundImageUrl;
     });
-    
-    // Draw image to fit canvas
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    
-    // Add dark overlay
     ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   } else {
-    // Draw gradient background
-    const gradient = getGradientForPreset(ctx, canvas, config.backgroundPreset);
-    ctx.fillStyle = gradient;
+    // fallback: plain dark background
+    ctx.fillStyle = '#222';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 };

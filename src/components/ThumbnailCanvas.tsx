@@ -1,4 +1,3 @@
-
 import { useEffect, useRef } from 'react';
 
 interface ThumbnailConfig {
@@ -45,7 +44,6 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
 
   const getBackgroundStyle = () => {
     if (config.backgroundImage) {
-      console.log('Using custom background image');
       return {
         backgroundImage: `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.4)), url(${config.backgroundImage})`,
         backgroundSize: 'cover',
@@ -53,73 +51,9 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
         backgroundRepeat: 'no-repeat'
       };
     }
-
-    const presets = {
-      'neon-city': {
-        backgroundImage: 'linear-gradient(135deg, #0a0a0f 0%, #1a1b3e 15%, #2d1b69 35%, #4c1d95 55%, #6b46c1 75%, #3b1d4f 100%)',
-        overlay: 'radial-gradient(circle at 20% 80%, rgba(0, 255, 136, 0.15) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(147, 51, 234, 0.1) 0%, transparent 50%)'
-      },
-      'destruction-zone': {
-        backgroundImage: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 20%, #4a4a4a 40%, #ff6b35 70%, #ffaa00 90%, #999 100%)',
-        overlay: 'radial-gradient(circle at 30% 70%, rgba(255, 107, 53, 0.3) 0%, transparent 60%), radial-gradient(circle at 70% 30%, rgba(255, 170, 0, 0.2) 0%, transparent 50%)'
-      },
-      'finals-arena': {
-        backgroundImage: 'linear-gradient(135deg, #0f0f1a 0%, #1a1a3e 15%, #2d1b4e 30%, #3d2a78 50%, #ff0080 80%, #00d4ff 100%)',
-        overlay: 'radial-gradient(circle at 25% 25%, rgba(255, 0, 128, 0.25) 0%, transparent 60%), radial-gradient(circle at 75% 75%, rgba(0, 212, 255, 0.2) 0%, transparent 50%)'
-      },
-      'monaco-streets': {
-        backgroundImage: `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.4)), url(/lovable-uploads/ff01c07f-8a42-4b34-bd5d-814ea69de169.png)`,
-        overlay: 'radial-gradient(circle at 50% 50%, rgba(255, 215, 0, 0.15) 0%, transparent 70%)'
-      },
-      'urban-battlefield': {
-        backgroundImage: `linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.3)), url(/lovable-uploads/2385a088-db61-4395-a7df-433b98126931.png)`,
-        overlay: 'radial-gradient(circle at 40% 60%, rgba(255, 107, 53, 0.2) 0%, transparent 60%)'
-      },
-      'casino-royale': {
-        backgroundImage: `linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.3)), url(/lovable-uploads/8f9ecc3b-dad0-4fd0-b0dc-95097941de66.png)`,
-        overlay: 'radial-gradient(circle at 50% 30%, rgba(255, 215, 0, 0.2) 0%, transparent 70%)'
-      },
-      'skybridge-arena': {
-        backgroundImage: `linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.35)), url(/lovable-uploads/ddad55a5-b9b9-46e0-ab90-b3f759cdb55e.png)`,
-        overlay: 'radial-gradient(circle at 70% 40%, rgba(0, 212, 255, 0.15) 0%, transparent 60%)'
-      },
-      'neon-paradise': {
-        backgroundImage: `linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.3)), url(/lovable-uploads/e859ab1d-04b2-4dc9-a666-a4a3411160ed.png)`,
-        overlay: 'radial-gradient(circle at 50% 50%, rgba(255, 0, 255, 0.2) 0%, transparent 70%)'
-      },
-      'crystal-district': {
-        backgroundImage: `linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.25)), url(/lovable-uploads/29e843a9-6fbf-4584-b09d-a99cdd7bd93b.png)`,
-        overlay: 'radial-gradient(circle at 60% 60%, rgba(139, 92, 246, 0.2) 0%, transparent 70%)'
-      },
-      'smoke-dust': {
-        backgroundImage: 'linear-gradient(135deg, #2a2520 0%, #3d3528 20%, #5c5247 40%, #8b7355 70%, #d4c4a8 95%, #f0e6d2 100%)',
-        overlay: 'radial-gradient(circle at 50% 80%, rgba(212, 196, 168, 0.25) 0%, transparent 70%), radial-gradient(circle at 20% 20%, rgba(139, 115, 85, 0.15) 0%, transparent 50%)'
-      },
-      'fire-storm': {
-        backgroundImage: 'linear-gradient(135deg, #0f0000 0%, #2a0505 15%, #4a0e0e 30%, #8b0000 50%, #b91c1c 70%, #dc2626 85%, #ff4500 100%)',
-        overlay: 'radial-gradient(circle at 30% 30%, rgba(255, 69, 0, 0.25) 0%, transparent 60%), radial-gradient(circle at 70% 70%, rgba(220, 38, 38, 0.15) 0%, transparent 50%)'
-      },
-      'ice-cold': {
-        backgroundImage: 'linear-gradient(135deg, #020617 0%, #0f172a 15%, #1e293b 30%, #334155 45%, #1e3a8a 60%, #3b82f6 75%, #60a5fa 90%, #93c5fd 100%)',
-        overlay: 'radial-gradient(circle at 50% 20%, rgba(59, 130, 246, 0.15) 0%, transparent 60%), radial-gradient(circle at 20% 80%, rgba(147, 197, 253, 0.1) 0%, transparent 50%)'
-      },
-      'toxic-green': {
-        backgroundImage: 'linear-gradient(135deg, #0d1b0d 0%, #1a4d1a 15%, #166534 30%, #15803d 45%, #16a34a 60%, #22c55e 75%, #4ade80 90%, #86efac 100%)',
-        overlay: 'radial-gradient(circle at 70% 30%, rgba(34, 197, 94, 0.2) 0%, transparent 60%), radial-gradient(circle at 30% 70%, rgba(74, 222, 128, 0.1) 0%, transparent 50%)'
-      },
-      'cyberpunk-pink': {
-        backgroundImage: 'linear-gradient(135deg, #1a0033 0%, #330066 20%, #4c0080 40%, #8000ff 60%, #ff00ff 80%, #ff80ff 100%)',
-        overlay: 'radial-gradient(circle at 60% 40%, rgba(255, 0, 255, 0.25) 0%, transparent 60%), radial-gradient(circle at 40% 60%, rgba(128, 0, 255, 0.15) 0%, transparent 50%)'
-      }
-    };
-    
-    const preset = presets[config.backgroundPreset as keyof typeof presets] || presets['neon-city'];
-    console.log('Using preset background:', config.backgroundPreset);
+    // Only Las Vegas fallback
     return {
-      backgroundImage: preset.backgroundImage,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat'
+      backgroundColor: '#222'
     };
   };
 
