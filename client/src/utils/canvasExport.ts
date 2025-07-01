@@ -47,7 +47,7 @@ export const exportThumbnail = async (config: ThumbnailConfig): Promise<void> =>
   // Draw overlay image if present with proper sizing
   let characterBounds = null;
   if (config.overlayImage) {
-    characterBounds = await drawOverlayImage(ctx, canvas, config.overlayImage, config.overlayImageSize || 25);
+    characterBounds = await drawOverlayImage(ctx, canvas, config.overlayImage, config.overlayImageSize || 25, config);
   }
   
   // Draw text with smart positioning based on character presence and bounds
@@ -113,7 +113,7 @@ const drawBackground = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasE
   }
 };
 
-const drawOverlayImage = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, imageSrc: string, sizePercentage: number) => {
+const drawOverlayImage = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, imageSrc: string, sizePercentage: number, config: ThumbnailConfig) => {
   const img = new Image();
   img.crossOrigin = 'anonymous';
   await new Promise((resolve, reject) => {
@@ -172,10 +172,19 @@ const drawOverlayImage = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanva
     ctx.fillRect(x - 100, y - 100, width + 200, height + 200);
   }
   
-  // Enhanced character effects
+  // Enhanced character effects with scene-aware lighting
   if (sizePercentage > 20) {
-    ctx.shadowColor = '#00d4ff';
-    ctx.shadowBlur = Math.min(50, sizePercentage * 0.8);
+    // Apply scene-specific lighting based on background preset
+    if (config.backgroundPreset === 'las-vegas') {
+      ctx.shadowColor = 'rgba(255, 204, 0, 0.8)';
+      ctx.shadowBlur = Math.min(40, sizePercentage * 0.6);
+    } else if (config.backgroundPreset === 'finals-arena') {
+      ctx.shadowColor = 'rgba(128, 0, 255, 0.8)';
+      ctx.shadowBlur = Math.min(40, sizePercentage * 0.6);
+    } else {
+      ctx.shadowColor = '#00d4ff';
+      ctx.shadowBlur = Math.min(50, sizePercentage * 0.8);
+    }
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 0;
   }
@@ -184,6 +193,27 @@ const drawOverlayImage = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanva
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(img, x, y, width, height);
+  
+  // Apply ambient lighting overlay for better scene integration
+  if (config.backgroundPreset === 'las-vegas' && sizePercentage > 15) {
+    ctx.globalCompositeOperation = 'overlay';
+    const lightingGradient = ctx.createRadialGradient(x + width/2, y + height/2, 0, x + width/2, y + height/2, Math.max(width, height));
+    lightingGradient.addColorStop(0, 'rgba(255, 204, 0, 0.25)');
+    lightingGradient.addColorStop(0.4, 'rgba(255, 102, 0, 0.15)');
+    lightingGradient.addColorStop(1, 'transparent');
+    ctx.fillStyle = lightingGradient;
+    ctx.fillRect(x, y, width, height);
+    ctx.globalCompositeOperation = 'source-over';
+  } else if (config.backgroundPreset === 'finals-arena' && sizePercentage > 15) {
+    ctx.globalCompositeOperation = 'overlay';
+    const lightingGradient = ctx.createRadialGradient(x + width/2, y + height/2, 0, x + width/2, y + height/2, Math.max(width, height));
+    lightingGradient.addColorStop(0, 'rgba(128, 0, 255, 0.2)');
+    lightingGradient.addColorStop(0.4, 'rgba(255, 0, 128, 0.1)');
+    lightingGradient.addColorStop(1, 'transparent');
+    ctx.fillStyle = lightingGradient;
+    ctx.fillRect(x, y, width, height);
+    ctx.globalCompositeOperation = 'source-over';
+  }
   
   // Draw NO DAMAGE badge with better positioning
   if (sizePercentage > 10) {

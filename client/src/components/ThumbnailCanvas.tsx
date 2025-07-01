@@ -301,37 +301,46 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
               className="relative transition-all duration-500"
               style={{...getOverlayImageSize(), ...getCharacterStyles()}}
             >
-              {/* Smart Character Ground Shadow - AI Controlled */}
+              {/* Ambient Scene Lighting Adaptation */}
+              <div 
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  background: config.backgroundPreset === 'las-vegas' ? 
+                    `radial-gradient(ellipse at center, rgba(255, 204, 0, 0.15) 0%, rgba(255, 102, 0, 0.08) 40%, transparent 70%)` :
+                    config.backgroundPreset === 'finals-arena' ?
+                    `radial-gradient(ellipse at center, rgba(128, 0, 255, 0.12) 0%, rgba(255, 0, 128, 0.06) 40%, transparent 70%)` :
+                    `radial-gradient(ellipse at center, ${config.accentColor}15 0%, ${config.accentColor}08 40%, transparent 70%)`,
+                  mixBlendMode: 'overlay'
+                }}
+              />
+
+              {/* Smart Character Ground Shadow - Scene Aware */}
               {config.glowEffect && (
                 <div 
-                  className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-2/3 h-3 opacity-40 rounded-full blur-sm"
+                  className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-2/3 h-3 opacity-30 rounded-full blur-sm"
                   style={{
-                    background: `radial-gradient(ellipse, ${config.accentColor}60 0%, ${config.accentColor}20 40%, transparent 80%)`,
+                    background: config.backgroundPreset === 'las-vegas' ? 
+                      'radial-gradient(ellipse, rgba(255, 204, 0, 0.6) 0%, rgba(255, 102, 0, 0.3) 40%, transparent 80%)' :
+                      `radial-gradient(ellipse, ${config.accentColor}60 0%, ${config.accentColor}20 40%, transparent 80%)`,
                   }}
                 />
               )}
 
-              {/* Subtle Character Aura - Only if glow enabled */}
-              {config.glowEffect && (
-                <div 
-                  className="absolute -inset-4 opacity-20 animate-pulse pointer-events-none"
-                  style={{
-                    background: `radial-gradient(ellipse at center, ${config.accentColor}30 0%, transparent 70%)`,
-                    animation: 'pulse 6s ease-in-out infinite',
-                    borderRadius: '50%'
-                  }}
-                />
-              )}
-
-              {/* Main Character Image - Fixed to remove box */}
+              {/* Main Character Image - Enhanced Blending */}
               <img 
                 src={config.overlayImage} 
                 alt="Character" 
                 className="w-full h-full relative z-10"
                 style={{
                   filter: config.glowEffect ? 
-                    `drop-shadow(0 0 40px ${config.accentColor}70) drop-shadow(0 0 80px ${config.accentColor}40) drop-shadow(0 15px 35px rgba(0,0,0,0.8)) contrast(1.15) saturate(1.25) brightness(1.08)` : 
-                    'drop-shadow(0 10px 25px rgba(0,0,0,0.6)) contrast(1.08) saturate(1.15) brightness(1.05)',
+                    config.backgroundPreset === 'las-vegas' ?
+                      `drop-shadow(0 0 30px rgba(255, 204, 0, 0.6)) drop-shadow(0 0 60px rgba(255, 102, 0, 0.3)) drop-shadow(0 15px 35px rgba(0,0,0,0.7)) contrast(1.1) saturate(1.15) brightness(1.1) hue-rotate(5deg)` :
+                      config.backgroundPreset === 'finals-arena' ?
+                      `drop-shadow(0 0 30px rgba(128, 0, 255, 0.6)) drop-shadow(0 0 60px rgba(255, 0, 128, 0.3)) drop-shadow(0 15px 35px rgba(0,0,0,0.7)) contrast(1.1) saturate(1.2) brightness(1.05)` :
+                      `drop-shadow(0 0 40px ${config.accentColor}70) drop-shadow(0 0 80px ${config.accentColor}40) drop-shadow(0 15px 35px rgba(0,0,0,0.8)) contrast(1.15) saturate(1.25) brightness(1.08)` :
+                    config.backgroundPreset === 'las-vegas' ?
+                      'drop-shadow(0 10px 25px rgba(0,0,0,0.6)) contrast(1.05) saturate(1.1) brightness(1.08) hue-rotate(3deg)' :
+                      'drop-shadow(0 10px 25px rgba(0,0,0,0.6)) contrast(1.08) saturate(1.15) brightness(1.05)',
                   objectFit: 'cover',
                   objectPosition: 'center bottom'
                 }}
