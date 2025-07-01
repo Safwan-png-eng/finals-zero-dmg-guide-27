@@ -129,68 +129,32 @@ const removeGreenBlueBackground = (imageData: ImageData): ImageData => {
       const r = data[i];
       const g = data[i + 1];
       const b = data[i + 2];
-      const a = data[i + 3];
       
-      // Skip if already transparent
-      if (a < 10) continue;
-      
-      // Enhanced chroma key detection with better thresholds
+      // Enhanced chroma key detection
       const greenDominance = g - Math.max(r, b);
       const blueDominance = b - Math.max(r, g);
-      const yellowDominance = (r + g) / 2 - b;
       
       // Multiple detection methods for better accuracy
       const isGreenScreen = (
-        (greenDominance > 30 && g > 70) || // Strong green dominance (lowered threshold)
-        (g > 100 && g > r * 1.3 && g > b * 1.3) || // Bright green (lowered threshold)
-        (g > r + 40 && g > b + 40 && g > 80) || // Classic green screen (lowered threshold)
-        (g > 90 && r < 120 && b < 120) // General green detection
+        (greenDominance > 40 && g > 80) || // Strong green dominance
+        (g > 120 && g > r * 1.4 && g > b * 1.4) || // Bright green
+        (g > r + 50 && g > b + 50 && g > 100) // Classic green screen
       );
       
       const isBlueScreen = (
-        (blueDominance > 30 && b > 70) || // Strong blue dominance (lowered threshold)
-        (b > 100 && b > r * 1.3 && b > g * 1.3) || // Bright blue (lowered threshold)
-        (b > r + 40 && b > g + 40 && b > 80) || // Classic blue screen (lowered threshold)
-        (b > 90 && r < 120 && g < 120) // General blue detection
+        (blueDominance > 40 && b > 80) || // Strong blue dominance
+        (b > 120 && b > r * 1.4 && b > g * 1.4) || // Bright blue
+        (b > r + 50 && b > g + 50 && b > 100) // Classic blue screen
       );
       
       // Check for cyan/turquoise variants often used in green screens
-      const isCyanScreen = (g > 80 && b > 80 && g + b > r * 2.2 && Math.abs(g - b) < 60);
+      const isCyanScreen = (g > 100 && b > 100 && g + b > r * 2.5 && Math.abs(g - b) < 50);
       
-      // Detect lime green and yellow-green variations
-      const isLimeGreen = (g > 120 && r > 40 && g > r * 1.5 && g > b * 1.5);
-      const isYellowGreen = (yellowDominance > 40 && g > 100 && r > 80);
-      
-      // Detect orange/yellow backgrounds common in gaming
-      const isOrangeYellow = (r > 150 && g > 120 && b < 100 && r + g > b * 3);
-      
-      // Detect any solid color backgrounds (high saturation, similar neighboring pixels)
-      let isSolidBackground = false;
-      if (x > 0 && x < width - 1 && y > 0 && y < height - 1) {
-        // Check surrounding pixels for similarity
-        let similarPixels = 0;
-        for (let dy = -1; dy <= 1; dy++) {
-          for (let dx = -1; dx <= 1; dx++) {
-            if (dx === 0 && dy === 0) continue;
-            const ni = ((y + dy) * width + (x + dx)) * 4;
-            const nr = data[ni];
-            const ng = data[ni + 1];
-            const nb = data[ni + 2];
-            
-            // Check if neighboring pixel is similar
-            if (Math.abs(r - nr) < 30 && Math.abs(g - ng) < 30 && Math.abs(b - nb) < 30) {
-              similarPixels++;
-            }
-          }
-        }
-        // If most surrounding pixels are similar and it's a bright/saturated color
-        if (similarPixels >= 6 && (r + g + b > 300 || Math.max(r, g, b) - Math.min(r, g, b) > 80)) {
-          isSolidBackground = true;
-        }
-      }
+      // Detect lime green variations
+      const isLimeGreen = (g > 150 && r > 50 && g > r * 1.8 && g > b * 2);
       
       // Remove background pixels by setting alpha to 0
-      if (isGreenScreen || isBlueScreen || isCyanScreen || isLimeGreen || isYellowGreen || isOrangeYellow || isSolidBackground) {
+      if (isGreenScreen || isBlueScreen || isCyanScreen || isLimeGreen) {
         data[i + 3] = 0; // Set alpha to 0 (transparent)
       }
       // Semi-transparent for edge pixels (better blending)
@@ -246,25 +210,20 @@ const drawOverlayImage = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanva
   }
   
   // Character background effects
-  // Only draw shadow and glow if explicitly enabled and character is large enough
-  if (sizePercentage > 15 && config.characterShadow !== false) {
-    // Draw character ground shadow (optional)
-    if (config.characterShadow !== false) {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.4)'; // Reduced opacity
-      ctx.beginPath();
-      ctx.ellipse(x + width/2, y + height - 10, width * 0.3, 20, 0, 0, Math.PI * 2); // Smaller shadow
-      ctx.fill();
-    }
+  if (sizePercentage > 15) {
+    // Draw character ground shadow
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    ctx.beginPath();
+    ctx.ellipse(x + width/2, y + height - 15, width * 0.5, 35, 0, 0, Math.PI * 2);
+    ctx.fill();
     
-    // Add atmospheric glow (only if glow effect is enabled)
-    if (config.glowEffect) {
-      const glowIntensity = Math.min(0.3, sizePercentage * 0.005); // Reduced intensity
-      const gradient = ctx.createRadialGradient(x + width/2, y + height/2, 0, x + width/2, y + height/2, Math.max(width, height) * 0.8);
-      gradient.addColorStop(0, `rgba(0, 212, 255, ${glowIntensity})`);
-      gradient.addColorStop(1, 'transparent');
-      ctx.fillStyle = gradient;
-      ctx.fillRect(x - 50, y - 50, width + 100, height + 100);
-    }
+    // Add atmospheric glow
+    const glowIntensity = Math.min(0.5, sizePercentage * 0.008);
+    const gradient = ctx.createRadialGradient(x + width/2, y + height/2, 0, x + width/2, y + height/2, Math.max(width, height) * 1.1);
+    gradient.addColorStop(0, `rgba(0, 212, 255, ${glowIntensity})`);
+    gradient.addColorStop(1, 'transparent');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(x - 100, y - 100, width + 200, height + 200);
   }
   
   // Enhanced character effects with scene-aware lighting
