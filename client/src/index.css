@@ -208,3 +208,59 @@ All colors MUST be HSL.
     saturate(1.12) 
     brightness(1.05);
 }
+
+/* Character Outline Glow Effects - Enhanced */
+.character-outline-glow {
+  filter: 
+    contrast(1.15) 
+    saturate(1.1) 
+    brightness(1.05)
+    drop-shadow(0 12px 30px rgba(0,0,0,0.7));
+}
+
+.character-outline-vegas {
+  filter: 
+    contrast(1.15) 
+    saturate(1.1) 
+    brightness(1.05)
+    drop-shadow(0 12px 30px rgba(0,0,0,0.7))
+    drop-shadow(0 0 20px rgba(255, 204, 0, 0.6)) 
+    drop-shadow(0 0 40px rgba(255, 102, 0, 0.3)) 
+    drop-shadow(0 0 60px rgba(255, 204, 0, 0.2));
+}
+
+.character-outline-arena {
+  filter: 
+    contrast(1.15) 
+    saturate(1.1) 
+    brightness(1.05)
+    drop-shadow(0 12px 30px rgba(0,0,0,0.7))
+    drop-shadow(0 0 20px rgba(128, 0, 255, 0.6)) 
+    drop-shadow(0 0 40px rgba(255, 0, 128, 0.3)) 
+    drop-shadow(0 0 60px rgba(128, 0, 255, 0.2));
+}
+
+/* Character Shadow Base */
+.character-shadow-base {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  width: 60%;
+  height: 32px;
+  opacity: 0.6;
+  border-radius: 50%;
+  filter: blur(12px);
+}
+
+.character-shadow-vegas {
+  background: radial-gradient(ellipse, rgba(255, 140, 0, 0.8) 0%, rgba(255, 80, 0, 0.4) 40%, transparent 80%);
+}
+
+.character-shadow-arena {
+  background: radial-gradient(ellipse, rgba(128, 0, 255, 0.8) 0%, rgba(255, 0, 128, 0.4) 40%, transparent 80%);
+}
+
+.character-shadow-default {
+  background: radial-gradient(ellipse, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 40%, transparent 80%);
+}

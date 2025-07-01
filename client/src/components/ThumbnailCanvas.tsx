@@ -358,11 +358,9 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
                   className={`w-full h-full character-clean character-enhanced ${
                     config.characterRemoveBackground ? 'remove-green' : ''
                   } ${
-                    config.glowEffect ? 
-                      config.backgroundPreset === 'las-vegas' ? 'character-glow-vegas' :
-                      config.backgroundPreset === 'finals-arena' ? 'character-glow-arena' :
-                      'character-glow-default' : 
-                    ''
+                    config.backgroundPreset === 'las-vegas' ? 'character-outline-vegas' :
+                    config.backgroundPreset === 'finals-arena' ? 'character-outline-arena' :
+                    'character-outline-glow'
                   }`}
                   style={{
                     objectFit: 'contain',
@@ -374,15 +372,24 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
                                  config.characterBlendMode === 'overlay' ? 'overlay' :
                                  config.characterBlendMode === 'color-dodge' ? 'color-dodge' :
                                  'normal',
-                    // Additional glow effects if enabled
-                    filter: config.glowEffect && config.accentColor ? 
-                      `drop-shadow(0 0 15px ${config.accentColor}40)` : 
+                    // Additional glow for custom accent colors
+                    filter: config.backgroundPreset !== 'las-vegas' && config.backgroundPreset !== 'finals-arena' && config.glowEffect ? 
+                      `contrast(1.15) saturate(1.1) brightness(1.05) drop-shadow(0 12px 30px rgba(0,0,0,0.7)) drop-shadow(0 0 20px ${config.accentColor}60) drop-shadow(0 0 40px ${config.accentColor}30) drop-shadow(0 0 60px ${config.accentColor}20) drop-shadow(0 0 80px ${config.accentColor}40)` :
                       undefined,
                     // Ensure crisp rendering
                     imageRendering: 'crisp-edges' as any
                   }}
                   onLoad={() => console.log('Character loaded successfully')}
                   onError={() => console.error('Failed to load character')}
+                />
+                
+                {/* Character Ground Shadow - matches export */}
+                <div 
+                  className={`character-shadow-base ${
+                    config.backgroundPreset === 'las-vegas' ? 'character-shadow-vegas' :
+                    config.backgroundPreset === 'finals-arena' ? 'character-shadow-arena' :
+                    'character-shadow-default'
+                  }`}
                 />
 
               </div>
