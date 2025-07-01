@@ -390,6 +390,41 @@ const ControlPanel = ({ config, onConfigChange }: ControlPanelProps) => {
               ))}
             </div>
           </div>
+
+          {/* Character Blending Mode */}
+          <div className="space-y-3">
+            <Label className="text-white block font-medium">Character Blending</Label>
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                onClick={() => onConfigChange('characterBlendMode', 'natural')}
+                variant="outline"
+                className={`text-xs p-3 ${
+                  (config.characterBlendMode || 'natural') === 'natural' 
+                    ? 'bg-green-400/20 border-green-400 text-green-400' 
+                    : 'bg-white/5 border-white/20 text-white hover:bg-white/10'
+                }`}
+              >
+                <div className="text-center">
+                  <div className="font-medium">Natural Blend</div>
+                  <div className="text-xs opacity-70">Soft edges</div>
+                </div>
+              </Button>
+              <Button
+                onClick={() => onConfigChange('characterBlendMode', 'sharp')}
+                variant="outline"
+                className={`text-xs p-3 ${
+                  (config.characterBlendMode || 'natural') === 'sharp' 
+                    ? 'bg-blue-400/20 border-blue-400 text-blue-400' 
+                    : 'bg-white/5 border-white/20 text-white hover:bg-white/10'
+                }`}
+              >
+                <div className="text-center">
+                  <div className="font-medium">Sharp Cut</div>
+                  <div className="text-xs opacity-70">Clean edges</div>
+                </div>
+              </Button>
+            </div>
+          </div>
           
 
         </div>
