@@ -17,7 +17,7 @@ const AIEnhancer = ({ config, onConfigChange }: AIEnhancerProps) => {
   const generateAIText = async () => {
     setIsGenerating(true);
     try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -59,7 +59,7 @@ const AIEnhancer = ({ config, onConfigChange }: AIEnhancerProps) => {
   const optimizeColors = async () => {
     setIsGenerating(true);
     try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -108,7 +108,7 @@ const AIEnhancer = ({ config, onConfigChange }: AIEnhancerProps) => {
     try {
       const presets = ['neon-city', 'destruction-zone', 'finals-arena', 'monaco-streets', 'urban-battlefield', 'casino-royale', 'skybridge-arena', 'neon-paradise', 'crystal-district', 'fire-storm', 'ice-cold', 'toxic-green', 'cyberpunk-pink'];
       
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
