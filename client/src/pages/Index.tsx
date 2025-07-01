@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import ThumbnailCanvas from '../components/ThumbnailCanvas';
 import ControlPanel from '../components/ControlPanel';
 import PresetSelector from '../components/PresetSelector';
-import UnifiedAIEnhancer from '../components/UnifiedAIEnhancer';
+import AIEnhancer from '../components/AIEnhancer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Download, Palette, Type, Image, Sparkles, Zap, RefreshCw, Brain, Save, Upload, Share2, Eye, History, Star } from 'lucide-react';
@@ -353,7 +353,7 @@ const Index = () => {
                   <span className="text-xs text-green-400 font-bold">GEMINI AI</span>
                 </div>
               </div>
-              <UnifiedAIEnhancer 
+              <AIEnhancer 
                 config={thumbnailConfig}
                 onConfigChange={handleConfigChange}
               />
