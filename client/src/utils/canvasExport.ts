@@ -463,7 +463,14 @@ const getGradientForPreset = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasE
     'ice-cold': ['#0a0a2e', '#16213e', '#1e3a8a', '#3b82f6'],
     'toxic-green': ['#0d1b0d', '#1a4d1a', '#228b22', '#32cd32'],
     'smoke-dust': ['#2a2520', '#5c5247', '#8b7355', '#d4c4a8'],
-    'cyberpunk-pink': ['#1a0033', '#2d1b4e', '#4c1d95', '#8b5cf6']
+    'cyberpunk-pink': ['#1a0033', '#2d1b4e', '#4c1d95', '#8b5cf6'],
+    'las-vegas': ['#1a0a00', '#4a1f00', '#ff6600', '#ffcc00'],
+    'monaco-streets': ['#0a0a1a', '#1f1f3a', '#4a4a8a', '#6a6aaa'],
+    'urban-battlefield': ['#1a1a1a', '#3a3a3a', '#8a6a4a', '#aa8a6a'],
+    'casino-royale': ['#0a1a0a', '#1f4a1f', '#4a8a4a', '#6aaa6a'],
+    'skybridge-arena': ['#1a1a2a', '#3a3a5a', '#5a5a8a', '#7a7aaa'],
+    'neon-paradise': ['#2a0a2a', '#5a1f5a', '#8a4a8a', '#aa6aaa'],
+    'crystal-district': ['#0a2a2a', '#1f5a5a', '#4a8a8a', '#6aaaaa']
   };
   
   const colors = presets[preset] || presets['neon-city'];

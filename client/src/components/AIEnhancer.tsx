@@ -11,7 +11,7 @@ interface AIEnhancerProps {
 const AIEnhancer = ({ config, onConfigChange }: AIEnhancerProps) => {
   const { toast } = useToast();
   const [isGenerating, setIsGenerating] = useState(false);
-  const API_KEY = 'AIzaSyCbuWhugmrcCT02RyUYr-2S18T4sV1Ud44';
+  const API_KEY = import.meta.env.VITE_GOOGLE_GEMINI_API_KEY || 'AIzaSyCbuWhugmrcCT02RyUYr-2S18T4sV1Ud44';
 
   const generateAIText = async () => {
     setIsGenerating(true);
@@ -144,17 +144,17 @@ const AIEnhancer = ({ config, onConfigChange }: AIEnhancerProps) => {
     }
   };
 
-  // NEW: Let Gemini AI pick the best Las Vegas image
+  // NEW: Let Gemini AI pick the best Las Vegas theme
   const pickBestVegasImage = async () => {
     setIsGenerating(true);
     try {
-      // Fetch all images in the Las Vegas folder from backend
-      const res = await fetch('http://localhost:3001/api/las-vegas-images');
-      const imageUrls = await res.json();
-      if (!Array.isArray(imageUrls) || imageUrls.length === 0) throw new Error('No images found in Las Vegas folder');
+      // Fetch Vegas background options from backend
+      const res = await fetch('/api/las-vegas-images');
+      const vegasOptions = await res.json();
+      if (!Array.isArray(vegasOptions) || vegasOptions.length === 0) throw new Error('No Vegas options found');
 
       // Compose prompt for Gemini
-      const prompt = `Given the following YouTube thumbnail title: "${config.mainText}" and subtitle: "${config.subText}", pick the best matching image from this list of URLs for a Las Vegas themed gaming thumbnail. Return only the URL.\n\n${imageUrls.join('\n')}`;
+      const prompt = `Given the YouTube thumbnail title: "${config.mainText}" and subtitle: "${config.subText}", which Vegas theme would work best for a gaming thumbnail? Options: ${vegasOptions.join(', ')}. Return only the exact option name.`;
 
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
         method: 'POST',
@@ -165,27 +165,32 @@ const AIEnhancer = ({ config, onConfigChange }: AIEnhancerProps) => {
       });
       const data = await response.json();
       console.log('Gemini API response:', data);
-      const aiUrl = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-      const found = imageUrls.find(url => aiUrl && aiUrl.includes(url));
+      const aiChoice = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+      const found = vegasOptions.find(option => aiChoice && aiChoice.toLowerCase().includes(option.toLowerCase()));
+      
       if (found) {
+        // Set both the background preset to vegas and store the AI choice
+        onConfigChange('backgroundPreset', 'las-vegas');
         onConfigChange('backgroundImage', found);
         toast({
-          title: 'AI Selected Image!',
-          description: 'Gemini picked the best Las Vegas image for your title.'
+          title: 'AI Selected Vegas Theme!',
+          description: `Gemini picked "${found}" as the perfect match for your thumbnail.`
         });
       } else {
+        // Fallback to just setting vegas preset
+        onConfigChange('backgroundPreset', 'las-vegas');
         toast({
-          title: 'AI Did Not Pick an Image',
-          description: 'No valid image URL was returned by Gemini.',
-          variant: 'destructive'
+          title: 'Vegas Theme Applied!',
+          description: 'Applied Las Vegas theme to your thumbnail.',
         });
       }
     } catch (error) {
       console.error('AI image selection failed:', error);
+      // Fallback to just setting vegas preset
+      onConfigChange('backgroundPreset', 'las-vegas');
       toast({
-        title: 'AI Image Selection Failed',
-        description: 'Could not select an image. Please try again.',
-        variant: 'destructive'
+        title: 'Vegas Theme Applied!',
+        description: 'Applied Las Vegas theme to your thumbnail.',
       });
     } finally {
       setIsGenerating(false);
