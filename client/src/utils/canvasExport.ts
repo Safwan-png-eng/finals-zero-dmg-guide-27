@@ -74,23 +74,32 @@ export const exportThumbnail = async (config: ThumbnailConfig): Promise<void> =>
 };
 
 const drawBackground = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, config: ThumbnailConfig) => {
-  // Only support Las Vegas preset, use uploaded image if present
   const backgroundImageUrl = config.backgroundImage;
 
-  if (backgroundImageUrl) {
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    await new Promise((resolve, reject) => {
-      img.onload = resolve;
-      img.onerror = reject;
-      img.src = backgroundImageUrl;
-    });
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  if (backgroundImageUrl && backgroundImageUrl !== 'null') {
+    try {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+        img.src = backgroundImageUrl;
+      });
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      // Add dark overlay for better text readability
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    } catch (error) {
+      console.error('Failed to load background image:', error);
+      // Fallback to gradient if image fails
+      const gradient = getGradientForPreset(ctx, canvas, config.backgroundPreset);
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
   } else {
-    // fallback: plain dark background
-    ctx.fillStyle = '#222';
+    // Use gradient based on preset
+    const gradient = getGradientForPreset(ctx, canvas, config.backgroundPreset);
+    ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 };

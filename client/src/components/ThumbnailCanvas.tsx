@@ -43,7 +43,7 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
   });
 
   const getBackgroundStyle = () => {
-    if (config.backgroundImage) {
+    if (config.backgroundImage && config.backgroundImage !== 'null') {
       return {
         backgroundImage: `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.4)), url(${config.backgroundImage})`,
         backgroundSize: 'cover',
@@ -51,9 +51,22 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
         backgroundRepeat: 'no-repeat'
       };
     }
-    // Only Las Vegas fallback
+    
+    // Use gradient based on preset
+    const presetGradients = {
+      'las-vegas': 'linear-gradient(135deg, #1a0a00 0%, #4a1f00 25%, #ff6600 75%, #ffcc00 100%)',
+      'neon-city': 'linear-gradient(135deg, #0f0f23 0%, #1a1a3e 25%, #2d1b69 75%, #0f0f23 100%)',
+      'destruction-zone': 'linear-gradient(135deg, #1a1a1a 0%, #4a4a4a 25%, #ff6b35 75%, #666666 100%)',
+      'finals-arena': 'linear-gradient(135deg, #0f0f1a 0%, #1a1a3e 25%, #3d2a78 75%, #ff0080 100%)',
+      'fire-storm': 'linear-gradient(135deg, #1a0000 0%, #4a0e0e 25%, #8b0000 75%, #ff4500 100%)',
+      'ice-cold': 'linear-gradient(135deg, #0a0a2e 0%, #16213e 25%, #1e3a8a 75%, #3b82f6 100%)',
+      'toxic-green': 'linear-gradient(135deg, #0d1b0d 0%, #1a4d1a 25%, #228b22 75%, #32cd32 100%)',
+      'smoke-dust': 'linear-gradient(135deg, #2a2520 0%, #5c5247 25%, #8b7355 75%, #d4c4a8 100%)',
+      'cyberpunk-pink': 'linear-gradient(135deg, #1a0033 0%, #2d1b4e 25%, #4c1d95 75%, #8b5cf6 100%)'
+    };
+    
     return {
-      backgroundColor: '#222'
+      background: presetGradients[config.backgroundPreset as keyof typeof presetGradients] || presetGradients['las-vegas']
     };
   };
 

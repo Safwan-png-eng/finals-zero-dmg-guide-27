@@ -144,7 +144,7 @@ const AIEnhancer = ({ config, onConfigChange }: AIEnhancerProps) => {
     }
   };
 
-  // NEW: Let Gemini AI pick the best Las Vegas theme
+  // NEW: Let Gemini AI pick the best Las Vegas image
   const pickBestVegasImage = async () => {
     setIsGenerating(true);
     try {
@@ -153,8 +153,11 @@ const AIEnhancer = ({ config, onConfigChange }: AIEnhancerProps) => {
       const vegasOptions = await res.json();
       if (!Array.isArray(vegasOptions) || vegasOptions.length === 0) throw new Error('No Vegas options found');
 
+      // Extract names for the prompt
+      const optionNames = vegasOptions.map(option => option.name);
+      
       // Compose prompt for Gemini
-      const prompt = `Given the YouTube thumbnail title: "${config.mainText}" and subtitle: "${config.subText}", which Vegas theme would work best for a gaming thumbnail? Options: ${vegasOptions.join(', ')}. Return only the exact option name.`;
+      const prompt = `Given the YouTube thumbnail title: "${config.mainText}" and subtitle: "${config.subText}", which Vegas background would work best for a gaming thumbnail? Options: ${optionNames.join(', ')}. Return only the exact option name.`;
 
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
         method: 'POST',
@@ -166,22 +169,24 @@ const AIEnhancer = ({ config, onConfigChange }: AIEnhancerProps) => {
       const data = await response.json();
       console.log('Gemini API response:', data);
       const aiChoice = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-      const found = vegasOptions.find(option => aiChoice && aiChoice.toLowerCase().includes(option.toLowerCase()));
+      const found = vegasOptions.find(option => aiChoice && aiChoice.toLowerCase().includes(option.name.toLowerCase()));
       
       if (found) {
-        // Set both the background preset to vegas and store the AI choice
+        // Set both the background preset to vegas and the selected image URL
         onConfigChange('backgroundPreset', 'las-vegas');
-        onConfigChange('backgroundImage', found);
+        onConfigChange('backgroundImage', found.url);
         toast({
-          title: 'AI Selected Vegas Theme!',
-          description: `Gemini picked "${found}" as the perfect match for your thumbnail.`
+          title: 'AI Selected Vegas Image!',
+          description: `Gemini picked "${found.name}" as the perfect match for your thumbnail.`
         });
       } else {
-        // Fallback to just setting vegas preset
+        // Fallback to random vegas image
+        const randomImage = vegasOptions[Math.floor(Math.random() * vegasOptions.length)];
         onConfigChange('backgroundPreset', 'las-vegas');
+        onConfigChange('backgroundImage', randomImage.url);
         toast({
-          title: 'Vegas Theme Applied!',
-          description: 'Applied Las Vegas theme to your thumbnail.',
+          title: 'Vegas Image Applied!',
+          description: `Applied ${randomImage.name} to your thumbnail.`,
         });
       }
     } catch (error) {
