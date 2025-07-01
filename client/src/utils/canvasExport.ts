@@ -59,12 +59,21 @@ export const exportThumbnail = async (config: ThumbnailConfig): Promise<void> =>
   }
   
   // Export canvas as image
+  // Generate smart filename based on content
+  const generateFilename = (config: ThumbnailConfig): string => {
+    const sanitizeText = (text: string) => text.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+    const mainTextClean = sanitizeText(config.mainText.slice(0, 20));
+    const timestamp = new Date().toISOString().slice(0, 10);
+    
+    return `finals-${mainTextClean}-${timestamp}.png`;
+  };
+
   canvas.toBlob((blob) => {
     if (blob) {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `finals-thumbnail-${Date.now()}.png`;
+      a.download = generateFilename(config);
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
