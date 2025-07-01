@@ -1,10 +1,10 @@
-
 import { useState } from 'react';
 import ThumbnailCanvas from '../components/ThumbnailCanvas';
 import ControlPanel from '../components/ControlPanel';
 import PresetSelector from '../components/PresetSelector';
+import AIEnhancer from '../components/AIEnhancer';
 import { Button } from '@/components/ui/button';
-import { Download, Palette, Type, Image, Sparkles, Zap, RefreshCw } from 'lucide-react';
+import { Download, Palette, Type, Image, Sparkles, Zap, RefreshCw, Brain } from 'lucide-react';
 import { exportThumbnail } from '../utils/canvasExport';
 import { useToast } from '@/hooks/use-toast';
 
@@ -158,6 +158,23 @@ const Index = () => {
         <div className="grid grid-cols-1 xl:grid-cols-5 gap-6 lg:gap-8">
           {/* Left Sidebar - Controls */}
           <div className="xl:col-span-2 space-y-6 order-2 xl:order-1">
+            {/* NEW: AI Enhancer Section */}
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 shadow-2xl">
+              <div className="flex items-center space-x-3 mb-6">
+                <div className="w-8 h-8 bg-gradient-to-r from-green-400 to-blue-500 rounded-lg flex items-center justify-center">
+                  <Brain className="w-5 h-5 text-white" />
+                </div>
+                <h2 className="text-xl font-bold text-white">AI Studio Enhancement</h2>
+                <div className="px-2 py-1 bg-gradient-to-r from-green-500/20 to-blue-500/20 rounded-full border border-green-400/30">
+                  <span className="text-xs text-green-400 font-bold">GEMINI AI</span>
+                </div>
+              </div>
+              <AIEnhancer 
+                config={thumbnailConfig}
+                onConfigChange={handleConfigChange}
+              />
+            </div>
+
             {/* Quick Presets */}
             <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 shadow-2xl">
               <div className="flex items-center space-x-3 mb-6">
@@ -206,7 +223,7 @@ const Index = () => {
             <div className="mt-6 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 backdrop-blur-sm rounded-2xl border border-cyan-300/20 p-6">
               <h3 className="text-lg font-semibold text-white mb-3 flex items-center space-x-2">
                 <Sparkles className="w-5 h-5 text-cyan-400" />
-                <span>Pro Tips & New Features</span>
+                <span>Pro Tips & AI Features</span>
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-white/80 text-sm">
                 <div>
@@ -218,12 +235,12 @@ const Index = () => {
                   </ul>
                 </div>
                 <div>
-                  <h4 className="font-medium text-purple-300 mb-2">New Features:</h4>
+                  <h4 className="font-medium text-green-300 mb-2">AI Features:</h4>
                   <ul className="space-y-1">
-                    <li>• Custom fonts & text styling</li>
-                    <li>• Text rotation & opacity controls</li>
-                    <li>• Gradient & animated text effects</li>
-                    <li>• Text backgrounds & outlines</li>
+                    <li>• Smart text generation with Gemini AI</li>
+                    <li>• Optimized color combinations</li>
+                    <li>• Intelligent preset suggestions</li>
+                    <li>• Fixed NO DAMAGE badge positioning</li>
                   </ul>
                 </div>
               </div>

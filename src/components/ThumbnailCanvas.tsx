@@ -133,22 +133,17 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
   };
 
   const getTextPosition = () => {
-    // Improved text positioning with better spacing calculations
     if (config.overlayImage) {
       const characterSize = config.overlayImageSize || 25;
       if (characterSize >= 70) {
-        // Large character - text takes left 60% of space
         return 'items-center justify-start';
       } else if (characterSize >= 40) {
-        // Medium character - text in upper 70% of space
         return 'items-start justify-center pt-4';
       } else {
-        // Small character - text centered with more space
         return 'items-center justify-center';
       }
     }
     
-    // No character - use selected position
     const positions = {
       top: 'items-start justify-center pt-4 sm:pt-6',
       center: 'items-center justify-center',
@@ -192,10 +187,9 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
     const clampedSize = Math.max(15, Math.min(100, baseSize));
     console.log('Overlay image size calculation:', { baseSize, clampedSize });
     
-    // Better size scaling with proper aspect ratio and improved spacing
     return {
-      width: `${Math.min(clampedSize * 0.5, 50)}%`, // Reduced max width to prevent overlap
-      maxHeight: `${Math.min(clampedSize * 0.7, 75)}%`, // Reduced max height
+      width: `${Math.min(clampedSize * 0.5, 50)}%`,
+      maxHeight: `${Math.min(clampedSize * 0.7, 75)}%`,
       aspectRatio: 'auto'
     };
   };
@@ -203,13 +197,10 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
   const getCharacterPosition = () => {
     const size = config.overlayImageSize || 25;
     if (size >= 70) {
-      // Large character - positioned to leave space for text
       return 'absolute bottom-0 right-0 z-10 flex items-end justify-end pr-4 pb-4';
     } else if (size >= 40) {
-      // Medium character - positioned lower to avoid text overlap
       return 'absolute bottom-0 right-0 z-10 flex items-end justify-end pr-6 pb-6';
     } else {
-      // Small character - corner placement with more margin
       return 'absolute bottom-0 right-0 z-10 flex items-end justify-end pr-8 pb-8';
     }
   };
@@ -217,16 +208,12 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
   const getTextContainerClass = () => {
     const size = config.overlayImageSize || 25;
     if (config.overlayImage && size >= 70) {
-      // Large character - text takes left 65% with proper padding
       return 'relative z-20 h-full flex flex-col text-left px-6 sm:px-8 w-3/5 pr-12';
     } else if (config.overlayImage && size >= 40) {
-      // Medium character - text in upper area with better spacing
       return 'relative z-20 h-2/3 flex flex-col text-center px-4 sm:px-6 w-full pb-8';
     } else if (config.overlayImage) {
-      // Small character - more centered with padding
       return 'relative z-20 h-full flex flex-col text-center px-4 sm:px-6 pr-16 pb-12';
     } else {
-      // No character - full width
       return 'relative z-20 h-full flex flex-col text-center px-4 sm:px-6';
     }
   };
@@ -234,13 +221,10 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
   const getNoDamageBadgePosition = () => {
     const size = config.overlayImageSize || 25;
     if (size >= 70) {
-      // Large character - badge positioned to avoid text overlap
-      return 'absolute top-6 right-8 z-30';
+      return 'absolute top-8 left-8 z-30'; // Moved to top-left to avoid text overlap
     } else if (size >= 40) {
-      // Medium character - badge positioned higher
-      return 'absolute top-4 right-6 z-30';
+      return 'absolute top-6 right-6 z-30';
     } else {
-      // Small character - standard position
       return 'absolute top-4 right-4 z-30';
     }
   };
@@ -285,7 +269,6 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/30" />
         <div className="absolute inset-0 bg-gradient-to-br from-transparent via-black/20 to-black/40" />
         
-        {/* Character Integration Layer */}
         {config.overlayImage && (
           <div className="absolute bottom-0 right-0 w-full h-full">
             <div 
@@ -297,7 +280,6 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
           </div>
         )}
 
-        {/* Improved Character Overlay with Better Spacing */}
         {config.overlayImage && (
           <div className={getCharacterPosition()}>
             <div 
@@ -356,29 +338,54 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
                 onError={() => console.error('Failed to load overlay image')}
               />
 
-              {/* NO DAMAGE Badge - Repositioned to Avoid Overlaps */}
+              {/* Enhanced NO DAMAGE Badge - Positioned Outside Character Area */}
               {config.overlayImage && (
                 <div className={getNoDamageBadgePosition()}>
-                  <div className="relative">
-                    {/* Badge Background Glow - More Intense */}
+                  <div className="relative animate-pulse">
+                    {/* Enhanced Badge Background Glow */}
                     <div 
-                      className="absolute -inset-2 rounded-xl opacity-60 animate-pulse blur-sm"
+                      className="absolute -inset-4 rounded-2xl opacity-80 blur-lg animate-pulse"
                       style={{
-                        background: `radial-gradient(circle, #ff0000 0%, #ff3300 30%, #ff6600 60%, transparent 100%)`,
+                        background: `radial-gradient(circle, #ff0000 0%, #ff3300 20%, #ff6600 40%, #ffaa00 60%, transparent 100%)`,
+                        animation: 'pulse 2s ease-in-out infinite'
                       }}
                     />
                     
-                    {/* Main Badge - Compact Design */}
-                    <div className="relative bg-gradient-to-r from-red-600 via-red-500 to-orange-500 text-white px-3 py-2 rounded-xl border-2 border-white/90 shadow-xl backdrop-blur-md"
-                         style={{ transform: `scale(${Math.max(0.8, Math.min(1.2, (config.overlayImageSize || 25) / 60))})` }}>
-                      <div className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-white rounded-full animate-pulse shadow-sm"></div>
-                        <span className="font-black text-sm tracking-wide drop-shadow-sm">NO DAMAGE</span>
+                    {/* Main Badge with Better Design */}
+                    <div className="relative bg-gradient-to-r from-red-600 via-red-500 to-orange-500 text-white px-4 py-3 rounded-2xl border-4 border-white shadow-2xl backdrop-blur-md transform hover:scale-105 transition-all duration-300"
+                         style={{ 
+                           transform: `scale(${Math.max(0.9, Math.min(1.3, (config.overlayImageSize || 25) / 50)))`,
+                           boxShadow: '0 0 40px rgba(255, 0, 0, 0.8), 0 0 80px rgba(255, 0, 0, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.2)'
+                         }}>
+                      <div className="flex items-center space-x-3">
+                        {/* Animated Status Indicator */}
+                        <div className="relative">
+                          <div className="w-3 h-3 bg-white rounded-full animate-ping"></div>
+                          <div className="absolute inset-0 w-3 h-3 bg-white rounded-full animate-pulse"></div>
+                        </div>
+                        
+                        {/* Badge Text with Better Typography */}
+                        <span className="font-black text-base tracking-wider drop-shadow-lg text-white uppercase">
+                          NO DAMAGE
+                        </span>
+                        
+                        {/* Challenge Icon */}
+                        <div className="text-yellow-300 font-bold text-lg animate-bounce">⚡</div>
+                      </div>
+                      
+                      {/* Badge Subtitle */}
+                      <div className="text-center mt-1 text-xs font-bold text-yellow-200 opacity-90 uppercase tracking-wide">
+                        CHALLENGE MODE
                       </div>
                     </div>
                     
-                    {/* Badge Shine Effect - More Visible */}
-                    <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse" style={{animationDelay: '1s'}} />
+                    {/* Enhanced Badge Shine Effect */}
+                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-white/40 to-transparent animate-pulse opacity-60" 
+                         style={{animationDelay: '1s', animationDuration: '3s'}} />
+                    
+                    {/* Floating Sparkles */}
+                    <div className="absolute -top-2 -right-2 w-2 h-2 bg-yellow-400 rounded-full animate-ping opacity-75"></div>
+                    <div className="absolute -bottom-1 -left-1 w-1 h-1 bg-white rounded-full animate-pulse opacity-90" style={{animationDelay: '0.5s'}}></div>
                   </div>
                 </div>
               )}
@@ -408,9 +415,7 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
           </div>
         )}
 
-        {/* Improved Text Container with Better Spacing */}
         <div className={`${getTextContainerClass()} ${config.animatedText ? 'animate-pulse' : ''}`}>
-          {/* Enhanced Text Background */}
           {config.textBackground && (
             <div 
               className="absolute inset-2 rounded-xl backdrop-blur-md border border-white/10"
@@ -422,7 +427,6 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
             />
           )}
 
-          {/* Main Text with Improved Spacing */}
           <h1 
             className={`font-black uppercase leading-tight transition-all duration-300 ${getFontSize().main} relative z-10 max-w-full break-words`}
             style={{ 
@@ -453,7 +457,6 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
             {config.mainText}
           </h1>
 
-          {/* Sub Text with Better Spacing */}
           {config.subText && (
             <p 
               className={`font-bold uppercase tracking-wide opacity-90 transition-all duration-300 ${getFontSize().sub} relative z-10 max-w-full break-words`}
@@ -483,7 +486,6 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
           )}
         </div>
 
-        {/* Enhanced Decorative Elements */}
         <div className="absolute top-3 right-3 flex space-x-2">
           {[...Array(4)].map((_, i) => (
             <div 
@@ -518,7 +520,6 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
           />
         </div>
 
-        {/* Enhanced Corner Accents */}
         <div className="absolute top-0 left-0 w-16 h-16">
           <div 
             className="w-full h-full rounded-br-2xl opacity-15 border-r border-b border-white/10"
@@ -537,7 +538,6 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
           />
         </div>
 
-        {/* Enhanced Grid Pattern */}
         <div 
           className="absolute inset-0 opacity-5"
           style={{
@@ -546,7 +546,6 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
           }}
         />
 
-        {/* Enhanced Atmospheric Effects with More Layers */}
         <div className="absolute top-1/4 left-1/4 w-40 h-40 rounded-full opacity-6 animate-pulse" 
              style={{ background: `radial-gradient(circle, ${config.accentColor}50 0%, transparent 70%)` }} />
         <div className="absolute bottom-1/3 right-1/3 w-32 h-32 rounded-full opacity-5 animate-pulse" 
@@ -555,7 +554,6 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
              style={{ background: `radial-gradient(circle, #ffffff30 0%, transparent 70%)`, animationDelay: '2s' }} />
       </div>
 
-      {/* Enhanced Dimensions Label */}
       <div className="text-center mt-4">
         <div className="inline-flex items-center space-x-3 bg-white/5 backdrop-blur-sm rounded-full px-4 py-2 border border-white/10">
           <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
