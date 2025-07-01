@@ -323,18 +323,17 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
                 />
               )}
 
-              {/* Main Character Image with Better Positioning */}
+              {/* Main Character Image - Fixed to remove box */}
               <img 
                 src={config.overlayImage} 
                 alt="Character" 
-                className="w-full h-full object-contain relative z-10"
+                className="w-full h-full relative z-10"
                 style={{
                   filter: config.glowEffect ? 
                     `drop-shadow(0 0 40px ${config.accentColor}70) drop-shadow(0 0 80px ${config.accentColor}40) drop-shadow(0 15px 35px rgba(0,0,0,0.8)) contrast(1.15) saturate(1.25) brightness(1.08)` : 
                     'drop-shadow(0 10px 25px rgba(0,0,0,0.6)) contrast(1.08) saturate(1.15) brightness(1.05)',
-                  objectFit: 'contain',
-                  maxWidth: '100%',
-                  maxHeight: '100%'
+                  objectFit: 'cover',
+                  objectPosition: 'center bottom'
                 }}
                 onLoad={() => console.log('Overlay image loaded successfully')}
                 onError={() => console.error('Failed to load overlay image')}

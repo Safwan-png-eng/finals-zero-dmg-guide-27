@@ -317,286 +317,81 @@ const ControlPanel = ({ config, onConfigChange }: ControlPanelProps) => {
         )}
       </div>
 
-      {/* Enhanced Character Controls */}
+      {/* Simplified Character Controls */}
       {config.overlayImage && (
-        <div className="space-y-6 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 p-6 rounded-xl border border-cyan-300/20 shadow-lg">
-          {/* Enhanced Visual Character Position Grid */}
-          <div className="space-y-4">
-            <Label className="text-white mb-3 block font-medium flex items-center">
-              <User className="w-5 h-5 mr-2 text-cyan-400" />
-              <span className="text-lg">Character Position</span>
-              <span className="ml-auto text-sm text-cyan-400 bg-cyan-400/10 px-2 py-1 rounded">
-                {config.characterPosition || 'bottom-right'}
-              </span>
+        <div className="space-y-4 bg-white/5 p-4 rounded-xl border border-white/10">
+          {/* Character Position */}
+          <div className="space-y-3">
+            <Label className="text-white block font-medium flex items-center">
+              <User className="w-4 h-4 mr-2" />
+              Character Position
             </Label>
             
-            {/* Visual Grid Position Selector */}
-            <div className="grid grid-cols-3 gap-3 p-4 bg-black/30 rounded-xl border border-white/10">
+            <div className="grid grid-cols-3 gap-2">
               {[
-                { pos: 'top-left', label: 'TL', desc: 'Unique' },
-                { pos: 'top-center', label: 'TC', desc: 'Centered' },
-                { pos: 'top-right', label: 'TR', desc: 'Dramatic' },
-                { pos: 'center-left', label: 'CL', desc: 'Bold' },
-                { pos: 'full-center', label: 'FC', desc: 'Dominant' },
-                { pos: 'center-right', label: 'CR', desc: 'Dynamic' },
-                { pos: 'bottom-left', label: 'BL', desc: 'Balance' },
-                { pos: 'bottom-center', label: 'BC', desc: 'Stable' },
-                { pos: 'bottom-right', label: 'BR', desc: 'Classic' }
+                { pos: 'bottom-left', label: 'Bottom Left' },
+                { pos: 'bottom-center', label: 'Bottom Center' },
+                { pos: 'bottom-right', label: 'Bottom Right' },
+                { pos: 'center-left', label: 'Center Left' },
+                { pos: 'full-center', label: 'Center' },
+                { pos: 'center-right', label: 'Center Right' }
               ].map((position) => (
-                <button
+                <Button
                   key={position.pos}
                   onClick={() => onConfigChange('characterPosition', position.pos)}
-                  className={`
-                    relative aspect-square p-2 rounded-lg border-2 transition-all duration-300 group
-                    ${(config.characterPosition || 'bottom-right') === position.pos 
-                      ? 'border-cyan-400 bg-cyan-400/20 text-cyan-400' 
-                      : 'border-white/20 bg-white/5 text-white/70 hover:border-cyan-400/60 hover:bg-cyan-400/10'
-                    }
-                  `}
+                  variant="outline"
+                  className={`text-xs p-2 ${
+                    (config.characterPosition || 'bottom-right') === position.pos 
+                      ? 'bg-cyan-400/20 border-cyan-400 text-cyan-400' 
+                      : 'bg-white/5 border-white/20 text-white hover:bg-white/10'
+                  }`}
                 >
-                  <div className="text-xs font-bold">{position.label}</div>
-                  <div className="text-[10px] opacity-80">{position.desc}</div>
-                  
-                  {/* Visual indicator dot */}
-                  <div className={`
-                    absolute w-2 h-2 rounded-full transition-all duration-300
-                    ${(config.characterPosition || 'bottom-right') === position.pos 
-                      ? 'bg-cyan-400' 
-                      : 'bg-white/40 group-hover:bg-cyan-400/70'
-                    }
-                    ${position.pos.includes('top') ? 'top-1' : position.pos.includes('bottom') ? 'bottom-1' : 'top-1/2 -translate-y-1/2'}
-                    ${position.pos.includes('left') ? 'left-1' : position.pos.includes('right') ? 'right-1' : 'left-1/2 -translate-x-1/2'}
-                  `} />
-                </button>
+                  {position.label}
+                </Button>
               ))}
-            </div>
-            
-            {/* Quick Position Presets */}
-            <div className="grid grid-cols-2 gap-2">
-              <Button
-                onClick={() => onConfigChange('characterPosition', 'bottom-right')}
-                variant="outline"
-                className="bg-gradient-to-r from-orange-500/20 to-red-500/20 border-orange-400/30 text-orange-300 hover:from-orange-500/30 hover:to-red-500/30"
-              >
-                🎮 Gaming Classic
-              </Button>
-              <Button
-                onClick={() => onConfigChange('characterPosition', 'center-right')}
-                variant="outline"
-                className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-purple-400/30 text-purple-300 hover:from-purple-500/30 hover:to-pink-500/30"
-              >
-                ⚡ Dynamic Pro
-              </Button>
             </div>
           </div>
 
-          {/* Enhanced Character Size Control */}
-          <div className="space-y-4">
-            <Label className="text-white mb-3 block font-medium flex items-center">
-              <Maximize2 className="w-5 h-5 mr-2 text-cyan-400" />
-              <span className="text-lg">Character Size</span>
-              <div className="ml-auto flex items-center space-x-2">
-                <span className="text-cyan-400 font-bold">{config.overlayImageSize || 25}%</span>
-                <div className={`w-3 h-3 rounded-full ${
-                  (config.overlayImageSize || 25) >= 80 ? 'bg-red-400' :
-                  (config.overlayImageSize || 25) >= 60 ? 'bg-yellow-400' :
-                  (config.overlayImageSize || 25) >= 40 ? 'bg-green-400' : 'bg-blue-400'
-                }`} />
-              </div>
+          {/* Character Size */}
+          <div className="space-y-3">
+            <Label className="text-white block font-medium flex items-center">
+              <Maximize2 className="w-4 h-4 mr-2" />
+              Character Size ({config.overlayImageSize || 25}%)
             </Label>
             
-            {/* Size Slider with Real-time Preview */}
-            <div className="space-y-3">
-              <Slider
-                value={[config.overlayImageSize || 25]}
-                onValueChange={(value) => onConfigChange('overlayImageSize', value[0])}
-                max={100}
-                min={15}
-                step={1}
-                className="w-full"
-              />
-              
-              {/* Visual Size Indicator */}
-              <div className="flex justify-center">
-                <div 
-                  className="bg-cyan-400/20 border-2 border-cyan-400 rounded-lg transition-all duration-300"
-                  style={{
-                    width: `${Math.max(20, (config.overlayImageSize || 25) * 0.6)}px`,
-                    height: `${Math.max(15, (config.overlayImageSize || 25) * 0.4)}px`
-                  }}
-                />
-              </div>
-            </div>
+            <Slider
+              value={[config.overlayImageSize || 25]}
+              onValueChange={(value) => onConfigChange('overlayImageSize', value[0])}
+              max={100}
+              min={15}
+              step={5}
+              className="w-full"
+            />
             
-            {/* Quick Size Presets */}
             <div className="grid grid-cols-4 gap-2">
               {[
-                { size: 25, label: 'Small', icon: '📱' },
-                { size: 50, label: 'Medium', icon: '💻' },
-                { size: 75, label: 'Large', icon: '🖥️' },
-                { size: 95, label: 'Huge', icon: '📺' }
+                { size: 25, label: 'Small' },
+                { size: 50, label: 'Medium' },
+                { size: 75, label: 'Large' },
+                { size: 95, label: 'Huge' }
               ].map((preset) => (
                 <Button
                   key={preset.size}
                   onClick={() => onConfigChange('overlayImageSize', preset.size)}
                   variant="outline"
-                  className={`text-xs p-2 transition-all duration-300 ${
+                  className={`text-xs ${
                     (config.overlayImageSize || 25) === preset.size 
                       ? 'bg-cyan-400/20 border-cyan-400 text-cyan-400' 
-                      : 'bg-white/5 border-white/20 text-white/70 hover:bg-cyan-400/10 hover:border-cyan-400/50'
+                      : 'bg-white/5 border-white/20 text-white hover:bg-white/10'
                   }`}
                 >
-                  <div className="text-center">
-                    <div className="text-lg">{preset.icon}</div>
-                    <div className="text-[10px]">{preset.label}</div>
-                    <div className="text-[9px] opacity-70">{preset.size}%</div>
-                  </div>
+                  {preset.label}
                 </Button>
               ))}
             </div>
           </div>
           
-          {/* Real-time Position Preview */}
-          <div className="bg-black/20 p-4 rounded-lg border border-white/10">
-            <Label className="text-white text-sm font-medium mb-3 block">Live Preview</Label>
-            <div className="relative w-full h-20 bg-gradient-to-r from-slate-800 to-slate-700 rounded-lg border border-white/20 overflow-hidden">
-              {/* Preview Background */}
-              <div className="absolute inset-0 opacity-30">
-                <div className="w-full h-full bg-gradient-to-br from-purple-500/20 to-cyan-500/20" />
-              </div>
-              
-              {/* Preview Character Position */}
-              <div className={`
-                absolute w-3 h-3 bg-cyan-400 rounded-full border-2 border-white transition-all duration-300
-                ${config.characterPosition === 'top-left' ? 'top-1 left-1' :
-                  config.characterPosition === 'top-center' ? 'top-1 left-1/2 -translate-x-1/2' :
-                  config.characterPosition === 'top-right' ? 'top-1 right-1' :
-                  config.characterPosition === 'center-left' ? 'top-1/2 left-1 -translate-y-1/2' :
-                  config.characterPosition === 'full-center' ? 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2' :
-                  config.characterPosition === 'center-right' ? 'top-1/2 right-1 -translate-y-1/2' :
-                  config.characterPosition === 'bottom-left' ? 'bottom-1 left-1' :
-                  config.characterPosition === 'bottom-center' ? 'bottom-1 left-1/2 -translate-x-1/2' :
-                  'bottom-1 right-1'
-                }
-              `}>
-                <div className="absolute inset-0 bg-cyan-400 rounded-full animate-ping opacity-50" />
-              </div>
-              
-              {/* Preview Text Area */}
-              <div className="absolute inset-2 flex items-center justify-center">
-                <div className="text-white/60 text-xs text-center">
-                  <div className="font-bold">MAIN TEXT</div>
-                  <div className="text-[10px] opacity-70">Sub Text</div>
-                </div>
-              </div>
-              
-              {/* Position Label */}
-              <div className="absolute bottom-0 right-0 bg-black/60 text-white text-[10px] px-2 py-1 rounded-tl">
-                {(config.characterPosition || 'bottom-right').replace('-', ' ').toUpperCase()}
-              </div>
-            </div>
-            
-            <p className="text-xs text-white/60 mt-2 text-center">
-              🎯 <strong>AI Tip:</strong> Use AI Character Position for optimal placement!
-            </p>
-          </div>
 
-          {/* Advanced Positioning Controls */}
-          <div className="bg-black/20 p-4 rounded-lg border border-white/10">
-            <Label className="text-white text-sm font-medium mb-3 block flex items-center">
-              <RotateCcw className="w-4 h-4 mr-2 text-cyan-400" />
-              Fine Adjustments
-            </Label>
-            
-            <div className="grid grid-cols-2 gap-3">
-              {/* Horizontal Offset */}
-              <div className="space-y-2">
-                <Label className="text-white/80 text-xs">Horizontal Shift</Label>
-                <Slider
-                  value={[config.characterHorizontalOffset || 0]}
-                  onValueChange={(value) => onConfigChange('characterHorizontalOffset', value[0])}
-                  max={50}
-                  min={-50}
-                  step={1}
-                  className="w-full"
-                />
-                <div className="text-xs text-white/60 text-center">
-                  {(config.characterHorizontalOffset || 0) > 0 ? '+' : ''}{config.characterHorizontalOffset || 0}px
-                </div>
-              </div>
-              
-              {/* Vertical Offset */}
-              <div className="space-y-2">
-                <Label className="text-white/80 text-xs">Vertical Shift</Label>
-                <Slider
-                  value={[config.characterVerticalOffset || 0]}
-                  onValueChange={(value) => onConfigChange('characterVerticalOffset', value[0])}
-                  max={50}
-                  min={-50}
-                  step={1}
-                  className="w-full"
-                />
-                <div className="text-xs text-white/60 text-center">
-                  {(config.characterVerticalOffset || 0) > 0 ? '+' : ''}{config.characterVerticalOffset || 0}px
-                </div>
-              </div>
-            </div>
-            
-            {/* Reset Button */}
-            <Button
-              onClick={() => {
-                onConfigChange('characterHorizontalOffset', 0);
-                onConfigChange('characterVerticalOffset', 0);
-              }}
-              variant="outline"
-              className="w-full mt-3 bg-white/5 border-white/20 text-white/70 hover:bg-white/10 text-xs"
-            >
-              <RotateCcw className="w-3 h-3 mr-1" />
-              Reset Position
-            </Button>
-          </div>
-
-          {/* Export Preview Feature */}
-          <div className="bg-black/20 p-4 rounded-lg border border-white/10">
-            <Label className="text-white text-sm font-medium mb-3 block flex items-center">
-              <Type className="w-4 h-4 mr-2 text-cyan-400" />
-              Export Preview
-            </Label>
-            
-            <div className="space-y-3">
-              <div className="text-xs text-white/70 space-y-1">
-                <div className="flex justify-between">
-                  <span>Resolution:</span>
-                  <span className="text-cyan-400 font-mono">1280x720</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Character Size:</span>
-                  <span className="text-cyan-400 font-mono">{config.overlayImageSize || 25}%</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Position:</span>
-                  <span className="text-cyan-400 font-mono">
-                    {(config.characterPosition || 'bottom-right').replace('-', ' ')}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Quality:</span>
-                  <span className="text-green-400 font-mono">YouTube HD</span>
-                </div>
-              </div>
-              
-              <div className="w-full h-2 bg-black/40 rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full transition-all duration-300"
-                  style={{ width: `${Math.min(100, (config.overlayImageSize || 25) + 20)}%` }}
-                />
-              </div>
-              
-              <p className="text-xs text-green-400/80 text-center">
-                ✓ Ready for export - All settings optimized
-              </p>
-            </div>
-          </div>
         </div>
       )}
 
@@ -764,69 +559,27 @@ const ControlPanel = ({ config, onConfigChange }: ControlPanelProps) => {
         />
       </div>
 
-      {/* Effects Toggles */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <Label htmlFor="particles" className="text-white font-medium">Particle Effects</Label>
-          <Switch
-            id="particles"
-            checked={config.showParticles}
-            onCheckedChange={(checked) => onConfigChange('showParticles', checked)}
-          />
-        </div>
-        
-        <div className="flex items-center justify-between">
-          <Label htmlFor="glow" className="text-white font-medium">Glow Effects</Label>
-          <Switch
-            id="glow"
-            checked={config.glowEffect}
-            onCheckedChange={(checked) => onConfigChange('glowEffect', checked)}
-          />
-        </div>
-
-        <div className="flex items-center justify-between">
-          <Label htmlFor="textShadow" className="text-white font-medium">Text Shadow</Label>
-          <Switch
-            id="textShadow"
-            checked={config.textShadow}
-            onCheckedChange={(checked) => onConfigChange('textShadow', checked)}
-          />
-        </div>
-
-        <div className="flex items-center justify-between">
-          <Label htmlFor="borderGlow" className="text-white font-medium">Border Glow</Label>
-          <Switch
-            id="borderGlow"
-            checked={config.borderGlow}
-            onCheckedChange={(checked) => onConfigChange('borderGlow', checked)}
-          />
-        </div>
-
-        <div className="flex items-center justify-between">
-          <Label htmlFor="textOutline" className="text-white font-medium">Text Outline</Label>
-          <Switch
-            id="textOutline"
-            checked={config.textOutline || false}
-            onCheckedChange={(checked) => onConfigChange('textOutline', checked)}
-          />
-        </div>
-
-        <div className="flex items-center justify-between">
-          <Label htmlFor="animatedText" className="text-white font-medium">Animated Text</Label>
-          <Switch
-            id="animatedText"
-            checked={config.animatedText || false}
-            onCheckedChange={(checked) => onConfigChange('animatedText', checked)}
-          />
-        </div>
-
-        <div className="flex items-center justify-between">
-          <Label htmlFor="gradientText" className="text-white font-medium">Gradient Text</Label>
-          <Switch
-            id="gradientText"
-            checked={config.gradientText || false}
-            onCheckedChange={(checked) => onConfigChange('gradientText', checked)}
-          />
+      {/* Essential Effects */}
+      <div className="space-y-3">
+        <Label className="text-white font-medium">Effects</Label>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="flex items-center justify-between bg-white/5 p-3 rounded-lg">
+            <Label htmlFor="glow" className="text-white text-sm">Glow</Label>
+            <Switch
+              id="glow"
+              checked={config.glowEffect}
+              onCheckedChange={(checked) => onConfigChange('glowEffect', checked)}
+            />
+          </div>
+          
+          <div className="flex items-center justify-between bg-white/5 p-3 rounded-lg">
+            <Label htmlFor="textShadow" className="text-white text-sm">Text Shadow</Label>
+            <Switch
+              id="textShadow"
+              checked={config.textShadow}
+              onCheckedChange={(checked) => onConfigChange('textShadow', checked)}
+            />
+          </div>
         </div>
       </div>
     </div>
