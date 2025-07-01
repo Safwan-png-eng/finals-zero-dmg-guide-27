@@ -279,13 +279,15 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
               className="relative transition-all duration-500"
               style={getOverlayImageSize()}
             >
-              {/* Character Ground Shadow */}
-              <div 
-                className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-3/4 h-4 opacity-60 rounded-full blur-md"
-                style={{
-                  background: `radial-gradient(ellipse, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 50%, transparent 100%)`,
-                }}
-              />
+              {/* Smart Character Ground Shadow - AI Controlled */}
+              {config.glowEffect && (
+                <div 
+                  className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-2/3 h-3 opacity-40 rounded-full blur-sm"
+                  style={{
+                    background: `radial-gradient(ellipse, ${config.accentColor}60 0%, ${config.accentColor}20 40%, transparent 80%)`,
+                  }}
+                />
+              )}
 
               {/* Enhanced Character Background Integration */}
               <div 
@@ -331,60 +333,55 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
                 onError={() => console.error('Failed to load overlay image')}
               />
 
-              {/* Enhanced NO DAMAGE Badge */}
+              {/* Enhanced Dynamic Challenge Badge */}
               <div className={getNoDamageBadgePosition()}>
-                <div className="relative animate-pulse">
-                  {/* Enhanced Badge Background Glow */}
+                <div className="relative">
+                  {/* Smart Badge Background Glow */}
                   <div 
-                    className="absolute -inset-4 rounded-2xl opacity-80 blur-lg animate-pulse"
+                    className="absolute -inset-3 rounded-xl opacity-70 blur-md animate-pulse"
                     style={{
-                      background: `radial-gradient(circle, #ff0000 0%, #ff3300 20%, #ff6600 40%, #ffaa00 60%, transparent 100%)`,
-                      animation: 'pulse 2s ease-in-out infinite'
+                      background: `radial-gradient(circle, ${config.accentColor} 0%, ${config.textColor}50 40%, transparent 80%)`,
+                      animation: 'pulse 3s ease-in-out infinite'
                     }}
                   />
                   
-                  {/* Main Badge with Better Design */}
+                  {/* Main Badge with Dynamic Colors */}
                   <div 
-                    className="relative bg-gradient-to-r from-red-600 via-red-500 to-orange-500 text-white px-4 py-3 rounded-2xl border-4 border-white shadow-2xl backdrop-blur-md transform hover:scale-105 transition-all duration-300"
+                    className="relative text-white px-3 py-2 rounded-xl border-2 shadow-xl backdrop-blur-sm transform transition-all duration-300"
                     style={{ 
-                      transform: `scale(${Math.max(0.9, Math.min(1.3, (config.overlayImageSize || 25) / 50))})`,
-                      boxShadow: '0 0 40px rgba(255, 0, 0, 0.8), 0 0 80px rgba(255, 0, 0, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.2)'
+                      transform: `scale(${Math.max(0.8, Math.min(1.2, (config.overlayImageSize || 25) / 60))})`,
+                      background: `linear-gradient(135deg, ${config.accentColor} 0%, ${config.textColor}80 100%)`,
+                      borderColor: config.textColor,
+                      boxShadow: `0 0 20px ${config.accentColor}60, 0 0 40px ${config.accentColor}30`
                     }}
                   >
-                    <div className="flex items-center space-x-3">
-                      {/* Animated Status Indicator */}
-                      <div className="relative">
-                        <div className="w-3 h-3 bg-white rounded-full animate-ping"></div>
-                        <div className="absolute inset-0 w-3 h-3 bg-white rounded-full animate-pulse"></div>
-                      </div>
+                    <div className="flex items-center space-x-2">
+                      {/* Class Indicator */}
+                      <div className="text-xs font-bold opacity-90">MED</div>
                       
-                      {/* Badge Text with Better Typography */}
-                      <span className="font-black text-base tracking-wider drop-shadow-lg text-white uppercase">
+                      {/* Badge Text */}
+                      <span className="font-black text-sm tracking-wide drop-shadow-md uppercase">
                         NO DAMAGE
                       </span>
                       
-                      {/* Challenge Icon */}
-                      <div className="text-yellow-300 font-bold text-lg animate-bounce">⚡</div>
+                      {/* Dynamic Icon */}
+                      <div className="text-sm animate-pulse">🛡️</div>
                     </div>
                     
-                    {/* Badge Subtitle */}
-                    <div className="text-center mt-1 text-xs font-bold text-yellow-200 opacity-90 uppercase tracking-wide">
-                      CHALLENGE MODE
+                    {/* Challenge Type */}
+                    <div className="text-center text-xs font-bold opacity-80 uppercase tracking-wider">
+                      MEDIUM CHALLENGE
                     </div>
                   </div>
                   
-                  {/* Enhanced Badge Shine Effect */}
+                  {/* Subtle Shine Effect */}
                   <div 
-                    className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-white/40 to-transparent animate-pulse opacity-60" 
-                    style={{animationDelay: '1s', animationDuration: '3s'}} 
+                    className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-50" 
+                    style={{
+                      animation: 'shine 4s ease-in-out infinite',
+                      animationDelay: '1s'
+                    }} 
                   />
-                  
-                  {/* Floating Sparkles */}
-                  <div className="absolute -top-2 -right-2 w-2 h-2 bg-yellow-400 rounded-full animate-ping opacity-75"></div>
-                  <div 
-                    className="absolute -bottom-1 -left-1 w-1 h-1 bg-white rounded-full animate-pulse opacity-90" 
-                    style={{animationDelay: '0.5s'}}
-                  ></div>
                 </div>
               </div>
               

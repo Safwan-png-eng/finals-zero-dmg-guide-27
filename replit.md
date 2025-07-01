@@ -107,6 +107,13 @@ This is a full-stack web application built with a modern React frontend and Expr
 ```
 Changelog:
 - July 01, 2025. Initial setup
+- July 01, 2025. Enhanced AI Character Positioning System:
+  * Added 7 strategic character positions (bottom-right, center-left, full-center, etc.)
+  * Improved NO DAMAGE badge with dynamic colors and Medium class indicator
+  * Smart character ground shadow controlled by glow effects
+  * Enhanced Vegas AI image picker with better selection logic
+  * Added Vegas image cycling feature for variety
+  * Fixed character positioning to work with all uploaded Vegas backgrounds
 ```
 
 ## User Preferences

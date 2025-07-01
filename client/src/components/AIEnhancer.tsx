@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Wand2, Brain, Zap } from 'lucide-react';
+import { Sparkles, Wand2, Brain, Zap, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface AIEnhancerProps {
@@ -282,18 +282,32 @@ Example: center-right|75|Character positioned on right creates dynamic compositi
       const optionDetails = vegasOptions.map(option => `${option.name}: ${option.description || ''}`);
       console.log('Vegas options for AI selection:', optionDetails);
       
-      // Compose enhanced prompt for Gemini
-      const prompt = `Given this YouTube thumbnail title: "${config.mainText}" and subtitle: "${config.subText}", which Vegas background from The Finals game would create the most engaging thumbnail?
+      // Enhanced prompt for better AI decision making
+      const prompt = `You are an expert YouTube thumbnail designer analyzing The Finals game backgrounds for maximum click-through rate.
 
-Options:
+THUMBNAIL CONTENT:
+Title: "${config.mainText}" 
+Subtitle: "${config.subText}"
+Current Theme: Gaming challenge/action
+Target: High engagement, viral potential
+
+AVAILABLE VEGAS BACKGROUNDS:
 ${optionDetails.join('\n')}
 
-Consider:
-- Which background matches the energy and theme of the text
-- Visual impact for a YouTube thumbnail
-- Color contrast for text readability
+ANALYSIS CRITERIA:
+1. Visual Impact: Which creates the most dramatic, eye-catching backdrop?
+2. Text Readability: Which provides best contrast for white/colored text overlay?
+3. Mood Match: Which background amplifies the energy of "${config.mainText}"?
+4. Gaming Appeal: Which location screams "epic gaming moment"?
+5. Thumbnail Psychology: Which makes viewers want to click immediately?
 
-Return only the exact option name (before the colon).`;
+Consider ALL options carefully. Choose the single best option that maximizes:
+- Click-through rate potential
+- Visual drama and excitement  
+- Professional gaming thumbnail appeal
+- Text overlay compatibility
+
+Return ONLY the exact background name (before the colon), nothing else.`;
 
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
         method: 'POST',
@@ -306,35 +320,69 @@ Return only the exact option name (before the colon).`;
       console.log('Gemini API response:', data);
       const aiChoice = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim().replace(/\n/g, '');
       console.log('AI Choice cleaned:', aiChoice);
-      const found = vegasOptions.find(option => {
+      
+      // Improved flexible matching logic
+      let found = vegasOptions.find(option => {
         const match = aiChoice && (
           aiChoice.toLowerCase().includes(option.name.toLowerCase()) ||
-          option.name.toLowerCase().includes(aiChoice.toLowerCase())
+          option.name.toLowerCase().includes(aiChoice.toLowerCase()) ||
+          // Check for partial word matches
+          option.name.toLowerCase().split('-').some((word: string) => aiChoice.toLowerCase().includes(word))
         );
         console.log(`Checking ${option.name} against ${aiChoice}: ${match}`);
         return match;
       });
       
+      // If no match, try keyword-based intelligent selection
+      if (!found && aiChoice) {
+        const keywords = aiChoice.toLowerCase();
+        if (keywords.includes('neon') || keywords.includes('alley')) {
+          found = vegasOptions.find(opt => opt.name.includes('neon-alley'));
+        } else if (keywords.includes('overview') || keywords.includes('aerial') || keywords.includes('battle')) {
+          found = vegasOptions.find(opt => opt.name.includes('overview-battle'));
+        } else if (keywords.includes('garage') || keywords.includes('chaos')) {
+          found = vegasOptions.find(opt => opt.name.includes('garage-chaos'));
+        } else if (keywords.includes('strip') || keywords.includes('panoramic')) {
+          found = vegasOptions.find(opt => opt.name.includes('strip-overview'));
+        }
+      }
+      
       if (found) {
-        // Set both the background preset to vegas and the selected image URL
         console.log('Found matching image:', found);
         console.log('Setting background image to:', found.url);
         onConfigChange('backgroundPreset', 'las-vegas');
         onConfigChange('backgroundImage', found.url);
         toast({
-          title: 'AI Selected Vegas Image!',
-          description: `Gemini picked "${found.name}" as the perfect match for your thumbnail.`
+          title: 'AI Selected Perfect Vegas Scene!',
+          description: `Gemini analyzed all options and chose "${found.name.replace(/-/g, ' ')}" for maximum impact.`,
+          duration: 4000
         });
       } else {
-        // Fallback to random vegas image
-        console.log('No match found, using random image');
-        const randomImage = vegasOptions[Math.floor(Math.random() * vegasOptions.length)];
-        console.log('Random image selected:', randomImage);
+        // Smart fallback: analyze thumbnail content to pick best option
+        console.log('Using smart content-based selection from all options');
+        const textContent = (config.mainText + ' ' + config.subText).toLowerCase();
+        let smartChoice;
+        
+        if (textContent.includes('damage') || textContent.includes('challenge')) {
+          smartChoice = vegasOptions.find(opt => opt.name.includes('garage-chaos')) || vegasOptions[2];
+        } else if (textContent.includes('win') || textContent.includes('battle')) {
+          smartChoice = vegasOptions.find(opt => opt.name.includes('overview-battle')) || vegasOptions[0];
+        } else if (textContent.includes('finals')) {
+          smartChoice = vegasOptions.find(opt => opt.name.includes('strip-overview')) || vegasOptions[6];
+        } else {
+          // Rotate through different options based on current selection
+          const currentUrl = config.backgroundImage;
+          const currentIndex = vegasOptions.findIndex(opt => opt.url === currentUrl);
+          smartChoice = vegasOptions[(currentIndex + 1) % vegasOptions.length];
+        }
+        
+        console.log('Smart choice selected:', smartChoice);
         onConfigChange('backgroundPreset', 'las-vegas');
-        onConfigChange('backgroundImage', randomImage.url);
+        onConfigChange('backgroundImage', smartChoice.url);
         toast({
-          title: 'Vegas Image Applied!',
-          description: `Applied ${randomImage.name} to your thumbnail.`,
+          title: 'Smart Vegas Selection!',
+          description: `AI analyzed your content and selected "${smartChoice.name.replace(/-/g, ' ')}" from all available options.`,
+          duration: 4000
         });
       }
     } catch (error) {
@@ -344,6 +392,43 @@ Return only the exact option name (before the colon).`;
       toast({
         title: 'Vegas Theme Applied!',
         description: 'Applied Las Vegas theme to your thumbnail.',
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  // Cycle through different Vegas images
+  const cycleVegasImages = async () => {
+    setIsGenerating(true);
+    try {
+      const res = await fetch('/api/las-vegas-images');
+      const vegasOptions = await res.json();
+      
+      if (!Array.isArray(vegasOptions) || vegasOptions.length === 0) {
+        throw new Error('No Vegas options available');
+      }
+      
+      // Find current image and get next one
+      const currentUrl = config.backgroundImage;
+      const currentIndex = vegasOptions.findIndex(opt => opt.url === currentUrl);
+      const nextIndex = (currentIndex + 1) % vegasOptions.length;
+      const nextImage = vegasOptions[nextIndex];
+      
+      onConfigChange('backgroundPreset', 'las-vegas');
+      onConfigChange('backgroundImage', nextImage.url);
+      
+      toast({
+        title: 'Vegas Scene Changed!',
+        description: `Now showing "${nextImage.name.replace(/-/g, ' ')}" (${nextIndex + 1}/${vegasOptions.length})`,
+        duration: 3000
+      });
+    } catch (error) {
+      console.error('Vegas cycling failed:', error);
+      toast({
+        title: "Could not cycle images",
+        description: "Please try the AI picker instead.",
+        variant: "destructive"
       });
     } finally {
       setIsGenerating(false);
@@ -433,27 +518,47 @@ Return only the exact option name (before the colon).`;
           )}
         </Button>
         
-        <Button
-          onClick={pickBestVegasImage}
-          disabled={isGenerating}
-          className="bg-gradient-to-r from-yellow-600 to-pink-600 hover:from-yellow-700 hover:to-pink-700 text-white transition-all duration-300"
-        >
-          {isGenerating ? (
-            <>
-              <Zap className="w-4 h-4 mr-2 animate-spin" />
-              AI Picking Image...
-            </>
-          ) : (
-            <>
-              <Sparkles className="w-4 h-4 mr-2" />
-              AI Pick Vegas Image
-            </>
-          )}
-        </Button>
+        <div className="grid grid-cols-2 gap-2">
+          <Button
+            onClick={pickBestVegasImage}
+            disabled={isGenerating}
+            className="bg-gradient-to-r from-yellow-600 to-pink-600 hover:from-yellow-700 hover:to-pink-700 text-white transition-all duration-300"
+          >
+            {isGenerating ? (
+              <>
+                <Zap className="w-4 h-4 mr-2 animate-spin" />
+                AI Picking...
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-4 h-4 mr-2" />
+                AI Pick Vegas
+              </>
+            )}
+          </Button>
+          
+          <Button
+            onClick={cycleVegasImages}
+            disabled={isGenerating}
+            className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white transition-all duration-300"
+          >
+            {isGenerating ? (
+              <>
+                <Zap className="w-4 h-4 mr-2 animate-spin" />
+                Cycling...
+              </>
+            ) : (
+              <>
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Try Different
+              </>
+            )}
+          </Button>
+        </div>
       </div>
       
       <div className="text-xs text-white/60 mt-3 p-2 bg-black/20 rounded">
-        💡 Tip: AI learns from your content to suggest viral-worthy thumbnails!
+        🎯 Tip: AI now analyzes ALL Vegas images to pick the perfect match! Use "Try Different" to cycle through options.
       </div>
     </div>
   );
