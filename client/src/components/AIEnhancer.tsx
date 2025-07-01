@@ -154,12 +154,22 @@ const AIEnhancer = ({ config, onConfigChange }: AIEnhancerProps) => {
       console.log('Vegas options received:', vegasOptions);
       if (!Array.isArray(vegasOptions) || vegasOptions.length === 0) throw new Error('No Vegas options found');
 
-      // Extract names for the prompt
-      const optionNames = vegasOptions.map(option => option.name);
-      console.log('Option names for prompt:', optionNames);
+      // Extract names and descriptions for better AI selection
+      const optionDetails = vegasOptions.map(option => `${option.name}: ${option.description || ''}`);
+      console.log('Vegas options for AI selection:', optionDetails);
       
-      // Compose prompt for Gemini
-      const prompt = `Given the YouTube thumbnail title: "${config.mainText}" and subtitle: "${config.subText}", which Vegas background would work best for a gaming thumbnail? Options: ${optionNames.join(', ')}. Return only the exact option name.`;
+      // Compose enhanced prompt for Gemini
+      const prompt = `Given this YouTube thumbnail title: "${config.mainText}" and subtitle: "${config.subText}", which Vegas background from The Finals game would create the most engaging thumbnail?
+
+Options:
+${optionDetails.join('\n')}
+
+Consider:
+- Which background matches the energy and theme of the text
+- Visual impact for a YouTube thumbnail
+- Color contrast for text readability
+
+Return only the exact option name (before the colon).`;
 
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
         method: 'POST',

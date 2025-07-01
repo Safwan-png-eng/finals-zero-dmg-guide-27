@@ -11,39 +11,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // API endpoint for Las Vegas themed background options
   app.get('/api/las-vegas-images', (req, res) => {
-    // Provide Vegas-themed background URLs
+    // Provide custom Vegas-themed backgrounds from The Finals game
     const vegasBackgrounds = [
       {
-        name: 'vegas-neon-lights',
-        url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1280&h=720&fit=crop'
+        name: 'vegas-overview-battle',
+        description: 'Epic aerial view of Vegas battlefield',
+        url: '/vegas-images/robert-berg-screenshot-alley-1-2024-11-17-13-57-0000-screenshot-overview-3-2024-11-17-13-58.jpg'
       },
       {
-        name: 'vegas-casino-strip',
-        url: 'https://images.unsplash.com/photo-1551316679-9c3e36883d3c?w=1280&h=720&fit=crop'
+        name: 'vegas-neon-alley',
+        description: 'Dark alley with neon lighting',
+        url: '/vegas-images/robert-berg-screenshot-alley-1-2024-11-17-13-57-0034-screenshot-alley-8-2024-11-17-13-58.jpg'
       },
       {
-        name: 'vegas-golden-sunset',
-        url: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1280&h=720&fit=crop'
+        name: 'vegas-garage-chaos',
+        description: 'Destruction in Vegas garage',
+        url: '/vegas-images/robert-berg-screenshot-alley-1-2024-11-17-13-57-0003-screenshot-garage-8-2024-11-17-13-58.jpg'
       },
       {
-        name: 'vegas-night-skyline',
-        url: 'https://images.unsplash.com/photo-1605833556294-ea5c7a74f57d?w=1280&h=720&fit=crop'
+        name: 'vegas-fremont-street',
+        description: 'Fremont Street battle zone',
+        url: '/vegas-images/robert-berg-screenshot-alley-2-2024-11-17-14-4-0003-screenshot-freemont-15-2024-11-17-14-5.jpg'
       },
       {
-        name: 'vegas-casino-interior',
-        url: 'https://images.unsplash.com/photo-1574414237975-5a14fec2b9fb?w=1280&h=720&fit=crop'
+        name: 'vegas-backstreets-action',
+        description: 'Intense backstreets combat',
+        url: '/vegas-images/robert-berg-screenshot-alley-2-2024-11-17-14-4-0018-screenshot-backstreets-10-2024-11-17-14-5.jpg'
       },
       {
-        name: 'vegas-luxury-hotel',
-        url: 'https://images.unsplash.com/photo-1540559827-32f9f4322a4d?w=1280&h=720&fit=crop'
+        name: 'vegas-casino-warfare',
+        description: 'Casino district battle',
+        url: '/vegas-images/robert-berg-screenshot-alley-2-2024-11-17-14-4-0000-screenshot-garage-3-2024-11-17-14-6.jpg'
       },
       {
-        name: 'vegas-fountain-show',
-        url: 'https://images.unsplash.com/photo-1518684079-3c830dcef090?w=1280&h=720&fit=crop'
+        name: 'vegas-strip-overview',
+        description: 'Panoramic Vegas Strip view',
+        url: '/vegas-images/robert-berg-screenshot-alley-2-2024-11-17-14-4-0032-screenshot-overview-5-2024-11-17-14-5.jpg'
       },
       {
-        name: 'vegas-bright-signs',
-        url: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=1280&h=720&fit=crop'
+        name: 'vegas-alley-showdown',
+        description: 'Narrow alley combat scene',
+        url: '/vegas-images/robert-berg-screenshot-alley-2-2024-11-17-14-4-0027-screenshot-alley-15-2024-11-17-14-5.jpg'
       }
     ];
     res.json(vegasBackgrounds);
