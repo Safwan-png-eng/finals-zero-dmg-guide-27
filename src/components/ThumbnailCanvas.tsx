@@ -1,4 +1,3 @@
-
 import { useEffect, useRef } from 'react';
 
 interface ThumbnailConfig {
@@ -137,10 +136,10 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
     // Smart text positioning based on character presence and size
     if (config.overlayImage) {
       const characterSize = config.overlayImageSize || 25;
-      if (characterSize > 60) {
+      if (characterSize >= 70) {
         // Large character - position text on left side
-        return 'items-center justify-start pl-8';
-      } else if (characterSize > 40) {
+        return 'items-center justify-start pl-6';
+      } else if (characterSize >= 40) {
         // Medium character - position text in upper area
         return 'items-start justify-center pt-8';
       } else {
@@ -192,37 +191,40 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
     const baseSize = config.overlayImageSize || 25;
     const clampedSize = Math.max(15, Math.min(100, baseSize));
     console.log('Overlay image size calculation:', { baseSize, clampedSize });
+    
+    // Better size scaling with proper aspect ratio
     return {
-      width: `${clampedSize}%`,
-      aspectRatio: '3/4'
+      width: `${Math.min(clampedSize * 0.6, 60)}%`,
+      maxHeight: `${Math.min(clampedSize * 0.8, 80)}%`,
+      aspectRatio: 'auto'
     };
   };
 
   const getCharacterPosition = () => {
     const size = config.overlayImageSize || 25;
-    if (size > 60) {
-      // Large character takes right half
-      return 'absolute bottom-0 right-0 z-10 w-1/2';
-    } else if (size > 40) {
-      // Medium character in bottom right corner
-      return 'absolute bottom-0 right-0 z-10';
+    if (size >= 70) {
+      // Large character takes right side
+      return 'absolute bottom-0 right-0 z-10 flex items-end justify-end p-4';
+    } else if (size >= 40) {
+      // Medium character in bottom right
+      return 'absolute bottom-0 right-0 z-10 flex items-end justify-end p-6';
     } else {
       // Small character in corner
-      return 'absolute bottom-0 right-0 z-10';
+      return 'absolute bottom-0 right-0 z-10 flex items-end justify-end p-8';
     }
   };
 
   const getTextContainerClass = () => {
     const size = config.overlayImageSize || 25;
-    if (config.overlayImage && size > 60) {
-      // Large character - text takes left half
-      return 'relative z-20 h-full flex flex-col text-left px-3 sm:px-4 w-1/2';
-    } else if (config.overlayImage && size > 40) {
+    if (config.overlayImage && size >= 70) {
+      // Large character - text takes left space
+      return 'relative z-20 h-full flex flex-col text-left px-6 sm:px-8 w-1/2';
+    } else if (config.overlayImage && size >= 40) {
       // Medium character - text in upper area
-      return 'relative z-20 h-3/5 flex flex-col text-center px-3 sm:px-4 w-full';
+      return 'relative z-20 h-3/5 flex flex-col text-center px-4 sm:px-6 w-full';
     } else {
       // Default full width text
-      return 'relative z-20 h-full flex flex-col text-center px-3 sm:px-4';
+      return 'relative z-20 h-full flex flex-col text-center px-4 sm:px-6';
     }
   };
 
@@ -278,7 +280,7 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
           </div>
         )}
 
-        {/* Enhanced Character Overlay with Smart Positioning */}
+        {/* Fixed Character Overlay with Proper Sizing */}
         {config.overlayImage && (
           <div className={getCharacterPosition()}>
             <div 
@@ -320,7 +322,7 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
                 }}
               />
 
-              {/* Main Character Image with Enhanced Effects */}
+              {/* Main Character Image with Enhanced Effects and Proper Scaling */}
               <img 
                 src={config.overlayImage} 
                 alt="Character" 
@@ -329,14 +331,16 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
                   filter: config.glowEffect ? 
                     `drop-shadow(0 0 40px ${config.accentColor}70) drop-shadow(0 0 80px ${config.accentColor}40) drop-shadow(0 15px 35px rgba(0,0,0,0.8)) contrast(1.15) saturate(1.25) brightness(1.08)` : 
                     'drop-shadow(0 10px 25px rgba(0,0,0,0.6)) contrast(1.08) saturate(1.15) brightness(1.05)',
-                  objectFit: 'contain'
+                  objectFit: 'contain',
+                  maxWidth: '100%',
+                  maxHeight: '100%'
                 }}
                 onLoad={() => console.log('Overlay image loaded successfully')}
                 onError={() => console.error('Failed to load overlay image')}
               />
 
-              {/* NO DAMAGE Badge - Enhanced and More Prominent */}
-              <div className="absolute top-4 left-4 z-20">
+              {/* NO DAMAGE Badge - Enhanced and Scaled with Character */}
+              <div className="absolute top-4 left-4 z-20" style={{ transform: `scale(${Math.max(0.8, Math.min(1.5, (config.overlayImageSize || 25) / 50))})` }}>
                 <div className="relative">
                   {/* Badge Background Glow - More Intense */}
                   <div 
@@ -359,14 +363,16 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
                 </div>
               </div>
               
-              {/* Character Stats Badge - Repositioned */}
-              <div className="absolute bottom-4 left-4 bg-gradient-to-r from-black/95 to-black/80 text-white text-sm px-4 py-2 rounded-2xl border-2 border-white/50 backdrop-blur-md shadow-xl">
+              {/* Character Stats Badge - Repositioned and Scaled */}
+              <div className="absolute bottom-4 left-4 bg-gradient-to-r from-black/95 to-black/80 text-white text-sm px-4 py-2 rounded-2xl border-2 border-white/50 backdrop-blur-md shadow-xl"
+                   style={{ transform: `scale(${Math.max(0.8, Math.min(1.2, (config.overlayImageSize || 25) / 60))})` }}>
                 <span className="font-bold text-cyan-400">{config.overlayImageSize || 25}%</span>
                 <span className="text-white/70 ml-2">SIZE</span>
               </div>
               
-              {/* Character Class Badge - Enhanced */}
-              <div className="absolute bottom-4 right-4 bg-gradient-to-r from-purple-600/95 to-blue-600/95 text-white text-sm px-4 py-2 rounded-2xl border-2 border-white/50 backdrop-blur-md shadow-xl">
+              {/* Character Class Badge - Enhanced and Scaled */}
+              <div className="absolute bottom-4 right-4 bg-gradient-to-r from-purple-600/95 to-blue-600/95 text-white text-sm px-4 py-2 rounded-2xl border-2 border-white/50 backdrop-blur-md shadow-xl"
+                   style={{ transform: `scale(${Math.max(0.8, Math.min(1.2, (config.overlayImageSize || 25) / 60))})` }}>
                 <span className="font-bold">⭐ HEAVY</span>
               </div>
 
@@ -382,7 +388,7 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
           </div>
         )}
 
-        {/* Smart Text Container */}
+        {/* Smart Text Container with Fixed Positioning */}
         <div className={`${getTextContainerClass()} ${config.animatedText ? 'animate-pulse' : ''}`}>
           {/* Enhanced Text Background */}
           {config.textBackground && (
@@ -396,7 +402,7 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
             />
           )}
 
-          {/* Main Text with Smart Sizing */}
+          {/* Main Text with Smart Sizing and Positioning */}
           <h1 
             className={`font-black uppercase leading-tight transition-all duration-300 ${getFontSize().main} relative z-10 max-w-full break-words`}
             style={{ 
