@@ -298,9 +298,9 @@ const ControlPanel = ({ config, onConfigChange }: ControlPanelProps) => {
         )}
       </div>
 
-      {/* Enhanced Character Size Control - Now supports up to 80% */}
+      {/* Enhanced Character Size Control - Now supports up to 100% */}
       {config.overlayImage && (
-        <div className="space-y-4 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 p-5 rounded-xl border border-cyan-300/20 shadow-lg">
+        <div className="space-y-4 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 p-6 rounded-xl border border-cyan-300/20 shadow-lg">
           <Label className="text-white mb-3 block font-medium flex items-center">
             <Maximize2 className="w-5 h-5 mr-2 text-cyan-400" />
             <span className="text-lg">Character Size: </span>
@@ -309,20 +309,20 @@ const ControlPanel = ({ config, onConfigChange }: ControlPanelProps) => {
           <Slider
             value={[config.overlayImageSize || 25]}
             onValueChange={(value) => onConfigChange('overlayImageSize', value[0])}
-            max={80}
-            min={10}
+            max={100}
+            min={15}
             step={2}
             className="w-full"
           />
           <div className="flex justify-between text-xs text-white/70 font-medium">
-            <span className="bg-white/10 px-2 py-1 rounded">Small (10%)</span>
-            <span className="bg-white/10 px-2 py-1 rounded">Medium (25%)</span>
-            <span className="bg-white/10 px-2 py-1 rounded">Large (50%)</span>
-            <span className="bg-cyan-400/20 px-2 py-1 rounded text-cyan-300">XL (80%)</span>
+            <span className="bg-white/10 px-2 py-1 rounded">Small (15%)</span>
+            <span className="bg-white/10 px-2 py-1 rounded">Medium (40%)</span>
+            <span className="bg-white/10 px-2 py-1 rounded">Large (70%)</span>
+            <span className="bg-gradient-to-r from-cyan-400/30 to-purple-400/30 px-2 py-1 rounded text-cyan-300 font-bold">MAX (100%)</span>
           </div>
           <div className="text-center">
             <p className="text-xs text-white/60 bg-white/5 px-3 py-2 rounded-lg">
-              💡 <strong>Tip:</strong> Larger characters create more impact! Try 50-80% for hero shots.
+              🔥 <strong>Pro Tip:</strong> Go BIG! Use 70-100% for maximum character impact and presence!
             </p>
           </div>
         </div>

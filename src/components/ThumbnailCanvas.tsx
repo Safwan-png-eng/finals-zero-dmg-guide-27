@@ -173,7 +173,7 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
 
   const getOverlayImageSize = () => {
     const baseSize = config.overlayImageSize || 25;
-    const clampedSize = Math.max(10, Math.min(80, baseSize)); // Increased max size to 80%
+    const clampedSize = Math.max(15, Math.min(100, baseSize)); // Increased max size to 100%
     console.log('Overlay image size calculation:', { baseSize, clampedSize });
     return {
       width: `${clampedSize}%`,
@@ -221,54 +221,87 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20" />
         <div className="absolute inset-0 bg-gradient-to-br from-transparent via-black/10 to-transparent" />
 
-        {/* Enhanced Overlay Image with Multiple Effects */}
+        {/* Enhanced Overlay Image with More Visual Impact */}
         {config.overlayImage && (
           <div className="absolute bottom-4 right-4 z-10">
             <div 
-              className="relative rounded-xl overflow-hidden border-2 border-white/30 shadow-2xl transition-all duration-500 hover:scale-105 backdrop-blur-sm bg-white/5"
+              className="relative rounded-xl overflow-hidden border-4 border-white/50 shadow-2xl transition-all duration-500 hover:scale-105 backdrop-blur-sm bg-white/10"
               style={getOverlayImageSize()}
             >
-              {/* Character Background Glow */}
+              {/* Multiple Character Background Glows for More Impact */}
               <div 
-                className="absolute inset-0 rounded-xl opacity-20 animate-pulse"
+                className="absolute -inset-4 rounded-xl opacity-30 animate-pulse"
                 style={{
-                  background: `radial-gradient(circle at center, ${config.accentColor}40 0%, transparent 70%)`
+                  background: `radial-gradient(circle at center, ${config.accentColor}60 0%, transparent 70%)`
+                }}
+              />
+              <div 
+                className="absolute -inset-2 rounded-xl opacity-20 animate-pulse"
+                style={{
+                  background: `radial-gradient(circle at center, #ffffff40 0%, transparent 60%)`,
+                  animationDelay: '0.5s'
                 }}
               />
               
-              {/* Main Character Image */}
+              {/* Spotlight Effect Behind Character */}
+              <div 
+                className="absolute -inset-8 rounded-full opacity-25"
+                style={{
+                  background: `radial-gradient(ellipse at center, ${config.accentColor}50 0%, ${config.accentColor}20 40%, transparent 70%)`,
+                  animation: 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                }}
+              />
+              
+              {/* Main Character Image with Enhanced Effects */}
               <img 
                 src={config.overlayImage} 
                 alt="Character" 
                 className="w-full h-full object-contain relative z-10"
                 style={{
                   filter: config.glowEffect ? 
-                    `drop-shadow(0 0 20px ${config.accentColor}60) drop-shadow(0 0 40px ${config.accentColor}30) contrast(1.1) saturate(1.2) brightness(1.05)` : 
-                    'contrast(1.1) saturate(1.15) brightness(1.05)',
+                    `drop-shadow(0 0 30px ${config.accentColor}80) drop-shadow(0 0 60px ${config.accentColor}40) drop-shadow(0 8px 20px rgba(0,0,0,0.6)) contrast(1.15) saturate(1.3) brightness(1.1)` : 
+                    'drop-shadow(0 4px 15px rgba(0,0,0,0.4)) contrast(1.1) saturate(1.15) brightness(1.05)',
                   objectFit: 'contain'
                 }}
                 onLoad={() => console.log('Overlay image loaded successfully')}
                 onError={() => console.error('Failed to load overlay image')}
               />
               
-              {/* Character Frame Effects */}
-              <div className="absolute inset-0 rounded-xl border border-white/20 shadow-inner" />
+              {/* Enhanced Character Frame Effects */}
+              <div className="absolute inset-0 rounded-xl border-2 border-white/30 shadow-inner" />
               <div 
-                className="absolute -inset-1 rounded-xl opacity-30 animate-pulse"
+                className="absolute -inset-2 rounded-xl opacity-40 animate-pulse"
                 style={{
-                  background: `linear-gradient(45deg, transparent 30%, ${config.accentColor}20 50%, transparent 70%)`
+                  background: `linear-gradient(45deg, transparent 20%, ${config.accentColor}30 40%, transparent 60%, ${config.accentColor}20 80%, transparent 100%)`
                 }}
               />
               
-              {/* Enhanced Size Indicator */}
-              <div className="absolute top-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded-full border border-white/20 backdrop-blur-sm">
-                <span className="font-semibold">{config.overlayImageSize || 25}%</span>
+              {/* Character Info Badges with Better Visibility */}
+              <div className="absolute top-3 left-3 bg-gradient-to-r from-black/90 to-black/70 text-white text-sm px-3 py-1 rounded-full border-2 border-white/30 backdrop-blur-sm shadow-lg">
+                <span className="font-bold text-cyan-400">{config.overlayImageSize || 25}%</span>
               </div>
               
-              {/* Character Info Badge */}
-              <div className="absolute bottom-2 left-2 bg-gradient-to-r from-black/80 to-transparent text-white text-xs px-2 py-1 rounded-full border border-white/20 backdrop-blur-sm">
-                <span className="font-medium">Character</span>
+              <div className="absolute bottom-3 left-3 bg-gradient-to-r from-purple-600/90 to-blue-600/90 text-white text-sm px-3 py-1 rounded-full border-2 border-white/30 backdrop-blur-sm shadow-lg">
+                <span className="font-semibold">★ CHARACTER</span>
               </div>
+
+              {/* New: Character Highlight Ring */}
+              <div 
+                className="absolute -inset-1 rounded-xl border-2 opacity-60 animate-pulse"
+                style={{
+                  borderColor: config.accentColor,
+                  boxShadow: `0 0 20px ${config.accentColor}60, inset 0 0 20px ${config.accentColor}20`
+                }}
+              />
+
+              {/* New: Animated Energy Rings */}
+              <div 
+                className="absolute -inset-6 rounded-full border border-white/20 opacity-30 animate-spin"
+                style={{
+                  animation: 'spin 8s linear infinite',
+                  background: `conic-gradient(from 0deg, transparent 0deg, ${config.accentColor}20 60deg, transparent 120deg, ${config.accentColor}15 180deg, transparent 240deg, ${config.accentColor}10 300deg, transparent 360deg)`
+                }}
+              />
             </div>
           </div>
         )}
@@ -410,11 +443,13 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
           }}
         />
 
-        {/* Additional Atmospheric Effects */}
-        <div className="absolute top-1/4 left-1/4 w-32 h-32 rounded-full opacity-5 animate-pulse" 
-             style={{ background: `radial-gradient(circle, ${config.accentColor}40 0%, transparent 70%)` }} />
-        <div className="absolute bottom-1/3 right-1/3 w-24 h-24 rounded-full opacity-4 animate-pulse" 
-             style={{ background: `radial-gradient(circle, ${config.textColor}30 0%, transparent 70%)`, animationDelay: '1s' }} />
+        {/* Enhanced Atmospheric Effects with More Layers */}
+        <div className="absolute top-1/4 left-1/4 w-40 h-40 rounded-full opacity-6 animate-pulse" 
+             style={{ background: `radial-gradient(circle, ${config.accentColor}50 0%, transparent 70%)` }} />
+        <div className="absolute bottom-1/3 right-1/3 w-32 h-32 rounded-full opacity-5 animate-pulse" 
+             style={{ background: `radial-gradient(circle, ${config.textColor}40 0%, transparent 70%)`, animationDelay: '1s' }} />
+        <div className="absolute top-1/2 left-1/2 w-24 h-24 rounded-full opacity-4 animate-pulse" 
+             style={{ background: `radial-gradient(circle, #ffffff30 0%, transparent 70%)`, animationDelay: '2s' }} />
       </div>
 
       {/* Enhanced Dimensions Label */}

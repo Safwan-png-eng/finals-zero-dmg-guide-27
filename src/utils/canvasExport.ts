@@ -117,8 +117,8 @@ const drawOverlayImage = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanva
     img.src = imageSrc;
   });
   
-  // Calculate size based on the size parameter (percentage)
-  const sizeMultiplier = Math.max(0.1, Math.min(0.5, size / 100)); // Clamp between 10% and 50%
+  // Calculate size based on the size parameter (percentage) - now supports up to 100%
+  const sizeMultiplier = Math.max(0.15, Math.min(1.0, size / 100)); // Increased max to 100%
   const maxWidth = canvas.width * sizeMultiplier;
   const maxHeight = canvas.height * (sizeMultiplier * 1.2); // Slightly taller for character proportions
   
@@ -132,13 +132,27 @@ const drawOverlayImage = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanva
     width = height * aspectRatio;
   }
   
-  const x = canvas.width - width - 30;
-  const y = canvas.height - height - 30;
+  // Position character based on size - larger characters get more centered positioning
+  const padding = Math.max(20, (100 - size) * 0.5); // Dynamic padding based on size
+  const x = canvas.width - width - padding;
+  const y = canvas.height - height - padding;
+  
+  // Add glow effect for larger characters
+  if (size > 50) {
+    ctx.shadowColor = '#00d4ff';
+    ctx.shadowBlur = Math.min(30, size * 0.3);
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+  }
   
   // Draw with better scaling
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(img, x, y, width, height);
+  
+  // Reset shadow
+  ctx.shadowColor = 'transparent';
+  ctx.shadowBlur = 0;
 };
 
 const drawParticles = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, accentColor: string) => {
