@@ -35,7 +35,23 @@ const ControlPanel = ({ config, onConfigChange }: ControlPanelProps) => {
     {
       name: 'Shield Specialist',
       image: '/lovable-uploads/6aaa02a3-b77f-45ec-9397-781371f3e09b.png',
-      description: 'THE FINALS Heavy class'
+      description: 'THE FINALS Heavy class',
+      position: 'center-right',
+      size: 75
+    },
+    {
+      name: 'Assault Fighter',
+      image: '/lovable-uploads/6aaa02a3-b77f-45ec-9397-781371f3e09b.png',
+      description: 'Aggressive Medium class',
+      position: 'bottom-left',
+      size: 65
+    },
+    {
+      name: 'Speed Runner',
+      image: '/lovable-uploads/6aaa02a3-b77f-45ec-9397-781371f3e09b.png',
+      description: 'Fast Light class',
+      position: 'center-left',
+      size: 55
     }
   ];
 
@@ -71,11 +87,13 @@ const ControlPanel = ({ config, onConfigChange }: ControlPanelProps) => {
     }
   };
 
-  const handleCharacterPreset = (imageUrl: string) => {
-    onConfigChange('overlayImage', imageUrl);
+  const handleCharacterPreset = (character: any) => {
+    onConfigChange('overlayImage', character.image);
+    onConfigChange('characterPosition', character.position);
+    onConfigChange('overlayImageSize', character.size);
     toast({
-      title: "Character Added!",
-      description: "Character preset has been applied to your thumbnail",
+      title: "Smart Character Applied!",
+      description: `${character.name} positioned ${character.position} at ${character.size}% size`,
     });
   };
 
@@ -228,7 +246,7 @@ const ControlPanel = ({ config, onConfigChange }: ControlPanelProps) => {
           {characterPresets.map((character, index) => (
             <button
               key={index}
-              onClick={() => handleCharacterPreset(character.image)}
+              onClick={() => handleCharacterPreset(character)}
               className="flex items-center space-x-3 p-3 bg-white/10 hover:bg-white/20 rounded-lg border border-white/20 transition-all duration-200"
             >
               <img 
@@ -236,9 +254,10 @@ const ControlPanel = ({ config, onConfigChange }: ControlPanelProps) => {
                 alt={character.name}
                 className="w-10 h-10 object-cover rounded-lg"
               />
-              <div className="text-left">
+              <div className="text-left flex-1">
                 <h4 className="text-white font-medium text-sm">{character.name}</h4>
                 <p className="text-white/60 text-xs">{character.description}</p>
+                <p className="text-cyan-400 text-xs font-medium">{character.position} • {character.size}%</p>
               </div>
             </button>
           ))}
@@ -298,31 +317,57 @@ const ControlPanel = ({ config, onConfigChange }: ControlPanelProps) => {
         )}
       </div>
 
-      {/* Enhanced Character Size Control - Now supports up to 100% */}
+      {/* Enhanced Character Controls */}
       {config.overlayImage && (
-        <div className="space-y-4 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 p-6 rounded-xl border border-cyan-300/20 shadow-lg">
-          <Label className="text-white mb-3 block font-medium flex items-center">
-            <Maximize2 className="w-5 h-5 mr-2 text-cyan-400" />
-            <span className="text-lg">Character Size: </span>
-            <span className="text-cyan-400 font-bold ml-1">{config.overlayImageSize || 25}%</span>
-          </Label>
-          <Slider
-            value={[config.overlayImageSize || 25]}
-            onValueChange={(value) => onConfigChange('overlayImageSize', value[0])}
-            max={100}
-            min={15}
-            step={2}
-            className="w-full"
-          />
-          <div className="flex justify-between text-xs text-white/70 font-medium">
-            <span className="bg-white/10 px-2 py-1 rounded">Small (15%)</span>
-            <span className="bg-white/10 px-2 py-1 rounded">Medium (40%)</span>
-            <span className="bg-white/10 px-2 py-1 rounded">Large (70%)</span>
-            <span className="bg-gradient-to-r from-cyan-400/30 to-purple-400/30 px-2 py-1 rounded text-cyan-300 font-bold">MAX (100%)</span>
+        <div className="space-y-6 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 p-6 rounded-xl border border-cyan-300/20 shadow-lg">
+          {/* Character Position Selection */}
+          <div className="space-y-3">
+            <Label className="text-white mb-3 block font-medium flex items-center">
+              <User className="w-5 h-5 mr-2 text-cyan-400" />
+              <span className="text-lg">Character Position</span>
+            </Label>
+            <Select value={config.characterPosition || 'bottom-right'} onValueChange={(value) => onConfigChange('characterPosition', value)}>
+              <SelectTrigger className="bg-white/10 border-white/20 text-white rounded-lg">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-slate-800 border-white/20">
+                <SelectItem value="bottom-right" className="text-white">Bottom Right (Classic)</SelectItem>
+                <SelectItem value="bottom-left" className="text-white">Bottom Left (Balance)</SelectItem>
+                <SelectItem value="center-right" className="text-white">Center Right (Dynamic)</SelectItem>
+                <SelectItem value="center-left" className="text-white">Center Left (Bold)</SelectItem>
+                <SelectItem value="top-right" className="text-white">Top Right (Dramatic)</SelectItem>
+                <SelectItem value="top-left" className="text-white">Top Left (Unique)</SelectItem>
+                <SelectItem value="full-center" className="text-white">Full Center (Dominant)</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
+
+          {/* Character Size Control */}
+          <div className="space-y-4">
+            <Label className="text-white mb-3 block font-medium flex items-center">
+              <Maximize2 className="w-5 h-5 mr-2 text-cyan-400" />
+              <span className="text-lg">Character Size: </span>
+              <span className="text-cyan-400 font-bold ml-1">{config.overlayImageSize || 25}%</span>
+            </Label>
+            <Slider
+              value={[config.overlayImageSize || 25]}
+              onValueChange={(value) => onConfigChange('overlayImageSize', value[0])}
+              max={100}
+              min={15}
+              step={2}
+              className="w-full"
+            />
+            <div className="flex justify-between text-xs text-white/70 font-medium">
+              <span className="bg-white/10 px-2 py-1 rounded">Small (15%)</span>
+              <span className="bg-white/10 px-2 py-1 rounded">Medium (40%)</span>
+              <span className="bg-white/10 px-2 py-1 rounded">Large (70%)</span>
+              <span className="bg-gradient-to-r from-cyan-400/30 to-purple-400/30 px-2 py-1 rounded text-cyan-300 font-bold">MAX (100%)</span>
+            </div>
+          </div>
+          
           <div className="text-center">
             <p className="text-xs text-white/60 bg-white/5 px-3 py-2 rounded-lg">
-              🔥 <strong>Pro Tip:</strong> Go BIG! Use 70-100% for maximum character impact and presence!
+              🎯 <strong>AI Tip:</strong> Use the AI Character Position button above for optimal placement based on your content!
             </p>
           </div>
         </div>

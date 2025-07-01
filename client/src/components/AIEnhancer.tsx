@@ -144,6 +144,130 @@ const AIEnhancer = ({ config, onConfigChange }: AIEnhancerProps) => {
     }
   };
 
+  // AI-powered character positioning system
+  const optimizeCharacterPosition = async () => {
+    if (!config.overlayImage) {
+      toast({
+        title: "No Character Selected",
+        description: "Please upload or select a character first.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      const prompt = `Analyze this YouTube gaming thumbnail composition:
+
+Title: "${config.mainText}"
+Subtitle: "${config.subText}"
+Background: ${config.backgroundPreset}
+Current Character Size: ${config.overlayImageSize || 25}%
+Font Size: ${config.fontSize}
+Text Position: ${config.textPosition}
+
+Determine the optimal character positioning strategy for maximum visual impact and engagement:
+
+POSITIONING OPTIONS:
+1. bottom-right: Character anchored to bottom-right corner (classic gaming style)
+2. bottom-left: Character on bottom-left for text balance  
+3. center-right: Character positioned on right side, vertically centered
+4. center-left: Character on left side for dynamic composition
+5. top-right: Character in upper right for dramatic effect
+6. full-center: Character dominates center with text overlay
+
+SIZING RECOMMENDATIONS:
+- small (20-35%): For text-heavy thumbnails
+- medium (40-60%): Balanced character/text presence  
+- large (65-85%): Character-focused thumbnails
+- dominant (90-100%): Character is the main focus
+
+Consider:
+- Text readability and contrast
+- Visual hierarchy and flow
+- Gaming thumbnail best practices
+- Character prominence vs text importance
+- Background compatibility
+- Eye-catching composition
+
+Return format: POSITION|SIZE|EXPLANATION
+Example: center-right|75|Character positioned on right creates dynamic composition while leaving space for impactful text on left side`;
+
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }]
+        })
+      });
+
+      const data = await response.json();
+      const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+      
+      if (aiResponse && aiResponse.includes('|')) {
+        const [position, size, explanation] = aiResponse.split('|');
+        const cleanPosition = position.trim().toLowerCase();
+        const cleanSize = parseInt(size.trim());
+        
+        // Validate AI recommendations
+        const validPositions = ['bottom-right', 'bottom-left', 'center-right', 'center-left', 'top-right', 'full-center'];
+        const finalPosition = validPositions.includes(cleanPosition) ? cleanPosition : 'center-right';
+        const finalSize = Math.max(20, Math.min(100, cleanSize || 50));
+        
+        // Apply AI recommendations
+        onConfigChange('characterPosition', finalPosition);
+        onConfigChange('overlayImageSize', finalSize);
+        
+        // Also optimize text position based on character placement
+        if (finalPosition.includes('left')) {
+          onConfigChange('textPosition', 'center-right');
+        } else if (finalPosition.includes('right')) {
+          onConfigChange('textPosition', 'center-left');
+        } else if (finalPosition === 'full-center') {
+          onConfigChange('textPosition', 'overlay-top');
+        }
+        
+        toast({
+          title: "Character Position Optimized!",
+          description: `AI positioned character ${finalPosition} at ${finalSize}% size. ${explanation?.substring(0, 50)}...`,
+          duration: 5000
+        });
+      } else {
+        // Fallback intelligent positioning
+        const textLength = (config.mainText + config.subText).length;
+        const backgroundType = config.backgroundPreset;
+        
+        let optimalPosition = 'center-right';
+        let optimalSize = 60;
+        
+        if (textLength > 20) {
+          optimalPosition = 'bottom-right';
+          optimalSize = 45;
+        } else if (backgroundType.includes('neon') || backgroundType.includes('cyber')) {
+          optimalPosition = 'center-left';
+          optimalSize = 70;
+        }
+        
+        onConfigChange('characterPosition', optimalPosition);
+        onConfigChange('overlayImageSize', optimalSize);
+        
+        toast({
+          title: "Smart Position Applied!",
+          description: `Applied ${optimalPosition} positioning with ${optimalSize}% size.`
+        });
+      }
+    } catch (error) {
+      console.error('Character positioning failed:', error);
+      toast({
+        title: "Positioning Failed",
+        description: "Could not optimize character position. Using smart fallback.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   // NEW: Let Gemini AI pick the best Las Vegas image
   const pickBestVegasImage = async () => {
     setIsGenerating(true);
@@ -287,6 +411,24 @@ Return only the exact option name (before the colon).`;
             <>
               <Brain className="w-4 h-4 mr-2" />
               AI Perfect Preset
+            </>
+          )}
+        </Button>
+        
+        <Button
+          onClick={optimizeCharacterPosition}
+          disabled={isGenerating}
+          className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white transition-all duration-300"
+        >
+          {isGenerating ? (
+            <>
+              <Zap className="w-4 h-4 mr-2 animate-spin" />
+              AI Positioning...
+            </>
+          ) : (
+            <>
+              <Brain className="w-4 h-4 mr-2" />
+              AI Character Position
             </>
           )}
         </Button>

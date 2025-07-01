@@ -26,6 +26,7 @@ interface ThumbnailConfig {
   textBackground: boolean;
   textBackgroundColor: string;
   textBackgroundOpacity: number;
+  characterPosition?: string;
 }
 
 interface ThumbnailCanvasProps {
@@ -144,25 +145,69 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
 
   const getCharacterPosition = () => {
     const size = config.overlayImageSize || 25;
+    const position = config.characterPosition || 'bottom-right';
+    
+    // Base positioning classes based on AI recommendation
+    const positionClasses = {
+      'bottom-right': 'bottom-0 right-0 items-end justify-end',
+      'bottom-left': 'bottom-0 left-0 items-end justify-start',
+      'center-right': 'top-1/2 right-0 -translate-y-1/2 items-center justify-end',
+      'center-left': 'top-1/2 left-0 -translate-y-1/2 items-center justify-start',
+      'top-right': 'top-0 right-0 items-start justify-end',
+      'top-left': 'top-0 left-0 items-start justify-start',
+      'full-center': 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 items-center justify-center'
+    };
+    
+    // Adjust padding based on character size and position
+    let padding = 'p-4';
     if (size >= 70) {
-      return 'absolute bottom-0 right-0 z-10 flex items-end justify-end pr-4 pb-4';
+      padding = 'p-2';
     } else if (size >= 40) {
-      return 'absolute bottom-0 right-0 z-10 flex items-end justify-end pr-6 pb-6';
+      padding = 'p-4';
     } else {
-      return 'absolute bottom-0 right-0 z-10 flex items-end justify-end pr-8 pb-8';
+      padding = 'p-6';
     }
+    
+    // Special handling for center positions
+    if (position === 'full-center') {
+      padding = 'p-0';
+    }
+    
+    const baseClasses = positionClasses[position as keyof typeof positionClasses] || positionClasses['bottom-right'];
+    
+    return `absolute z-10 flex ${baseClasses} ${padding}`;
   };
 
   const getTextContainerClass = () => {
     const size = config.overlayImageSize || 25;
-    if (config.overlayImage && size >= 70) {
-      return 'relative z-20 h-full flex flex-col text-left px-6 sm:px-8 w-3/5 pr-12';
-    } else if (config.overlayImage && size >= 40) {
-      return 'relative z-20 h-2/3 flex flex-col text-center px-4 sm:px-6 w-full pb-8';
-    } else if (config.overlayImage) {
-      return 'relative z-20 h-full flex flex-col text-center px-4 sm:px-6 pr-16 pb-12';
-    } else {
+    const characterPosition = config.characterPosition || 'bottom-right';
+    const textPosition = config.textPosition;
+    
+    if (!config.overlayImage) {
       return 'relative z-20 h-full flex flex-col text-center px-4 sm:px-6';
+    }
+    
+    // Handle specific text position overrides
+    if (textPosition === 'center-right') {
+      return 'relative z-20 h-full flex flex-col text-right px-4 sm:px-6 pr-8 w-3/5 ml-auto';
+    } else if (textPosition === 'center-left') {
+      return 'relative z-20 h-full flex flex-col text-left px-4 sm:px-6 pl-8 w-3/5';
+    } else if (textPosition === 'overlay-top') {
+      return 'relative z-30 h-full flex flex-col text-center px-4 sm:px-6 pt-8 pb-4';
+    }
+    
+    // Smart text positioning based on character position
+    if (characterPosition.includes('left')) {
+      return `relative z-20 h-full flex flex-col text-right px-4 sm:px-6 w-3/5 ml-auto ${size >= 70 ? 'pr-2' : 'pr-8'}`;
+    } else if (characterPosition.includes('right')) {
+      return `relative z-20 h-full flex flex-col text-left px-4 sm:px-6 w-3/5 ${size >= 70 ? 'pl-2' : 'pl-8'}`;
+    } else if (characterPosition === 'full-center') {
+      return 'relative z-30 h-full flex flex-col text-center px-4 sm:px-6 pt-8';
+    } else if (characterPosition.includes('top')) {
+      return 'relative z-20 h-full flex flex-col text-center px-4 sm:px-6 pt-32';
+    } else {
+      // Default bottom positioning
+      return `relative z-20 h-full flex flex-col text-center px-4 sm:px-6 ${size >= 70 ? 'pb-4' : 'pb-12'}`;
     }
   };
 
