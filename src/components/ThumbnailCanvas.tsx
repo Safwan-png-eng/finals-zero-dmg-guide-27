@@ -134,6 +134,22 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
   };
 
   const getTextPosition = () => {
+    // Smart text positioning based on character presence and size
+    if (config.overlayImage) {
+      const characterSize = config.overlayImageSize || 25;
+      if (characterSize > 60) {
+        // Large character - position text on left side
+        return 'items-center justify-start pl-8';
+      } else if (characterSize > 40) {
+        // Medium character - position text in upper area
+        return 'items-start justify-center pt-8';
+      } else {
+        // Small character - center text
+        return 'items-center justify-center';
+      }
+    }
+    
+    // No character - use selected position
     const positions = {
       top: 'items-start justify-center pt-4 sm:pt-6',
       center: 'items-center justify-center',
@@ -182,6 +198,34 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
     };
   };
 
+  const getCharacterPosition = () => {
+    const size = config.overlayImageSize || 25;
+    if (size > 60) {
+      // Large character takes right half
+      return 'absolute bottom-0 right-0 z-10 w-1/2';
+    } else if (size > 40) {
+      // Medium character in bottom right corner
+      return 'absolute bottom-0 right-0 z-10';
+    } else {
+      // Small character in corner
+      return 'absolute bottom-0 right-0 z-10';
+    }
+  };
+
+  const getTextContainerClass = () => {
+    const size = config.overlayImageSize || 25;
+    if (config.overlayImage && size > 60) {
+      // Large character - text takes left half
+      return 'relative z-20 h-full flex flex-col text-left px-3 sm:px-4 w-1/2';
+    } else if (config.overlayImage && size > 40) {
+      // Medium character - text in upper area
+      return 'relative z-20 h-3/5 flex flex-col text-center px-3 sm:px-4 w-full';
+    } else {
+      // Default full width text
+      return 'relative z-20 h-full flex flex-col text-center px-3 sm:px-4';
+    }
+  };
+
   const backgroundStyle = getBackgroundStyle();
   const containerStyle = {
     ...backgroundStyle,
@@ -222,7 +266,7 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/30" />
         <div className="absolute inset-0 bg-gradient-to-br from-transparent via-black/20 to-black/40" />
         
-        {/* Character Integration Layer - helps blend character with background */}
+        {/* Character Integration Layer */}
         {config.overlayImage && (
           <div className="absolute bottom-0 right-0 w-full h-full">
             <div 
@@ -234,121 +278,112 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
           </div>
         )}
 
-        {/* Enhanced Overlay Image with Better Integration */}
+        {/* Enhanced Character Overlay with Smart Positioning */}
         {config.overlayImage && (
-          <div className="absolute bottom-0 right-0 z-10">
+          <div className={getCharacterPosition()}>
             <div 
               className="relative transition-all duration-500"
               style={getOverlayImageSize()}
             >
-              {/* Character Ground Shadow - makes character feel grounded */}
+              {/* Character Ground Shadow */}
               <div 
-                className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-3/4 h-4 opacity-40 rounded-full blur-md"
+                className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-3/4 h-4 opacity-60 rounded-full blur-md"
                 style={{
-                  background: `radial-gradient(ellipse, rgba(0,0,0,0.8) 0%, transparent 70%)`,
+                  background: `radial-gradient(ellipse, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 50%, transparent 100%)`,
                 }}
               />
 
               {/* Enhanced Character Background Integration */}
               <div 
-                className="absolute -inset-8 rounded-full opacity-20 animate-pulse"
+                className="absolute -inset-8 rounded-full opacity-25 animate-pulse"
                 style={{
-                  background: `radial-gradient(ellipse at center, ${config.accentColor}40 0%, ${config.accentColor}20 50%, transparent 80%)`,
+                  background: `radial-gradient(ellipse at center, ${config.accentColor}50 0%, ${config.accentColor}25 40%, transparent 80%)`,
                   animation: 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite'
                 }}
               />
               
-              {/* Atmospheric Lighting Effect */}
+              {/* Character Spotlight Effect */}
               <div 
-                className="absolute -inset-12 opacity-15"
+                className="absolute -inset-16 opacity-20"
                 style={{
-                  background: `conic-gradient(from 45deg at center, transparent 0deg, ${config.accentColor}30 90deg, transparent 180deg, ${config.accentColor}20 270deg, transparent 360deg)`,
+                  background: `conic-gradient(from 45deg at center, transparent 0deg, ${config.accentColor}40 60deg, transparent 120deg, ${config.accentColor}30 180deg, transparent 240deg, ${config.accentColor}40 300deg, transparent 360deg)`,
                   borderRadius: '50%',
-                  animation: 'spin 12s linear infinite'
+                  animation: 'spin 15s linear infinite'
                 }}
               />
               
-              {/* Character Color Matching Overlay */}
+              {/* Character Color Harmony Layer */}
               <div 
-                className="absolute inset-0 rounded-xl opacity-10 mix-blend-overlay"
+                className="absolute inset-0 rounded-xl opacity-15 mix-blend-soft-light"
                 style={{
-                  background: `linear-gradient(135deg, ${config.accentColor}60 0%, transparent 50%, ${config.textColor}40 100%)`
+                  background: `linear-gradient(135deg, ${config.accentColor}70 0%, transparent 60%, ${config.textColor}50 100%)`
                 }}
               />
 
-              {/* Main Character Image with Enhanced Integration */}
+              {/* Main Character Image with Enhanced Effects */}
               <img 
                 src={config.overlayImage} 
                 alt="Character" 
                 className="w-full h-full object-contain relative z-10"
                 style={{
                   filter: config.glowEffect ? 
-                    `drop-shadow(0 0 30px ${config.accentColor}60) drop-shadow(0 0 60px ${config.accentColor}30) drop-shadow(0 12px 25px rgba(0,0,0,0.7)) contrast(1.1) saturate(1.2) brightness(1.05) hue-rotate(5deg)` : 
-                    'drop-shadow(0 8px 20px rgba(0,0,0,0.5)) contrast(1.05) saturate(1.1) brightness(1.02)',
+                    `drop-shadow(0 0 40px ${config.accentColor}70) drop-shadow(0 0 80px ${config.accentColor}40) drop-shadow(0 15px 35px rgba(0,0,0,0.8)) contrast(1.15) saturate(1.25) brightness(1.08)` : 
+                    'drop-shadow(0 10px 25px rgba(0,0,0,0.6)) contrast(1.08) saturate(1.15) brightness(1.05)',
                   objectFit: 'contain'
                 }}
                 onLoad={() => console.log('Overlay image loaded successfully')}
                 onError={() => console.error('Failed to load overlay image')}
               />
 
-              {/* NO DAMAGE Badge - positioned near character */}
-              <div className="absolute top-6 left-6 z-20">
+              {/* NO DAMAGE Badge - Enhanced and More Prominent */}
+              <div className="absolute top-4 left-4 z-20">
                 <div className="relative">
-                  {/* Badge Background Glow */}
+                  {/* Badge Background Glow - More Intense */}
                   <div 
-                    className="absolute -inset-2 rounded-full opacity-60 animate-pulse blur-sm"
+                    className="absolute -inset-3 rounded-2xl opacity-80 animate-pulse blur-md"
                     style={{
-                      background: `radial-gradient(circle, #ff0000 0%, #ff6600 50%, transparent 100%)`,
+                      background: `radial-gradient(circle, #ff0000 0%, #ff3300 30%, #ff6600 60%, transparent 100%)`,
                     }}
                   />
                   
-                  {/* Main Badge */}
-                  <div className="relative bg-gradient-to-r from-red-600 via-red-500 to-orange-500 text-white px-4 py-2 rounded-full border-3 border-white/80 shadow-2xl backdrop-blur-sm">
-                    <div className="flex items-center space-x-2">
+                  {/* Main Badge - Larger and More Prominent */}
+                  <div className="relative bg-gradient-to-r from-red-600 via-red-500 to-orange-500 text-white px-5 py-3 rounded-2xl border-3 border-white/90 shadow-2xl backdrop-blur-md">
+                    <div className="flex items-center space-x-3">
                       <div className="w-3 h-3 bg-white rounded-full animate-pulse shadow-lg"></div>
-                      <span className="font-black text-sm tracking-wider drop-shadow-lg">NO DAMAGE</span>
+                      <span className="font-black text-base tracking-wider drop-shadow-lg">NO DAMAGE</span>
                     </div>
                   </div>
                   
-                  {/* Badge Shine Effect */}
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse" style={{animationDelay: '1s'}} />
+                  {/* Badge Shine Effect - More Visible */}
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-white/40 to-transparent animate-pulse" style={{animationDelay: '1s'}} />
                 </div>
               </div>
               
-              {/* Enhanced Character Stats Badge */}
-              <div className="absolute bottom-6 left-6 bg-gradient-to-r from-black/90 to-black/70 text-white text-sm px-4 py-2 rounded-full border-2 border-white/40 backdrop-blur-sm shadow-xl">
+              {/* Character Stats Badge - Repositioned */}
+              <div className="absolute bottom-4 left-4 bg-gradient-to-r from-black/95 to-black/80 text-white text-sm px-4 py-2 rounded-2xl border-2 border-white/50 backdrop-blur-md shadow-xl">
                 <span className="font-bold text-cyan-400">{config.overlayImageSize || 25}%</span>
-                <span className="text-white/60 ml-2">SIZE</span>
+                <span className="text-white/70 ml-2">SIZE</span>
               </div>
               
-              {/* Character Class Badge */}
-              <div className="absolute bottom-6 right-6 bg-gradient-to-r from-purple-600/90 to-blue-600/90 text-white text-sm px-4 py-2 rounded-full border-2 border-white/40 backdrop-blur-sm shadow-xl">
-                <span className="font-semibold">★ HEAVY</span>
+              {/* Character Class Badge - Enhanced */}
+              <div className="absolute bottom-4 right-4 bg-gradient-to-r from-purple-600/95 to-blue-600/95 text-white text-sm px-4 py-2 rounded-2xl border-2 border-white/50 backdrop-blur-md shadow-xl">
+                <span className="font-bold">⭐ HEAVY</span>
               </div>
 
-              {/* Enhanced Character Highlight Effects */}
+              {/* Enhanced Character Frame Effect */}
               <div 
-                className="absolute -inset-1 rounded-xl border-2 opacity-50 animate-pulse"
+                className="absolute -inset-2 rounded-2xl border-2 opacity-60 animate-pulse"
                 style={{
                   borderColor: config.accentColor,
-                  boxShadow: `0 0 25px ${config.accentColor}50, inset 0 0 25px ${config.accentColor}15`
-                }}
-              />
-
-              {/* Animated Energy Rings */}
-              <div 
-                className="absolute -inset-8 rounded-full border border-white/15 opacity-25"
-                style={{
-                  animation: 'spin 10s linear infinite',
-                  background: `conic-gradient(from 0deg, transparent 0deg, ${config.accentColor}15 60deg, transparent 120deg, ${config.accentColor}10 180deg, transparent 240deg, ${config.accentColor}20 300deg, transparent 360deg)`
+                  boxShadow: `0 0 30px ${config.accentColor}60, inset 0 0 30px ${config.accentColor}20`
                 }}
               />
             </div>
           </div>
         )}
 
-        {/* Content Container */}
-        <div className={`relative z-20 h-full flex flex-col text-center px-3 sm:px-4 ${config.animatedText ? 'animate-pulse' : ''}`}>
+        {/* Smart Text Container */}
+        <div className={`${getTextContainerClass()} ${config.animatedText ? 'animate-pulse' : ''}`}>
           {/* Enhanced Text Background */}
           {config.textBackground && (
             <div 
@@ -361,7 +396,7 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
             />
           )}
 
-          {/* Main Text */}
+          {/* Main Text with Smart Sizing */}
           <h1 
             className={`font-black uppercase leading-tight transition-all duration-300 ${getFontSize().main} relative z-10 max-w-full break-words`}
             style={{ 
@@ -369,12 +404,12 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
               fontFamily: getFontFamily(),
               fontWeight: '900',
               textShadow: config.textShadow ? 
-                `3px 3px 6px rgba(0,0,0,0.9), 0 0 25px ${config.accentColor}60, 0 0 50px ${config.accentColor}40, 1px 1px 0px ${config.accentColor}80` : 
-                '3px 3px 6px rgba(0,0,0,0.9), 1px 1px 0px rgba(0,0,0,0.5)',
-              WebkitTextStroke: config.textOutline ? `2px ${config.accentColor}` : 'none',
+                `4px 4px 8px rgba(0,0,0,0.95), 0 0 30px ${config.accentColor}70, 0 0 60px ${config.accentColor}50, 2px 2px 0px ${config.accentColor}90` : 
+                '4px 4px 8px rgba(0,0,0,0.95), 2px 2px 0px rgba(0,0,0,0.6)',
+              WebkitTextStroke: config.textOutline ? `3px ${config.accentColor}` : 'none',
               filter: config.glowEffect ? 
-                `drop-shadow(0 0 25px ${config.accentColor}60) drop-shadow(0 0 50px ${config.accentColor}35) contrast(1.1)` : 
-                'contrast(1.05)',
+                `drop-shadow(0 0 30px ${config.accentColor}70) drop-shadow(0 0 60px ${config.accentColor}40) contrast(1.15)` : 
+                'contrast(1.08)',
               letterSpacing: getLetterSpacing(),
               lineHeight: getLineHeight(),
               opacity: config.textOpacity / 100,
@@ -391,7 +426,7 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
             {config.mainText}
           </h1>
 
-          {/* Sub Text */}
+          {/* Sub Text with Enhanced Styling */}
           {config.subText && (
             <p 
               className={`font-bold uppercase tracking-wide opacity-90 mt-2 transition-all duration-300 ${getFontSize().sub} relative z-10 max-w-full break-words`}
@@ -400,10 +435,10 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
                 fontFamily: getFontFamily(),
                 fontWeight: '700',
                 textShadow: config.textShadow ? 
-                  `2px 2px 4px rgba(0,0,0,0.9), 0 0 20px ${config.accentColor}50, 1px 1px 0px ${config.accentColor}60` : 
-                  '2px 2px 4px rgba(0,0,0,0.9)',
+                  `3px 3px 6px rgba(0,0,0,0.95), 0 0 25px ${config.accentColor}60, 2px 2px 0px ${config.accentColor}70` : 
+                  '3px 3px 6px rgba(0,0,0,0.95)',
                 filter: config.glowEffect ? 
-                  `drop-shadow(0 0 20px ${config.accentColor}50) contrast(1.05)` : 
+                  `drop-shadow(0 0 25px ${config.accentColor}60) contrast(1.1)` : 
                   'contrast(1.05)',
                 letterSpacing: getLetterSpacing(),
                 opacity: (config.textOpacity / 100) * 0.9,
