@@ -173,7 +173,7 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
 
   const getOverlayImageSize = () => {
     const baseSize = config.overlayImageSize || 25;
-    const clampedSize = Math.max(10, Math.min(50, baseSize));
+    const clampedSize = Math.max(10, Math.min(80, baseSize)); // Increased max size to 80%
     console.log('Overlay image size calculation:', { baseSize, clampedSize });
     return {
       width: `${clampedSize}%`,
@@ -194,51 +194,80 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
         className={`relative w-full aspect-video rounded-xl overflow-hidden border transition-all duration-500 ${config.borderGlow ? 'border-white/20 shadow-xl' : 'border-white/10'} ${getTextPosition()}`}
         style={containerStyle}
       >
-        {/* Particles Background */}
+        {/* Enhanced Particles Background */}
         {config.showParticles && (
-          <div className="absolute inset-0 opacity-20">
-            {[...Array(25)].map((_, i) => (
+          <div className="absolute inset-0 opacity-25">
+            {[...Array(40)].map((_, i) => (
               <div
                 key={i}
                 className="absolute rounded-full animate-pulse"
                 style={{
                   left: `${Math.random() * 100}%`,
                   top: `${Math.random() * 100}%`,
-                  width: `${Math.random() * 3 + 1}px`,
-                  height: `${Math.random() * 3 + 1}px`,
-                  backgroundColor: i % 3 === 0 ? config.accentColor : i % 3 === 1 ? '#ffffff40' : '#ffdd0040',
-                  animationDelay: `${Math.random() * 3}s`,
-                  animationDuration: `${2 + Math.random() * 3}s`
+                  width: `${Math.random() * 4 + 1}px`,
+                  height: `${Math.random() * 4 + 1}px`,
+                  backgroundColor: i % 4 === 0 ? config.accentColor : 
+                                 i % 4 === 1 ? '#ffffff40' : 
+                                 i % 4 === 2 ? '#ffdd0040' : '#ff006040',
+                  animationDelay: `${Math.random() * 4}s`,
+                  animationDuration: `${2 + Math.random() * 4}s`
                 }}
               />
             ))}
           </div>
         )}
 
-        {/* Background Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/15" />
+        {/* Enhanced Background Overlay with Multiple Layers */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-black/10 to-transparent" />
 
-        {/* Overlay Image - Enhanced sizing */}
+        {/* Enhanced Overlay Image with Multiple Effects */}
         {config.overlayImage && (
           <div className="absolute bottom-4 right-4 z-10">
             <div 
-              className="relative rounded-lg overflow-hidden border border-white/20 shadow-xl transition-all duration-300"
+              className="relative rounded-xl overflow-hidden border-2 border-white/30 shadow-2xl transition-all duration-500 hover:scale-105 backdrop-blur-sm bg-white/5"
               style={getOverlayImageSize()}
             >
+              {/* Character Background Glow */}
+              <div 
+                className="absolute inset-0 rounded-xl opacity-20 animate-pulse"
+                style={{
+                  background: `radial-gradient(circle at center, ${config.accentColor}40 0%, transparent 70%)`
+                }}
+              />
+              
+              {/* Main Character Image */}
               <img 
                 src={config.overlayImage} 
                 alt="Character" 
-                className="w-full h-full object-contain"
+                className="w-full h-full object-contain relative z-10"
                 style={{
-                  filter: config.glowEffect ? `drop-shadow(0 0 15px ${config.accentColor}40) contrast(1.05) saturate(1.1)` : 'contrast(1.05) saturate(1.1)',
+                  filter: config.glowEffect ? 
+                    `drop-shadow(0 0 20px ${config.accentColor}60) drop-shadow(0 0 40px ${config.accentColor}30) contrast(1.1) saturate(1.2) brightness(1.05)` : 
+                    'contrast(1.1) saturate(1.15) brightness(1.05)',
                   objectFit: 'contain'
                 }}
                 onLoad={() => console.log('Overlay image loaded successfully')}
                 onError={() => console.error('Failed to load overlay image')}
               />
-              {/* Visual indicator for size adjustment */}
-              <div className="absolute top-1 left-1 bg-black/50 text-white text-xs px-1 rounded">
-                {config.overlayImageSize || 25}%
+              
+              {/* Character Frame Effects */}
+              <div className="absolute inset-0 rounded-xl border border-white/20 shadow-inner" />
+              <div 
+                className="absolute -inset-1 rounded-xl opacity-30 animate-pulse"
+                style={{
+                  background: `linear-gradient(45deg, transparent 30%, ${config.accentColor}20 50%, transparent 70%)`
+                }}
+              />
+              
+              {/* Enhanced Size Indicator */}
+              <div className="absolute top-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded-full border border-white/20 backdrop-blur-sm">
+                <span className="font-semibold">{config.overlayImageSize || 25}%</span>
+              </div>
+              
+              {/* Character Info Badge */}
+              <div className="absolute bottom-2 left-2 bg-gradient-to-r from-black/80 to-transparent text-white text-xs px-2 py-1 rounded-full border border-white/20 backdrop-blur-sm">
+                <span className="font-medium">Character</span>
               </div>
             </div>
           </div>
@@ -246,13 +275,14 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
 
         {/* Content Container */}
         <div className={`relative z-20 h-full flex flex-col text-center px-3 sm:px-4 ${config.animatedText ? 'animate-pulse' : ''}`}>
-          {/* Text Background */}
+          {/* Enhanced Text Background */}
           {config.textBackground && (
             <div 
-              className="absolute inset-2 rounded-lg backdrop-blur-sm"
+              className="absolute inset-2 rounded-xl backdrop-blur-md border border-white/10"
               style={{
                 backgroundColor: config.textBackgroundColor,
-                opacity: config.textBackgroundOpacity / 100
+                opacity: config.textBackgroundOpacity / 100,
+                boxShadow: `inset 0 0 20px rgba(255,255,255,0.1)`
               }}
             />
           )}
@@ -265,12 +295,12 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
               fontFamily: getFontFamily(),
               fontWeight: '900',
               textShadow: config.textShadow ? 
-                `1px 1px 2px rgba(0,0,0,0.8), 0 0 15px ${config.accentColor}40` : 
-                '1px 1px 2px rgba(0,0,0,0.8)',
-              WebkitTextStroke: config.textOutline ? `0.5px ${config.accentColor}` : 'none',
+                `2px 2px 4px rgba(0,0,0,0.9), 0 0 20px ${config.accentColor}50, 0 0 40px ${config.accentColor}30` : 
+                '2px 2px 4px rgba(0,0,0,0.9)',
+              WebkitTextStroke: config.textOutline ? `1px ${config.accentColor}` : 'none',
               filter: config.glowEffect ? 
-                `drop-shadow(0 0 15px ${config.accentColor}40) contrast(1.02)` : 
-                'contrast(1.02)',
+                `drop-shadow(0 0 20px ${config.accentColor}50) drop-shadow(0 0 40px ${config.accentColor}25) contrast(1.05)` : 
+                'contrast(1.05)',
               letterSpacing: getLetterSpacing(),
               lineHeight: getLineHeight(),
               opacity: config.textOpacity / 100,
@@ -290,19 +320,19 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
           {/* Sub Text */}
           {config.subText && (
             <p 
-              className={`font-bold uppercase tracking-wide opacity-85 mt-1 transition-all duration-300 ${getFontSize().sub} relative z-10 max-w-full break-words`}
+              className={`font-bold uppercase tracking-wide opacity-90 mt-2 transition-all duration-300 ${getFontSize().sub} relative z-10 max-w-full break-words`}
               style={{ 
                 color: config.gradientText ? 'transparent' : config.accentColor,
                 fontFamily: getFontFamily(),
                 fontWeight: '700',
                 textShadow: config.textShadow ? 
-                  `1px 1px 2px rgba(0,0,0,0.8), 0 0 10px ${config.accentColor}30` : 
-                  '1px 1px 2px rgba(0,0,0,0.8)',
+                  `1px 1px 3px rgba(0,0,0,0.9), 0 0 15px ${config.accentColor}40` : 
+                  '1px 1px 3px rgba(0,0,0,0.9)',
                 filter: config.glowEffect ? 
-                  `drop-shadow(0 0 10px ${config.accentColor}30) contrast(1.02)` : 
-                  'contrast(1.02)',
+                  `drop-shadow(0 0 15px ${config.accentColor}40) contrast(1.05)` : 
+                  'contrast(1.05)',
                 letterSpacing: getLetterSpacing(),
-                opacity: (config.textOpacity / 100) * 0.85,
+                opacity: (config.textOpacity / 100) * 0.9,
                 background: config.gradientText ? 
                   `linear-gradient(45deg, ${config.accentColor}, ${config.textColor}, ${config.accentColor})` : 
                   'none',
@@ -317,65 +347,85 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
           )}
         </div>
 
-        {/* Decorative Elements */}
-        <div className="absolute top-2 right-2 flex space-x-1">
-          {[...Array(3)].map((_, i) => (
+        {/* Enhanced Decorative Elements */}
+        <div className="absolute top-3 right-3 flex space-x-2">
+          {[...Array(4)].map((_, i) => (
             <div 
               key={i}
-              className="w-1.5 h-1.5 rounded-full animate-pulse"
+              className="w-2 h-2 rounded-full animate-pulse border border-white/20"
               style={{ 
                 backgroundColor: config.accentColor,
-                animationDelay: `${i * 0.3}s`,
-                opacity: 0.6
+                animationDelay: `${i * 0.4}s`,
+                opacity: 0.7,
+                boxShadow: `0 0 8px ${config.accentColor}40`
               }}
             />
           ))}
         </div>
         
-        <div className="absolute bottom-2 left-2">
+        <div className="absolute bottom-3 left-3 flex space-x-1">
           <div 
-            className="w-8 h-0.5 rounded-full animate-pulse"
+            className="w-12 h-1 rounded-full animate-pulse border-t border-white/20"
             style={{ 
               backgroundColor: config.accentColor,
-              opacity: 0.5
+              opacity: 0.6,
+              boxShadow: `0 0 10px ${config.accentColor}30`
             }}
           />
-        </div>
-
-        {/* Corner Accents */}
-        <div className="absolute top-0 left-0 w-12 h-12">
           <div 
-            className="w-full h-full rounded-br-xl opacity-10"
+            className="w-6 h-1 rounded-full animate-pulse"
             style={{ 
-              background: `linear-gradient(135deg, ${config.accentColor} 0%, transparent 100%)`
+              backgroundColor: config.accentColor,
+              opacity: 0.4,
+              animationDelay: '0.5s'
             }}
           />
         </div>
 
-        <div className="absolute bottom-0 right-0 w-10 h-10">
+        {/* Enhanced Corner Accents */}
+        <div className="absolute top-0 left-0 w-16 h-16">
           <div 
-            className="w-full h-full rounded-tl-xl opacity-8"
+            className="w-full h-full rounded-br-2xl opacity-15 border-r border-b border-white/10"
             style={{ 
-              background: `linear-gradient(315deg, ${config.accentColor} 0%, transparent 100%)`
+              background: `linear-gradient(135deg, ${config.accentColor} 0%, ${config.accentColor}50 50%, transparent 100%)`
             }}
           />
         </div>
 
-        {/* Subtle Grid Pattern */}
+        <div className="absolute bottom-0 right-0 w-14 h-14">
+          <div 
+            className="w-full h-full rounded-tl-2xl opacity-12 border-l border-t border-white/10"
+            style={{ 
+              background: `linear-gradient(315deg, ${config.accentColor} 0%, ${config.accentColor}40 50%, transparent 100%)`
+            }}
+          />
+        </div>
+
+        {/* Enhanced Grid Pattern */}
         <div 
-          className="absolute inset-0 opacity-3"
+          className="absolute inset-0 opacity-5"
           style={{
-            backgroundImage: `linear-gradient(${config.accentColor}20 1px, transparent 1px), linear-gradient(90deg, ${config.accentColor}20 1px, transparent 1px)`,
-            backgroundSize: '30px 30px'
+            backgroundImage: `linear-gradient(${config.accentColor}30 1px, transparent 1px), linear-gradient(90deg, ${config.accentColor}30 1px, transparent 1px)`,
+            backgroundSize: '25px 25px'
           }}
         />
+
+        {/* Additional Atmospheric Effects */}
+        <div className="absolute top-1/4 left-1/4 w-32 h-32 rounded-full opacity-5 animate-pulse" 
+             style={{ background: `radial-gradient(circle, ${config.accentColor}40 0%, transparent 70%)` }} />
+        <div className="absolute bottom-1/3 right-1/3 w-24 h-24 rounded-full opacity-4 animate-pulse" 
+             style={{ background: `radial-gradient(circle, ${config.textColor}30 0%, transparent 70%)`, animationDelay: '1s' }} />
       </div>
 
-      {/* Dimensions Label */}
-      <div className="text-center mt-3">
-        <p className="text-white/50 text-sm">
-          <span className="text-cyan-400 font-medium">YouTube Thumbnail</span> • 1280×720 • HD Ready
-        </p>
+      {/* Enhanced Dimensions Label */}
+      <div className="text-center mt-4">
+        <div className="inline-flex items-center space-x-3 bg-white/5 backdrop-blur-sm rounded-full px-4 py-2 border border-white/10">
+          <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+          <p className="text-white/70 text-sm font-medium">
+            <span className="text-cyan-400 font-semibold">YouTube Thumbnail</span> • 1280×720 • HD Ready
+          </p>
+          <div className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" style={{animationDelay: '0.5s'}}></div>
+        </div>
       </div>
     </div>
   );
