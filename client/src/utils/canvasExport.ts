@@ -5,6 +5,7 @@ import {
   getCharacterPosition,
   CharacterRenderOptions 
 } from './characterRenderer';
+import { Filesystem, Directory } from '@capacitor/filesystem';
 
 interface ThumbnailConfig {
   mainText: string;
@@ -37,6 +38,10 @@ interface ThumbnailConfig {
   characterVerticalOffset?: number;
   characterBlendMode?: string;
   characterRemoveBackground?: boolean;
+}
+
+function isNativeAndroid() {
+  return !!(window as any).Capacitor && (window as any).Capacitor.getPlatform && (window as any).Capacitor.getPlatform() === 'android';
 }
 
 export const exportThumbnail = async (config: ThumbnailConfig): Promise<void> => {
@@ -81,12 +86,46 @@ export const exportThumbnail = async (config: ThumbnailConfig): Promise<void> =>
     return `finals-${mainTextClean}-${timestamp}.png`;
   };
 
-  canvas.toBlob((blob) => {
-    if (blob) {
+  canvas.toBlob(async (blob) => {
+    if (!blob) return;
+    const filename = generateFilename(config);
+
+    if (isNativeAndroid()) {
+      // Request storage permission at runtime
+      const permResult = await Filesystem.requestPermissions();
+      if (permResult.publicStorage !== 'granted') {
+        alert('Permission to write to storage was denied.');
+        return;
+      }
+      // Convert blob to base64
+      const arrayBuffer = await blob.arrayBuffer();
+      const uint8Array = new Uint8Array(arrayBuffer);
+      const base64 = btoa(String.fromCharCode(...Array.from(uint8Array)));
+      try {
+        await Filesystem.writeFile({
+          path: filename,
+          data: base64,
+          directory: Directory.External, // Changed from Directory.Documents to Directory.External for better accessibility
+        });
+        alert('Image saved to External directory! You can access it with a file manager.');
+        // If you want to save to a truly public folder like "Pictures" or "Downloads",
+        // you will need to use a plugin such as @awesome-cordova-plugins/file or write a custom Capacitor plugin
+        // to interact with Android's MediaStore. Capacitor's Filesystem API does not support this directly.
+      } catch (err) {
+        let errorMsg = '';
+        if (err && typeof err === 'object' && 'message' in err) {
+          errorMsg = (err as any).message;
+        } else {
+          errorMsg = JSON.stringify(err);
+        }
+        alert('Failed to save image: ' + errorMsg);
+      }
+    } else {
+      // Web fallback
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = generateFilename(config);
+      a.download = filename;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

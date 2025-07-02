@@ -1,0 +1,5 @@
+package com.thumnail.rubin;
+
+import com.getcapacitor.BridgeActivity;
+
+public class MainActivity extends BridgeActivity {}
