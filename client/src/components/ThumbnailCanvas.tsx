@@ -31,6 +31,9 @@ interface ThumbnailConfig {
   characterVerticalOffset?: number;
   characterBlendMode?: string;
   characterRemoveBackground?: boolean;
+  logoWatermark: boolean;
+  logoImage: string | null;
+  logoOpacity?: number;
 }
 
 interface ThumbnailCanvasProps {
@@ -236,14 +239,8 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
   };
 
   const getNoDamageBadgePosition = () => {
-    const size = config.overlayImageSize || 25;
-    if (size >= 70) {
-      return 'absolute top-8 left-8 z-30';
-    } else if (size >= 40) {
-      return 'absolute top-6 right-6 z-30';
-    } else {
-      return 'absolute top-4 right-4 z-30';
-    }
+    // Always top left, with extra margin
+    return 'absolute top-10 left-10 z-30';
   };
 
   const backgroundStyle = getBackgroundStyle();
@@ -399,21 +396,21 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
                 <div className="relative">
                   {/* Smart Badge Background Glow */}
                   <div 
-                    className="absolute -inset-3 rounded-xl opacity-70 blur-md animate-pulse"
+                    className="absolute -inset-1 rounded-xl opacity-40 blur-sm animate-pulse"
                     style={{
-                      background: `radial-gradient(circle, ${config.accentColor} 0%, ${config.textColor}50 40%, transparent 80%)`,
+                      background: `radial-gradient(circle, ${config.accentColor}80 0%, ${config.textColor}30 40%, transparent 80%)`,
                       animation: 'pulse 3s ease-in-out infinite'
                     }}
                   />
                   
                   {/* Main Badge with Dynamic Colors */}
                   <div 
-                    className="relative text-white px-3 py-2 rounded-xl border-2 shadow-xl backdrop-blur-sm transform transition-all duration-300"
+                    className="relative text-white px-2 py-1 rounded-xl border shadow-md backdrop-blur-sm transform transition-all duration-300"
                     style={{ 
-                      transform: `scale(${Math.max(0.8, Math.min(1.2, (config.overlayImageSize || 25) / 60))})`,
-                      background: `linear-gradient(135deg, ${config.accentColor} 0%, ${config.textColor}80 100%)`,
+                      transform: `scale(0.75)`,
+                      background: `linear-gradient(135deg, ${config.accentColor}80 0%, ${config.textColor}30 100%)`,
                       borderColor: config.textColor,
-                      boxShadow: `0 0 20px ${config.accentColor}60, 0 0 40px ${config.accentColor}30`
+                      boxShadow: `0 0 10px ${config.accentColor}40, 0 0 20px ${config.accentColor}20`
                     }}
                   >
                     <div className="flex items-center space-x-2">
@@ -422,7 +419,7 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
                       
                       {/* Badge Text */}
                       <span className="font-black text-sm tracking-wide drop-shadow-md uppercase">
-                        NO DAMAGE
+                        OHNE SCHADEN
                       </span>
                       
                       {/* Dynamic Icon */}
@@ -617,6 +614,22 @@ const ThumbnailCanvas = ({ config }: ThumbnailCanvasProps) => {
           className="absolute top-1/2 left-1/2 w-24 h-24 rounded-full opacity-4 animate-pulse" 
           style={{ background: `radial-gradient(circle, #ffffff30 0%, transparent 70%)`, animationDelay: '2s' }} 
         />
+
+        {/* Logo Watermark Preview (matches export logic) */}
+        {config.logoWatermark && config.logoImage && !config.overlayImage && (
+          <div
+            className="absolute bottom-6 right-6 z-40"
+            style={{ width: '10%', minWidth: 64, maxWidth: 120, aspectRatio: '1/1', opacity: (config.logoOpacity ?? 80) / 100 }}
+          >
+            <div style={{ width: '100%', height: '100%', borderRadius: '50%', overflow: 'hidden', background: 'rgba(0,0,0,0.05)', boxShadow: '0 2px 12px rgba(0,0,0,0.18)' }}>
+              <img
+                src={config.logoImage || '/lovable-uploads/6aaa02a3-b77f-45ec-9397-781371f3e09b.png'}
+                alt="Logo Watermark"
+                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="text-center mt-4">

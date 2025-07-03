@@ -38,6 +38,11 @@ interface ThumbnailConfig {
   characterVerticalOffset?: number;
   characterBlendMode?: string;
   characterRemoveBackground?: boolean;
+  showCharacterShadow: boolean;
+  logoWatermark: boolean;
+  logoImage: string | null;
+  logoPosition: string;
+  logoOpacity: number;
 }
 
 function isNativeAndroid() {
@@ -65,7 +70,7 @@ export const exportThumbnail = async (config: ThumbnailConfig): Promise<void> =>
   // Draw overlay image if present with proper sizing
   let characterBounds = null;
   if (config.overlayImage) {
-    characterBounds = await drawOverlayImage(ctx, canvas, config.overlayImage, config.overlayImageSize || 25, config);
+    characterBounds = await drawOverlayImage(ctx, canvas, config.overlayImage, config.overlayImageSize || 25, config, config.showCharacterShadow);
   }
   
   // Draw text with smart positioning based on character presence and bounds
@@ -74,6 +79,11 @@ export const exportThumbnail = async (config: ThumbnailConfig): Promise<void> =>
   // Draw border glow
   if (config.borderGlow) {
     drawBorderGlow(ctx, canvas, config.accentColor);
+  }
+  
+  // If config.logoWatermark is set, draw the logo image in the selected corner with the specified opacity
+  if (config.logoWatermark && config.logoImage && !config.overlayImage) {
+    await drawLogo(ctx, canvas, config.logoImage, config.logoPosition, config.logoOpacity);
   }
   
   // Export canvas as image
@@ -102,11 +112,11 @@ export const exportThumbnail = async (config: ThumbnailConfig): Promise<void> =>
       const uint8Array = new Uint8Array(arrayBuffer);
       const base64 = btoa(String.fromCharCode(...Array.from(uint8Array)));
       try {
-        await Filesystem.writeFile({
-          path: filename,
-          data: base64,
+      await Filesystem.writeFile({
+        path: filename,
+        data: base64,
           directory: Directory.External, // Changed from Directory.Documents to Directory.External for better accessibility
-        });
+      });
         alert('Image saved to External directory! You can access it with a file manager.');
         // If you want to save to a truly public folder like "Pictures" or "Downloads",
         // you will need to use a plugin such as @awesome-cordova-plugins/file or write a custom Capacitor plugin
@@ -214,7 +224,7 @@ const removeGreenBlueBackground = (imageData: ImageData): ImageData => {
   return imageData;
 };
 
-const drawOverlayImage = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, imageSrc: string, sizePercentage: number, config: ThumbnailConfig) => {
+const drawOverlayImage = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, imageSrc: string, sizePercentage: number, config: ThumbnailConfig, showCharacterShadow: boolean) => {
   try {
     // Create character render options based on config
     const renderOptions: CharacterRenderOptions = {
@@ -258,7 +268,7 @@ const drawOverlayImage = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanva
     );
     
     // Draw ground shadow first (under character)
-    if (sizePercentage > 15) {
+    if (showCharacterShadow && sizePercentage > 15) {
       ctx.save();
       ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
       ctx.beginPath();
@@ -310,11 +320,6 @@ const drawOverlayImage = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanva
       ctx.restore();
     }
     
-    // Draw NO DAMAGE badge with better positioning
-    if (sizePercentage > 10) {
-      drawNoDamageBadge(ctx, x, y, sizePercentage, width, height);
-    }
-    
     // Return character bounds for text positioning
     return { x, y, width, height };
     
@@ -337,80 +342,6 @@ const drawOverlayImage = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanva
     ctx.drawImage(img, x, y, width, height);
     return { x, y, width, height };
   }
-};
-
-const drawNoDamageBadge = (ctx: CanvasRenderingContext2D, characterX: number, characterY: number, size: number, characterWidth: number, characterHeight: number) => {
-  // Larger badge scaling
-  const badgeScale = Math.max(1.0, Math.min(1.6, size / 50));
-  const badgeWidth = 120 * badgeScale;
-  const badgeHeight = 32 * badgeScale;
-  
-  // Position badge to avoid overlapping with text area
-  let badgeX, badgeY;
-  
-  if (size >= 70) {
-    // Large character - position badge in top right of character
-    badgeX = characterX + characterWidth - badgeWidth - 10;
-    badgeY = characterY + 15;
-  } else if (size >= 40) {
-    // Medium character - position above character
-    badgeX = characterX + characterWidth * 0.7;
-    badgeY = characterY + 10;
-  } else {
-    // Small character - position safely
-    badgeX = characterX + characterWidth * 0.6;
-    badgeY = characterY + 10;
-  }
-  
-  // Ensure badge stays within character area
-  badgeX = Math.min(badgeX, characterX + characterWidth - badgeWidth - 5);
-  badgeX = Math.max(badgeX, characterX + 5);
-  badgeY = Math.max(badgeY, characterY + 5);
-  
-  // Badge background glow
-  ctx.shadowColor = '#ff0000';
-  ctx.shadowBlur = 20 * badgeScale;
-  ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
-  ctx.beginPath();
-  ctx.roundRect(badgeX - 8, badgeY - 8, badgeWidth + 16, badgeHeight + 16, 25);
-  ctx.fill();
-  
-  // Main badge background
-  const badgeGradient = ctx.createLinearGradient(badgeX, badgeY, badgeX + badgeWidth, badgeY);
-  badgeGradient.addColorStop(0, '#dc2626');
-  badgeGradient.addColorStop(0.5, '#ef4444');
-  badgeGradient.addColorStop(1, '#f97316');
-  ctx.fillStyle = badgeGradient;
-  ctx.beginPath();
-  ctx.roundRect(badgeX, badgeY, badgeWidth, badgeHeight, 18);
-  ctx.fill();
-  
-  // Badge border
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
-  ctx.lineWidth = 4 * badgeScale;
-  ctx.beginPath();
-  ctx.roundRect(badgeX, badgeY, badgeWidth, badgeHeight, 18);
-  ctx.stroke();
-  
-  // Badge text
-  ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
-  ctx.shadowBlur = 3 * badgeScale;
-  ctx.fillStyle = 'white';
-  ctx.font = `bold ${14 * badgeScale}px Impact, Arial Black, sans-serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  
-  // Draw indicator dot
-  ctx.beginPath();
-  ctx.arc(badgeX + 18 * badgeScale, badgeY + badgeHeight/2, 5 * badgeScale, 0, Math.PI * 2);
-  ctx.fill();
-  
-  // Draw badge text
-  ctx.fillText('NO DAMAGE', badgeX + badgeWidth/2 + 12 * badgeScale, badgeY + badgeHeight/2);
-  
-  // Reset shadow
-  ctx.shadowColor = 'transparent';
-  ctx.shadowBlur = 0;
 };
 
 const drawParticles = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, accentColor: string) => {
@@ -445,20 +376,20 @@ const drawText = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, conf
     const characterSize = config.overlayImageSize || 25;
     
     if (characterSize >= 70) {
-      // Large character - text confined to left 40% of canvas
-      textX = 60;
+      // Large character - text uses left 55% of canvas, more centered
+      textX = canvas.width * 0.3;
       textY = canvas.height * 0.35;
-      maxTextWidth = canvas.width * 0.35; // Only use 35% of width
+      maxTextWidth = canvas.width * 0.55;
     } else if (characterSize >= 40) {
-      // Medium character - text in upper left area
-      textX = 60;
+      // Medium character - text uses left 65% of canvas
+      textX = canvas.width * 0.35;
       textY = canvas.height * 0.25;
-      maxTextWidth = canvas.width * 0.45; // Use 45% of width
+      maxTextWidth = canvas.width * 0.65;
     } else {
-      // Small character - more space but still safe
-      textX = 60;
+      // Small character - text uses left 75% of canvas
+      textX = canvas.width * 0.4;
       textY = canvas.height * 0.4;
-      maxTextWidth = canvas.width * 0.55; // Use 55% of width
+      maxTextWidth = canvas.width * 0.75;
     }
   } else {
     // No character - use selected position with full width
@@ -504,21 +435,12 @@ const drawText = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, conf
   
   // Draw main text with better spacing and word wrapping
   ctx.font = `900 ${fontSize}px ${fontFamily}`;
-  
   if (config.textShadow) {
     ctx.shadowColor = config.accentColor;
     ctx.shadowBlur = 20;
     ctx.shadowOffsetX = 3;
     ctx.shadowOffsetY = 3;
   }
-  
-  // Text outline
-  if (config.textOutline) {
-    ctx.strokeStyle = config.accentColor;
-    ctx.lineWidth = 6;
-    ctx.strokeText(config.mainText.toUpperCase(), textX, textY - subFontSize/2);
-  }
-  
   // Text fill with opacity and gradient
   if (config.gradientText) {
     const gradient = ctx.createLinearGradient(textX - 200, textY, textX + 200, textY);
@@ -529,18 +451,14 @@ const drawText = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, conf
   } else {
     ctx.fillStyle = config.textColor;
   }
-  
   ctx.globalAlpha = config.textOpacity / 100;
-  
   // Word wrapping for long text with stricter width limits
   const words = config.mainText.toUpperCase().split(' ');
   const lines = [];
   let currentLine = '';
-  
   for (const word of words) {
     const testLine = currentLine ? `${currentLine} ${word}` : word;
     const metrics = ctx.measureText(testLine);
-    
     if (metrics.width > maxTextWidth && currentLine) {
       lines.push(currentLine);
       currentLine = word;
@@ -549,29 +467,18 @@ const drawText = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, conf
     }
   }
   if (currentLine) lines.push(currentLine);
-  
   // Draw text lines with proper spacing
   const lineHeight = fontSize * 1.1;
   const totalHeight = lines.length * lineHeight;
   let startY = textY - totalHeight / 2 + lineHeight / 2;
-  
   lines.forEach((line, index) => {
     const lineY = startY + index * lineHeight;
     ctx.fillText(line, textX, lineY);
   });
-  
   ctx.globalAlpha = 1.0;
-  
   // Draw sub text with improved spacing
   if (config.subText) {
     ctx.font = `700 ${subFontSize}px ${fontFamily}`;
-    
-    if (config.textOutline) {
-      ctx.strokeStyle = config.accentColor;
-      ctx.lineWidth = 3;
-      ctx.strokeText(config.subText.toUpperCase(), textX, startY + lines.length * lineHeight + subFontSize);
-    }
-    
     if (config.gradientText) {
       const gradient = ctx.createLinearGradient(textX - 150, textY, textX + 150, textY);
       gradient.addColorStop(0, config.accentColor);
@@ -581,17 +488,14 @@ const drawText = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, conf
     } else {
       ctx.fillStyle = config.accentColor;
     }
-    
     ctx.globalAlpha = (config.textOpacity / 100) * 0.85;
     ctx.fillText(config.subText.toUpperCase(), textX, startY + lines.length * lineHeight + subFontSize);
     ctx.globalAlpha = 1.0;
   }
-  
   // Restore rotation
   if (config.textRotation !== 0) {
     ctx.restore();
   }
-  
   // Reset shadow
   ctx.shadowColor = 'transparent';
   ctx.shadowBlur = 0;
@@ -644,21 +548,73 @@ const getGradientForPreset = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasE
 
 const getFontSizeForCanvas = (size: string): number => {
   const sizes: Record<string, number> = {
-    small: 75,
-    medium: 90,
-    large: 105,
-    xlarge: 120
+    small: 48,
+    medium: 64,
+    large: 80,
+    xlarge: 96
   };
-  return sizes[size] || 90;
+  return sizes[size] || 64;
 };
 
 const getFontFamilyForCanvas = (font: string): string => {
   const fonts: Record<string, string> = {
+    'saira-condensed': 'Saira Condensed, Arial, sans-serif',
+    'saira-extracondensed': 'Saira ExtraCondensed, Arial, sans-serif',
     'arial': 'Arial, sans-serif',
     'impact': 'Impact, Arial Black, sans-serif',
     'bebas': 'Bebas Neue, Impact, sans-serif',
     'oswald': 'Oswald, Impact, sans-serif',
     'roboto': 'Roboto, Arial, sans-serif'
   };
-  return fonts[font] || 'Impact, Arial Black, sans-serif';
+  return fonts[font?.toLowerCase()] || 'Saira Condensed, Saira ExtraCondensed, Arial, sans-serif';
+};
+
+const drawLogo = async (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, logoImage: string, position: string, opacity: number) => {
+  try {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    await new Promise((resolve, reject) => {
+      img.onload = resolve;
+      img.onerror = reject;
+      img.src = logoImage;
+    });
+    
+    const width = canvas.width * 0.2;
+    const height = (width / img.width) * img.height;
+    
+    let x = 0;
+    let y = 0;
+    
+    switch (position) {
+      case 'top-left':
+        x = 0;
+        y = 0;
+        break;
+      case 'top-right':
+        x = canvas.width - width;
+        y = 0;
+        break;
+      case 'bottom-left':
+        x = 0;
+        y = canvas.height - height;
+        break;
+      case 'bottom-right':
+        x = canvas.width - width;
+        y = canvas.height - height;
+        break;
+    }
+    
+    ctx.save();
+    ctx.globalAlpha = opacity;
+    // Draw circular mask
+    ctx.beginPath();
+    ctx.arc(x + width / 2, y + width / 2, width / 2, 0, Math.PI * 2, false);
+    ctx.closePath();
+    ctx.clip();
+    ctx.drawImage(img, x, y, width, width); // force square for circle
+    ctx.globalAlpha = 1.0;
+    ctx.restore();
+  } catch (error) {
+    console.error('Error drawing logo:', error);
+  }
 };

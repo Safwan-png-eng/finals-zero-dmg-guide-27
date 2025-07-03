@@ -12,8 +12,8 @@ import { useToast } from '@/hooks/use-toast';
 const Index = () => {
   const { toast } = useToast();
   const [thumbnailConfig, setThumbnailConfig] = useState({
-    mainText: 'CAN I WIN WITHOUT DAMAGE?',
-    subText: 'THE FINALS CHALLENGE',
+    mainText: 'KANN ICH GEWINNEN, OHNE JEMANDEN ZU VERLETZEN?',
+    subText: '',
     backgroundPreset: 'las-vegas',
     textColor: '#ffffff',
     accentColor: '#FFD700',
@@ -29,7 +29,7 @@ const Index = () => {
     characterRemoveBackground: false,
     textShadow: true,
     borderGlow: false,
-    textOutline: false,
+    textOutline: true,
     textRotation: 0,
     textOpacity: 100,
     animatedText: false,
@@ -39,7 +39,12 @@ const Index = () => {
     lineHeight: 'normal',
     textBackground: false,
     textBackgroundColor: '#000000',
-    textBackgroundOpacity: 50
+    textBackgroundOpacity: 50,
+    showCharacterShadow: true,
+    logoWatermark: true,
+    logoImage: '/lovable-uploads/6aaa02a3-b77f-45ec-9397-781371f3e09b.png',
+    logoPosition: 'bottom-right',
+    logoOpacity: 80,
   });
 
   const [isExporting, setIsExporting] = useState(false);
@@ -155,8 +160,8 @@ const Index = () => {
   // NEW FEATURE 10: Reset to Default
   const resetToDefault = () => {
     setThumbnailConfig({
-      mainText: 'CAN I WIN WITHOUT DAMAGE?',
-      subText: 'THE FINALS CHALLENGE',
+      mainText: 'KANN ICH GEWINNEN, OHNE JEMANDEN ZU VERLETZEN?',
+      subText: '',
       backgroundPreset: 'las-vegas',
       textColor: '#ffffff',
       accentColor: '#FFD700',
@@ -172,7 +177,7 @@ const Index = () => {
       characterRemoveBackground: false,
       textShadow: true,
       borderGlow: false,
-      textOutline: false,
+      textOutline: true,
       textRotation: 0,
       textOpacity: 100,
       animatedText: false,
@@ -182,7 +187,12 @@ const Index = () => {
       lineHeight: 'normal',
       textBackground: false,
       textBackgroundColor: '#000000',
-      textBackgroundOpacity: 50
+      textBackgroundOpacity: 50,
+      showCharacterShadow: true,
+      logoWatermark: true,
+      logoImage: '/lovable-uploads/6aaa02a3-b77f-45ec-9397-781371f3e09b.png',
+      logoPosition: 'bottom-right',
+      logoOpacity: 80,
     });
     toast({
       title: "Reset Complete!",
@@ -193,7 +203,14 @@ const Index = () => {
   const handleExport = async () => {
     setIsExporting(true);
     try {
-      await exportThumbnail(thumbnailConfig);
+      const configToExport = {
+        ...thumbnailConfig,
+        logoImage:
+          thumbnailConfig.logoWatermark && !thumbnailConfig.logoImage
+            ? '/lovable-uploads/6aaa02a3-b77f-45ec-9397-781371f3e09b.png'
+            : thumbnailConfig.logoImage,
+      };
+      await exportThumbnail(configToExport);
       toast({
         title: "Success!",
         description: "Thumbnail exported successfully",

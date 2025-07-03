@@ -61,10 +61,10 @@ const ControlPanel = ({ config, onConfigChange }: ControlPanelProps) => {
       const reader = new FileReader();
       reader.onload = (e) => {
         const result = e.target?.result as string;
-        onConfigChange('backgroundImage', result);
+        onConfigChange('logoImage', result);
         toast({
-          title: "Background Updated!",
-          description: "Custom background image has been applied",
+          title: "Logo Updated!",
+          description: "Custom logo image has been applied",
         });
       };
       reader.readAsDataURL(file);
@@ -189,6 +189,8 @@ const ControlPanel = ({ config, onConfigChange }: ControlPanelProps) => {
             <SelectValue />
           </SelectTrigger>
           <SelectContent className="bg-slate-800 border-white/20">
+            <SelectItem value="saira-condensed" className="text-white">Saira Condensed (Brand)</SelectItem>
+            <SelectItem value="saira-extracondensed" className="text-white">Saira ExtraCondensed (Brand)</SelectItem>
             <SelectItem value="impact" className="text-white">Impact (Bold)</SelectItem>
             <SelectItem value="arial" className="text-white">Arial (Clean)</SelectItem>
             <SelectItem value="bebas" className="text-white">Bebas Neue (Modern)</SelectItem>
@@ -443,7 +445,17 @@ const ControlPanel = ({ config, onConfigChange }: ControlPanelProps) => {
             )}
           </div>
           
-
+          {/* Character Shadow Toggle */}
+          <div className="flex items-center justify-between bg-white/5 p-3 rounded-lg mt-2">
+            <div>
+              <Label className="text-white text-sm font-medium">Character Shadow</Label>
+              <p className="text-white/60 text-xs">Show or hide the shadow under the character</p>
+            </div>
+            <Switch
+              checked={config.showCharacterShadow || false}
+              onCheckedChange={(checked) => onConfigChange('showCharacterShadow', checked)}
+            />
+          </div>
         </div>
       )}
 
@@ -633,6 +645,100 @@ const ControlPanel = ({ config, onConfigChange }: ControlPanelProps) => {
             />
           </div>
         </div>
+      </div>
+
+      {/* Logo Watermark Section */}
+      <div className="space-y-3">
+        <Label className="text-white mb-3 block font-medium">Logo Watermark</Label>
+        <div className="grid grid-cols-2 gap-2">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
+            className="hidden"
+          />
+          <Button
+            onClick={() => fileInputRef.current?.click()}
+            variant="secondary"
+            className="bg-white/10 hover:bg-white/20 text-white border-white/20 rounded-lg"
+          >
+            <Upload className="w-4 h-4 mr-2" />
+            Upload Logo
+          </Button>
+          <Button
+            onClick={handleRemoveBackground}
+            disabled={!config.overlayImage || isRemovingBackground}
+            variant="secondary"
+            className="bg-gradient-to-r from-cyan-500/20 to-purple-500/20 hover:from-cyan-500/30 hover:to-purple-500/30 text-white border-cyan-300/20 disabled:opacity-50 rounded-lg"
+          >
+            {isRemovingBackground ? (
+              <Sparkles className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <Scissors className="w-4 h-4 mr-2" />
+            )}
+            Remove BG
+          </Button>
+        </div>
+        
+        {config.overlayImage && (
+          <div className="relative">
+            <img 
+              src={config.overlayImage} 
+              alt="Overlay preview" 
+              className="w-full h-24 object-contain rounded-lg border border-white/20 bg-gradient-to-b from-slate-700 to-slate-800"
+            />
+            <Button
+              onClick={removeOverlayImage}
+              size="sm"
+              variant="destructive"
+              className="absolute top-1 right-1 h-6 w-6 p-0 rounded-full"
+            >
+              <X className="w-3 h-3" />
+            </Button>
+          </div>
+        )}
+      </div>
+
+      {/* Logo Position */}
+      <div className="space-y-3">
+        <Label className="text-white mb-3 block font-medium">Logo Position</Label>
+        <div className="grid grid-cols-3 gap-2">
+          {[
+            { pos: 'bottom-left', label: 'Bottom Left' },
+            { pos: 'bottom-center', label: 'Bottom Center' },
+            { pos: 'bottom-right', label: 'Bottom Right' },
+            { pos: 'center-left', label: 'Center Left' },
+            { pos: 'full-center', label: 'Center' },
+            { pos: 'center-right', label: 'Center Right' }
+          ].map((position) => (
+            <Button
+              key={position.pos}
+              onClick={() => onConfigChange('logoPosition', position.pos)}
+              variant="outline"
+              className={`text-xs p-2 ${
+                (config.logoPosition || 'bottom-right') === position.pos 
+                  ? 'bg-cyan-400/20 border-cyan-400 text-cyan-400' 
+                  : 'bg-white/5 border-white/20 text-white hover:bg-white/10'
+              }`}
+            >
+              {position.label}
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      {/* Logo Opacity */}
+      <div className="space-y-3">
+        <Label className="text-white mb-2 block font-medium">Logo Opacity</Label>
+        <Slider
+          value={[config.logoOpacity || 100]}
+          onValueChange={(value) => onConfigChange('logoOpacity', value[0])}
+          max={100}
+          min={0}
+          step={5}
+          className="w-full"
+        />
       </div>
     </div>
   );
